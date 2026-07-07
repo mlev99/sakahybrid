@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SLS Monitor V4.3 - Stable</title>
+    <title>SLS Monitor V4.4</title>
     <style>
         :root {
             --bg-color: #0b1120;
@@ -26,20 +26,17 @@
             padding-bottom: calc(var(--nav-height) + 30px); 
             min-height: 100vh; 
             line-height: 1.6; 
-            overflow-x: hidden; /* Mencegah scroll horizontal */
+            overflow-x: hidden;
         }
 
         .container { max-width: 800px; margin: 0 auto; padding: 20px; display: flex; flex-direction: column; gap: 20px; }
         
-        /* Header */
         .header { text-align: center; padding: 15px 0; border-bottom: 1px solid var(--border); margin-bottom: 10px; }
         .header h1 { font-size: 1.4rem; font-weight: 700; letter-spacing: -0.5px; }
         .header p { color: var(--text-muted); font-size: 0.85rem; margin-top: 4px; }
 
-        /* Form Section - FIXED GRID LAYOUT */
         .form-section { background: var(--card-bg); border-radius: 16px; padding: 15px; border: 1px solid var(--border); }
         
-        /* Grid Input Mobile Friendly */
         .input-grid { 
             display: grid; 
             grid-template-columns: 50px repeat(5, 1fr); 
@@ -49,48 +46,20 @@
             margin-bottom: 10px;
         }
         
-        .input-header { 
-            color: var(--text-muted); 
-            font-weight: 600; 
-            text-align: center; 
-            padding-bottom: 8px; 
-            border-bottom: 1px solid var(--border); 
-            font-size: 0.7rem;
-        }
-        
-        .sls-code { 
-            font-weight: bold; 
-            color: var(--accent-blue); 
-            text-align: left; 
-            padding-left: 2px;
-            font-size: 0.8rem;
-        }
+        .input-header { color: var(--text-muted); font-weight: 600; text-align: center; padding-bottom: 8px; border-bottom: 1px solid var(--border); font-size: 0.7rem; }
+        .sls-code { font-weight: bold; color: var(--accent-blue); text-align: left; padding-left: 2px; font-size: 0.8rem; }
         
         input[type="number"] {
-            background: #0f172a; 
-            border: 1px solid var(--border); 
-            color: white;
-            padding: 10px 2px; 
-            border-radius: 8px; 
-            width: 100%; 
-            text-align: center; 
-            font-size: 0.9rem; 
-            transition: all 0.2s;
-            -moz-appearance: textfield; /* Hilangkan spinner Firefox */
+            background: #0f172a; border: 1px solid var(--border); color: white;
+            padding: 10px 2px; border-radius: 8px; width: 100%; text-align: center; 
+            font-size: 0.9rem; transition: all 0.2s;
+            -moz-appearance: textfield;
         }
         input[type="number"]::-webkit-outer-spin-button,
-        input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; } /* Hilangkan spinner Chrome */
-        
+        input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
         input[type="number"]:focus { outline: none; border-color: var(--accent-blue); background: #172033; }
 
-        .draft-row { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            padding: 15px 5px; 
-            border-top: 1px solid var(--border); 
-            margin-top: 10px; 
-        }
+        .draft-row { display: flex; justify-content: space-between; align-items: center; padding: 15px 5px; border-top: 1px solid var(--border); margin-top: 10px; }
         .draft-label { font-weight: bold; font-size: 0.9rem; }
         .draft-input-wrap { width: 100px; }
 
@@ -98,20 +67,17 @@
             background: linear-gradient(135deg, var(--accent-blue), #2563eb); 
             color: white; border: none; padding: 16px; border-radius: 12px; 
             font-weight: 700; cursor: pointer; width: 100%; font-size: 1rem;
-            transition: all 0.3s ease; margin-top: 15px; 
-            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.2);
+            transition: all 0.3s ease; margin-top: 15px; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.2);
         }
         .btn-analyze:active { transform: scale(0.98); }
         .btn-analyze:disabled { opacity: 0.7; cursor: wait; filter: grayscale(0.5); }
 
-        /* Analysis Results Animation */
         #analysis-container { display: none; animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
         @keyframes fadeUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
 
         .result-card { background: var(--card-bg); border-radius: 16px; padding: 20px; border: 1px solid var(--border); margin-bottom: 16px; }
         .result-title { font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 700; margin-bottom: 15px; }
 
-        /* Forecast & Metrics */
         .forecast-box { padding: 15px; border-radius: 10px; font-size: 0.9rem; font-weight: 500; margin-bottom: 10px; }
         .forecast-ok { background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); color: var(--accent-green); }
         .forecast-warn { background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); color: var(--accent-orange); }
@@ -122,7 +88,6 @@
         .metric-label { font-size: 0.8rem; color: var(--text-muted); }
         .metric-value { font-size: 1.1rem; font-weight: 700; }
 
-        /* Priority Accordion */
         .priority-list { display: flex; flex-direction: column; gap: 10px; }
         .priority-item { background: #0f172a; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
         .priority-header { padding: 15px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
@@ -143,7 +108,6 @@
         .toggle-icon { transition: transform 0.3s; font-size: 0.8rem; color: var(--text-muted); }
         .priority-item.expanded .toggle-icon { transform: rotate(180deg); }
 
-        /* Performance & AI Text */
         .perf-display { text-align: center; padding: 10px 0; }
         .grade-big { font-size: 3.5rem; font-weight: 800; line-height: 1; margin-bottom: 5px; }
         .progress-track { height: 8px; background: #334155; border-radius: 4px; overflow: hidden; margin-top: 10px; }
@@ -155,7 +119,6 @@
         .ai-warn { background: rgba(239, 68, 68, 0.15); color: #f87171; padding: 2px 6px; border-radius: 4px; font-weight: 600; }
         .ai-success { background: rgba(16, 185, 129, 0.15); color: #34d399; padding: 2px 6px; border-radius: 4px; font-weight: 600; }
 
-        /* Settings Page */
         #settings-page { display: none; padding: 20px; max-width: 600px; margin: 0 auto; }
         .setting-group { margin-bottom: 20px; }
         .setting-group label { display: block; color: var(--text-muted); margin-bottom: 8px; font-size: 0.9rem; }
@@ -165,7 +128,6 @@
         .btn-save { background: var(--accent-green); color: white; border: none; padding: 12px; border-radius: 10px; width: 100%; font-weight: 600; margin-top: 10px; }
         .btn-test { background: transparent; border: 1px solid var(--border); color: var(--text-muted); padding: 10px; border-radius: 10px; width: 100%; margin-top: 10px; font-size: 0.85rem; }
 
-        /* Bottom Nav */
         .bottom-nav {
             position: fixed; bottom: 0; left: 0; right: 0; height: var(--nav-height);
             background: rgba(11, 17, 32, 0.95); backdrop-filter: blur(12px);
@@ -182,7 +144,6 @@
 </head>
 <body>
 
-<!-- DASHBOARD PAGE -->
 <div id="dashboard-page" class="container">
     <div class="header">
         <h1>SLS PROGRESS MONITOR</h1>
@@ -190,31 +151,27 @@
     </div>
 
     <div class="form-section">
-        <!-- Grid Header -->
         <div class="input-grid">
-            <div class="input-header">Kode</div>
-            <div class="input-header">Open</div>
-            <div class="input-header">Sub</div>
-            <div class="input-header">Rej</div>
-            <div class="input-header">Pend</div>
-            <div class="input-header">App</div>
-            
-            <!-- Dynamic Rows Container -->
+            <div class="input-header">Kode</div><div class="input-header">Open</div><div class="input-header">Sub</div>
+            <div class="input-header">Rej</div><div class="input-header">Pend</div><div class="input-header">App</div>
             <div id="sls-inputs-container" style="display:contents"></div>
         </div>
 
         <div class="draft-row">
             <span class="draft-label">DRAFT TOTAL</span>
-            <div class="draft-input-wrap">
-                <input type="number" id="global-draft" value="27">
-            </div>
+            <div class="draft-input-wrap"><input type="number" id="global-draft" value="27"></div>
         </div>
 
         <button class="btn-analyze" id="btn-analyze" onclick="runAnalysis()">🧠 ANALISIS & SIMPAN SNAPSHOT</button>
     </div>
 
-    <!-- ANALYSIS RESULTS (Hidden by default) -->
     <div id="analysis-container">
+        <!-- TERMIN 1 ALERT -->
+        <div class="result-card" id="termin-alert-card" style="display:none;">
+            <div class="result-title">⚠️ STATUS TERMIN PEMBAYARAN 1</div>
+            <div id="termin-status"></div>
+        </div>
+
         <div class="result-card">
             <div class="result-title">🔮 FORECAST ENGINE (CLEARANCE)</div>
             <div id="forecast-status"></div>
@@ -222,25 +179,29 @@
         </div>
 
         <div class="result-card">
-            <div class="result-title">🎯 TARGET HARIAN REALISTIS</div>
+            <div class="result-title"> KOMPARASI & TARGET HARIAN</div>
             <div class="metrics-grid">
                 <div class="metric-item">
-                    <span class="metric-label">Ritme Saat Ini (Avg)</span>
-                    <span class="metric-value" id="curr-velocity">-</span>
+                    <span class="metric-label">% Dashboard FASIH</span>
+                    <span class="metric-value" id="comp-dash-persen" style="color:var(--accent-blue)">-</span>
                 </div>
                 <div class="metric-item">
-                    <span class="metric-label">Ritme Dibutuhkan</span>
-                    <span class="metric-value" id="req-velocity" style="color:var(--accent-orange)">-</span>
+                    <span class="metric-label">% Muatan Kontrak</span>
+                    <span class="metric-value" id="comp-muatan-persen" style="color:var(--accent-green)">-</span>
                 </div>
                 <div class="metric-item" style="grid-column: 1/-1; border-top:1px solid var(--border); padding-top:10px; margin-top:5px;">
-                    <span class="metric-label">Target 40% Minggu Ini</span>
-                    <span class="metric-value" id="weekly-target">-</span>
+                    <span class="metric-label">Ritme Saat Ini (Bulatkan)</span>
+                    <span class="metric-value" id="curr-velocity">-</span>
+                </div>
+                <div class="metric-item" style="grid-column: 1/-1;">
+                    <span class="metric-label">Ritme Dibutuhkan (Bulatkan)</span>
+                    <span class="metric-value" id="req-velocity" style="color:var(--accent-orange)">-</span>
                 </div>
             </div>
         </div>
 
         <div class="result-card">
-            <div class="result-title">⚡ PRIORITAS KERJA OPTIMAL</div>
+            <div class="result-title"> PRIORITAS KERJA OPTIMAL</div>
             <div class="priority-list" id="priority-list"></div>
         </div>
 
@@ -269,7 +230,6 @@
     </div>
 </div>
 
-<!-- SETTINGS PAGE -->
 <div id="settings-page">
     <div class="header">
         <h1>PENGATURAN AI HYBRID</h1>
@@ -292,37 +252,32 @@
             <div class="api-status" id="status-mistral"><span class="status-dot"></span> Belum dikonfigurasi</div>
         </div>
         <button class="btn-save" onclick="saveApiKeys()">💾 Simpan Konfigurasi</button>
-        <button class="btn-test" onclick="testAllApis()">🔍 Uji Koneksi Semua Provider</button>
+        <button class="btn-test" onclick="testAllApis()"> Uji Koneksi Semua Provider</button>
         <div id="test-results" style="margin-top:15px; font-size:0.85rem; color:var(--text-muted)"></div>
     </div>
 </div>
 
-<!-- BOTTOM NAVBAR -->
 <nav class="bottom-nav">
     <div class="nav-item active" onclick="switchPage('dashboard')">
-        <span class="nav-icon">📊</span>
-        <span>Dashboard</span>
+        <span class="nav-icon">📊</span><span>Dashboard</span>
     </div>
     <div class="nav-item" onclick="switchPage('settings')">
-        <span class="nav-icon">⚙️</span>
-        <span>Pengaturan</span>
+        <span class="nav-icon">️</span><span>Pengaturan</span>
     </div>
 </nav>
 
 <script>
-// ===============================
-// CONFIG & STATE
-// ===============================
 const CONFIG = {
     assessment: 696, muatan: 813,
     startDate: new Date("2026-06-15"), 
     absoluteDeadline: new Date("2026-08-30"),
-    safetyBufferDays: 4
+    safetyBufferDays: 4,
+    termin1TargetDate: new Date("2026-07-13") // Minggu ini (contoh: 13 Juli 2026)
 };
 const clearanceDate = new Date(CONFIG.absoluteDeadline);
 clearanceDate.setDate(clearanceDate.getDate() - CONFIG.safetyBufferDays);
 
-let state = JSON.parse(localStorage.getItem('sls_monitor_v4_3')) || {
+let state = JSON.parse(localStorage.getItem('sls_monitor_v4_4')) || {
     dashboard: { open: 496, draft: 27, submit: 35, reject: 0, pending: 0, approve: 166 },
     sls: [
         {kode:"0012",open:61,submit:0,reject:0,pending:0,approve:0},
@@ -339,9 +294,6 @@ let state = JSON.parse(localStorage.getItem('sls_monitor_v4_3')) || {
     apiKeys: { openai: '', gemini: '', mistral: '' }
 };
 
-// ===============================
-// HYBRID AI ORCHESTRATOR
-// ===============================
 class HybridAIOrchestrator {
     constructor(keys) {
         this.keys = keys;
@@ -365,12 +317,9 @@ class HybridAIOrchestrator {
             } catch (err) {
                 console.warn(`${provider.name} failed:`, err.message);
                 this.updateStatus(provider.name, 'error');
-                // Lanjut ke provider berikutnya jika error
                 continue;
             }
         }
-        
-        // Fallback jika semua gagal
         this.activeProvider = 'Deterministic Fallback';
         this.updateStatus('Fallback', 'active');
         return this.deterministicFallback();
@@ -379,7 +328,6 @@ class HybridAIOrchestrator {
     async callProvider(provider, prompt) {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 12000);
-
         let body, headers;
         if (provider.name === 'Gemini') {
             body = JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] });
@@ -388,17 +336,13 @@ class HybridAIOrchestrator {
             body = JSON.stringify({ model: provider.model, messages: [{ role: 'user', content: prompt }], temperature: 0.3, max_tokens: 500 });
             headers = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${provider.key}` };
         }
-
         const res = await fetch(provider.endpoint, { method: 'POST', headers, body, signal: controller.signal });
         clearTimeout(timeoutId);
-
         if (!res.ok) { 
             const errData = await res.json().catch(() => ({}));
             const err = new Error(errData.error?.message || `HTTP ${res.status}`);
-            err.status = res.status;
-            throw err; 
+            err.status = res.status; throw err; 
         }
-        
         const data = await res.json();
         if (provider.name === 'Gemini') return data.candidates?.[0]?.content?.parts?.[0]?.text || '';
         return data.choices?.[0]?.message?.content || '';
@@ -409,8 +353,7 @@ class HybridAIOrchestrator {
         let cleaned = text.replace(/\*\*(.*?)\*\*/g, '<span class="ai-highlight">$1</span>');
         cleaned = cleaned.replace(/\*(.*?)\*/g, '<em>$1</em>');
         cleaned = cleaned.split('\n\n').map(p => `<p>${p.trim()}</p>`).join('');
-        cleaned = cleaned.replace(/\n/g, '<br>');
-        return cleaned;
+        return cleaned.replace(/\n/g, '<br>');
     }
 
     deterministicFallback() {
@@ -421,9 +364,8 @@ class HybridAIOrchestrator {
         const currVel = getVelocity();
         const isOnTrack = currVel >= reqVel;
         const top3 = prioritasSLS().slice(0,3).map(s => `${s.kode} (${s.open} open)`).join(', ');
-        
         const statusTag = isOnTrack ? '<span class="ai-success">ON TRACK</span>' : '<span class="ai-warn">AT RISK</span>';
-        return `<p>${statusTag}: Ritme saat ini <strong>${currVel.toFixed(1)} data/hari</strong> ${isOnTrack ? 'memenuhi' : 'belum memenuhi'} target clearance.</p>
+        return `<p>${statusTag}: Ritme saat ini <strong>${currVel} data/hari</strong> ${isOnTrack ? 'memenuhi' : 'belum memenuhi'} target clearance.</p>
                 <p>Sisa data: <strong>${remaining}</strong>. Kebutuhan harian: <strong>${reqVel} data</strong>.</p>
                 <p>Fokus prioritas: <span class="ai-highlight">${top3}</span>.</p>`;
     }
@@ -435,12 +377,14 @@ class HybridAIOrchestrator {
     }
 }
 
-// ===============================
-// CORE LOGIC
-// ===============================
+// LOGIKA YANG DIPERBAIKI
 function getProgress() {
     const p = state.dashboard.submit + state.dashboard.approve;
-    return { val: p, dashP: (p/CONFIG.assessment)*100, muatanP: (p/CONFIG.muatan)*100 };
+    return { 
+        val: p, 
+        dashP: (p/CONFIG.assessment)*100, 
+        muatanP: (p/CONFIG.muatan)*100 
+    };
 }
 
 function getSisaHariKeClearance() {
@@ -456,11 +400,13 @@ function getVelocity() {
         const first = state.history[0].progress;
         const last = state.history[state.history.length-1].progress;
         const histDays = Math.max(1, state.history.length - 1);
-        return (last - first) / histDays;
+        // DIBULATKAN KE ATAS TANPA KOMA
+        return Math.ceil((last - first) / histDays);
     }
     
     const currentProg = getProgress().val;
-    return currentProg / elapsedDays;
+    // DIBULATKAN KE ATAS TANPA KOMA
+    return Math.ceil(currentProg / elapsedDays);
 }
 
 function prioritasSLS() {
@@ -487,47 +433,42 @@ function generateSLSDetail(slsItem, rank) {
     if(rank <= 3) strategy = `Prioritas utama. Fokuskan resource untuk menutup ${slsItem.open} item open tersisa.`;
     else if (slsItem.open > 80) strategy = `Volume open sangat tinggi (${slsItem.open}). Butuh delegasi agar tidak jadi bottleneck.`;
     else strategy = `Status: ${status}. Lakukan monitoring mingguan.`;
-    
     return `<strong>Kode:</strong> ${slsItem.kode} | <strong>Status:</strong> ${status}<br>
             <strong>Detail:</strong> Open: ${slsItem.open}, Submit: ${slsItem.submit}, Approve: ${slsItem.approve}<br><br>
             <strong>Strategi AI:</strong> ${strategy}`;
 }
 
-// ===============================
-// MAIN ACTION
-// ===============================
 async function runAnalysis() {
     const btn = document.getElementById('btn-analyze');
-    btn.disabled = true;
-    btn.innerText = ' Sedang Menganalisis...';
+    btn.disabled = true; btn.innerText = ' Sedang Menganalisis...';
 
     state.dashboard.draft = parseInt(document.getElementById('global-draft').value)||0;
-    
     const prog = getProgress();
     const perf = performanceGrade(prog.dashP);
+    
     const snapshot = {
         date: new Date().toLocaleDateString('id-ID'),
         progress: prog.val, dashP: prog.dashP,
         velocity: getVelocity(), grade: perf.g
     };
-    
     const lastHist = state.history[state.history.length-1];
     if(lastHist && lastHist.date === snapshot.date) state.history.pop();
     state.history.push(snapshot);
-    localStorage.setItem('sls_monitor_v4_3', JSON.stringify(state));
+    localStorage.setItem('sls_monitor_v4_4', JSON.stringify(state));
 
+    renderTerminAlert(prog); // Render alert termin baru
     renderForecast();
-    renderTargets();
+    renderTargetsAndComparison(prog); // Render komparasi baru
     renderPriorityAccordions();
     renderPerformance(prog, perf);
 
     const orchestrator = new HybridAIOrchestrator(state.apiKeys);
     const top3 = prioritasSLS().slice(0,3);
-    const aiPrompt = `Analisis progres SLS: Progress ${prog.val}/${CONFIG.assessment} (${prog.dashP.toFixed(2)}%). 
-    Velocity rata-rata sejak 15 Juni 2026: ${getVelocity().toFixed(1)} data/hari.
-    Sisa hari ke clearance: ${getSisaHariKeClearance()} hari.
+    const aiPrompt = `Analisis progres SLS: Progress Dashboard ${prog.dashP.toFixed(2)}%, Muatan ${prog.muatanP.toFixed(2)}%. 
+    Velocity rata-rata: ${getVelocity()} data/hari (bulat).
+    Status Termin 1 (Target 40%): ${prog.dashP >= 40 ? 'Tercapai' : 'Belum Tercapai'}.
     Top 3 SLS prioritas: ${top3.map(s=>`${s.kode} (${s.open} open)`).join(', ')}.
-    Berikan insight strategis singkat 2-3 paragraf. Highlight angka penting.`;
+    Berikan insight strategis singkat. Highlight jika termin 1 terancam.`;
     
     const insight = await orchestrator.generateInsight(aiPrompt);
     document.getElementById('ai-insights').innerHTML = insight;
@@ -536,13 +477,46 @@ async function runAnalysis() {
     container.style.display = 'block';
     setTimeout(()=>container.scrollIntoView({behavior:'smooth',block:'start'}),100);
 
-    btn.disabled = false;
-    btn.innerText = ' ANALISIS & SIMPAN SNAPSHOT';
+    btn.disabled = false; btn.innerText = ' ANALISIS & SIMPAN SNAPSHOT';
 }
 
-// ===============================
-// RENDER FUNCTIONS
-// ===============================
+// FUNGSI RENDER BARU UNTUK TERMIN
+function renderTerminAlert(prog) {
+    const card = document.getElementById('termin-alert-card');
+    const statusDiv = document.getElementById('termin-status');
+    const today = new Date();
+    const isPastDeadline = today > CONFIG.termin1TargetDate;
+    const isTargetMet = prog.dashP >= 40;
+
+    if (!isTargetMet) {
+        card.style.display = 'block';
+        if (isPastDeadline) {
+            statusDiv.innerHTML = `<div class="forecast-box forecast-crit">CRITICAL: Termin 1 BELUM tercapai (${prog.dashP.toFixed(2)}%) dan melewati batas waktu minggu ini. Segera percepat approval!</div>`;
+        } else {
+            const daysLeft = Math.ceil((CONFIG.termin1TargetDate - today)/(1000*60*60*24));
+            statusDiv.innerHTML = `<div class="forecast-box forecast-warn">WARNING: Termin 1 belum tercapai (${prog.dashP.toFixed(2)}%). Sisa waktu minggu ini: ${daysLeft} hari. Wajib selesai dalam minggu ini!</div>`;
+        }
+    } else {
+        card.style.display = 'none'; // Sembunyikan jika sudah aman
+    }
+}
+
+// FUNGSI RENDER KOMPARASI & TARGET
+function renderTargetsAndComparison(prog) {
+    // Komparasi Persentase
+    document.getElementById('comp-dash-persen').innerText = prog.dashP.toFixed(2) + '%';
+    document.getElementById('comp-muatan-persen').innerText = prog.muatanP.toFixed(2) + '%';
+
+    // Target Harian (Semua dibulatkan)
+    const sisaHari = getSisaHariKeClearance();
+    const remaining = CONFIG.assessment - prog.val;
+    const reqVel = Math.ceil(remaining/sisaHari);
+    const currVel = getVelocity();
+    
+    document.getElementById('curr-velocity').innerText = currVel + ' data/hari';
+    document.getElementById('req-velocity').innerText = reqVel + ' data/hari';
+}
+
 function renderForecast() {
     const prog = getProgress();
     const sisaHari = getSisaHariKeClearance();
@@ -557,39 +531,24 @@ function renderForecast() {
     
     let boxClass = isOnTrack ? 'forecast-ok' : (currVel >= reqVel * 0.7 ? 'forecast-warn' : 'forecast-crit');
     let text = isOnTrack ? `✅ ON TRACK: Clearance aman sebelum ${dateStr}` : 
-               (currVel >= reqVel * 0.7 ? `⚠️ WARNING: Margin tipis untuk clearance ${dateStr}` : ` CRITICAL: Tidak mencapai clearance ${dateStr}`);
+               (currVel >= reqVel * 0.7 ? `️ WARNING: Margin tipis untuk clearance ${dateStr}` : ` CRITICAL: Tidak mencapai clearance ${dateStr}`);
                
     statusDiv.innerHTML = `<div class="forecast-box ${boxClass}">${text}</div>`;
     
     if(isOnTrack) {
-        detailDiv.innerHTML = `Ritme <strong>${currVel.toFixed(1)} data/hari</strong> cukup. Buffer: <strong>${sisaHari - Math.ceil(remaining/currVel)} hari</strong>.`;
+        detailDiv.innerHTML = `Ritme <strong>${currVel} data/hari</strong> cukup. Buffer: <strong>${sisaHari - Math.ceil(remaining/currVel)} hari</strong>.`;
     } else {
-        detailDiv.innerHTML = `Kekurangan ritme: <strong>${(reqVel-currVel).toFixed(1)} data/hari</strong>. Estimasi terlambat <strong>${Math.ceil(remaining/Math.max(0.1,currVel))-sisaHari} hari</strong>.`;
+        detailDiv.innerHTML = `Kekurangan ritme: <strong>${(reqVel-currVel)} data/hari</strong>. Estimasi terlambat <strong>${Math.ceil(remaining/Math.max(1,currVel))-sisaHari} hari</strong>.`;
     }
-}
-
-function renderTargets() {
-    const prog = getProgress();
-    const sisaHari = getSisaHariKeClearance();
-    const remaining = CONFIG.assessment - prog.val;
-    const reqVel = Math.ceil(remaining/sisaHari);
-    const target40 = Math.ceil(CONFIG.assessment*0.40);
-    const kurang40 = Math.max(0, target40-prog.val);
-    
-    document.getElementById('curr-velocity').innerText = getVelocity().toFixed(1)+' data/hari';
-    document.getElementById('req-velocity').innerText = reqVel+' data/hari';
-    document.getElementById('weekly-target').innerText = kurang40>0?`${kurang40} data lagi`:'Sudah Tercapai ✅';
 }
 
 function renderPriorityAccordions() {
     const list = prioritasSLS();
     const container = document.getElementById('priority-list');
     container.innerHTML = '';
-    
     list.forEach((s,i)=>{
         let actionClass = s.persen===100?'action-done':s.prog>0?'action-lanjut':'action-mulai';
         let actionText = s.persen===100?'Selesai':s.prog>0?'Lanjutkan':'Mulai';
-        
         const item = document.createElement('div');
         item.className = 'priority-item';
         item.innerHTML = `
@@ -606,9 +565,7 @@ function renderPriorityAccordions() {
                     <span class="toggle-icon">▼</span>
                 </div>
             </div>
-            <div class="priority-detail">
-                <div class="detail-content">${generateSLSDetail(s, i+1)}</div>
-            </div>
+            <div class="priority-detail"><div class="detail-content">${generateSLSDetail(s, i+1)}</div></div>
         `;
         container.appendChild(item);
     });
@@ -629,9 +586,6 @@ function renderPerformance(prog, perf) {
     document.getElementById('dash-bar').style.width = Math.min(100,prog.dashP)+'%';
 }
 
-// ===============================
-// SETTINGS & NAV
-// ===============================
 function switchPage(page) {
     document.querySelectorAll('.nav-item').forEach(el=>el.classList.remove('active'));
     if(page==='dashboard') {
@@ -651,7 +605,7 @@ function saveApiKeys() {
     state.apiKeys.openai = document.getElementById('api-openai').value.trim();
     state.apiKeys.gemini = document.getElementById('api-gemini').value.trim();
     state.apiKeys.mistral = document.getElementById('api-mistral').value.trim();
-    localStorage.setItem('sls_monitor_v4_3', JSON.stringify(state));
+    localStorage.setItem('sls_monitor_v4_4', JSON.stringify(state));
     updateApiStatusUI();
     alert('Konfigurasi API berhasil disimpan!');
 }
@@ -677,13 +631,11 @@ async function testAllApis() {
     const resultsDiv = document.getElementById('test-results');
     resultsDiv.innerHTML = '🔄 Menguji koneksi...';
     let output = '';
-    
     const tests = [
         {name:'OpenAI', key:state.apiKeys.openai, url:'https://api.openai.com/v1/models', auth:`Bearer ${state.apiKeys.openai}`},
         {name:'Gemini', key:state.apiKeys.gemini, url:`https://generativelanguage.googleapis.com/v1beta/models?key=${state.apiKeys.gemini}`, auth:null},
         {name:'Mistral', key:state.apiKeys.mistral, url:'https://api.mistral.ai/v1/models', auth:`Bearer ${state.apiKeys.mistral}`}
     ];
-    
     for(const t of tests) {
         if(!t.key) { output += `<div>❌ ${t.name}: API Key kosong</div>`; continue; }
         try {
@@ -691,23 +643,17 @@ async function testAllApis() {
             const res = await fetch(t.url, {headers, signal:AbortSignal.timeout(5000)});
             if(res.ok) output += `<div style="color:var(--accent-green)">✅ ${t.name}: Terhubung</div>`;
             else output += `<div style="color:var(--accent-red)">❌ ${t.name}: Gagal (${res.status})</div>`;
-        } catch(e) {
-            output += `<div style="color:var(--accent-red)"> ${t.name}: ${e.message}</div>`;
-        }
+        } catch(e) { output += `<div style="color:var(--accent-red)"> ${t.name}: ${e.message}</div>`; }
     }
     resultsDiv.innerHTML = output;
 }
 
-// ===============================
-// INIT
-// ===============================
 function initForm() {
     const container = document.getElementById('sls-inputs-container');
     container.innerHTML = '';
     state.sls.forEach((s,idx)=>{
         const row = document.createElement('div');
         row.className = 'input-row';
-        // Menggunakan style inline display:contents agar masuk grid parent
         row.style.display = 'contents'; 
         row.innerHTML = `
             <div class="sls-code">${s.kode}</div>
@@ -724,11 +670,7 @@ function initForm() {
 
 function updateSLS(idx, field, val) {
     const num = parseInt(val);
-    if (isNaN(num) || num < 0) {
-        state.sls[idx][field] = 0;
-        event.target.value = 0;
-        return;
-    }
+    if (isNaN(num) || num < 0) { state.sls[idx][field] = 0; event.target.value = 0; return; }
     state.sls[idx][field] = num;
 }
 
