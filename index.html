@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Saka Tracker V5.0 - Omni</title>
+    <title>Saka Tracker V5.1 - Official</title>
     <style>
         :root {
             --bg-color: #0b1120;
@@ -31,14 +31,13 @@
         .header h1 { font-size: 1.4rem; font-weight: 700; letter-spacing: -0.5px; }
         .header p { color: var(--text-muted); font-size: 0.85rem; margin-top: 4px; }
 
-        /* CONSISTENT INPUT STYLING */
+        /* FORM STYLING */
         .form-section { background: var(--card-bg); border-radius: 16px; padding: 20px; border: 1px solid var(--border); }
         
         .input-grid { display: grid; grid-template-columns: 50px repeat(5, 1fr); gap: 6px; align-items: center; font-size: 0.75rem; margin-bottom: 10px; }
         .input-header { color: var(--text-muted); font-weight: 600; text-align: center; padding-bottom: 8px; border-bottom: 1px solid var(--border); font-size: 0.7rem; }
         .sls-code { font-weight: bold; color: var(--accent-blue); text-align: left; padding-left: 2px; font-size: 0.8rem; }
         
-        /* Unified Input Style for ALL pages */
         input[type="number"], input[type="password"], input[type="text"] {
             background: #0f172a; border: 1px solid var(--border); color: white;
             padding: 12px; border-radius: 10px; width: 100%; text-align: center; 
@@ -51,7 +50,7 @@
         .draft-label { font-weight: bold; font-size: 0.9rem; }
         .draft-input-wrap { width: 100px; }
 
-        /* Buttons */
+        /* BUTTONS */
         .btn-primary {
             background: linear-gradient(135deg, var(--accent-blue), #2563eb); 
             color: white; border: none; padding: 16px; border-radius: 12px; 
@@ -60,9 +59,8 @@
         }
         .btn-success { background: var(--accent-green); color: white; border: none; padding: 14px; border-radius: 12px; width: 100%; font-weight: 600; margin-top: 10px; cursor: pointer;}
         .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text-muted); padding: 14px; border-radius: 12px; width: 100%; margin-top: 10px; font-size: 0.9rem; cursor: pointer;}
-        .btn-small { padding: 8px 16px; font-size: 0.8rem; border-radius: 8px; width: auto; display: inline-block; margin-right: 5px; margin-top: 5px;}
-
-        /* Analysis Cards */
+        
+        /* ANALYSIS CARDS */
         #analysis-container { display: none; animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
         @keyframes fadeUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
         .result-card { background: var(--card-bg); border-radius: 16px; padding: 20px; border: 1px solid var(--border); margin-bottom: 16px; }
@@ -78,7 +76,7 @@
         .metric-label { font-size: 0.8rem; color: var(--text-muted); }
         .metric-value { font-size: 1.1rem; font-weight: 700; }
 
-        /* Priority Accordion */
+        /* PRIORITY ACCORDION */
         .priority-list { display: flex; flex-direction: column; gap: 10px; }
         .priority-item { background: #0f172a; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
         .priority-header { padding: 15px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
@@ -107,19 +105,17 @@
         .ai-warn { background: rgba(239, 68, 68, 0.15); color: #f87171; padding: 2px 6px; border-radius: 4px; font-weight: 600; }
         .ai-success { background: rgba(16, 185, 129, 0.15); color: #34d399; padding: 2px 6px; border-radius: 4px; font-weight: 600; }
 
-        /* Settings & Data SLS Page Styling */
+        /* SETTINGS & INFO PAGE */
         .setting-group { margin-bottom: 20px; }
         .setting-group label { display: block; color: var(--text-muted); margin-bottom: 8px; font-size: 0.9rem; }
         .api-status { font-size: 0.8rem; margin-top: 6px; display: flex; align-items: center; gap: 6px; }
         .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border); }
         .status-dot.active { background: var(--accent-green); box-shadow: 0 0 8px var(--accent-green); }
 
-        .data-sls-row { display: grid; grid-template-columns: 60px 1fr 1fr 40px; gap: 10px; align-items: center; margin-bottom: 10px; padding: 10px; background: #0f172a; border-radius: 10px; border: 1px solid var(--border); }
-        .data-sls-row input { text-align: left; padding: 10px; }
-        .btn-delete { background: rgba(239, 68, 68, 0.1); color: var(--accent-red); border: none; width: 30px; height: 30px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center;}
-
-        /* Footer Info */
-        .app-footer { text-align: center; padding: 30px 20px; color: var(--text-muted); font-size: 0.8rem; border-top: 1px solid var(--border); margin-top: 20px; }
+        .app-info-box { 
+            background: #0f172a; border: 1px solid var(--border); border-radius: 12px; 
+            padding: 20px; margin-top: 30px; text-align: center; 
+        }
         .app-name { font-size: 1.1rem; font-weight: bold; color: var(--text-main); margin-bottom: 5px; }
         .dev-contact { margin: 15px 0; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
         .contact-btn { background: var(--card-bg); border: 1px solid var(--border); color: var(--text-main); padding: 8px 16px; border-radius: 20px; text-decoration: none; font-size: 0.8rem; display: flex; align-items: center; gap: 6px; transition: all 0.2s;}
@@ -127,14 +123,14 @@
         .legal-links { margin-top: 15px; display: flex; justify-content: center; gap: 15px; }
         .legal-btn { background: none; border: none; color: var(--text-muted); font-size: 0.75rem; cursor: pointer; text-decoration: underline; padding: 5px;}
 
-        /* Modal */
+        /* MODAL */
         .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); z-index: 2000; display: none; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(5px);}
         .modal-content { background: var(--card-bg); border-radius: 16px; padding: 25px; max-width: 500px; width: 100%; max-height: 80vh; overflow-y: auto; border: 1px solid var(--border); }
         .modal-title { font-size: 1.2rem; font-weight: bold; margin-bottom: 15px; color: var(--text-main); }
         .modal-body { font-size: 0.9rem; color: var(--text-muted); line-height: 1.6; white-space: pre-wrap; }
         .modal-close { margin-top: 20px; width: 100%; }
 
-        /* Bottom Nav */
+        /* BOTTOM NAV */
         .bottom-nav {
             position: fixed; bottom: 0; left: 0; right: 0; height: var(--nav-height);
             background: rgba(11, 17, 32, 0.95); backdrop-filter: blur(12px);
@@ -148,7 +144,7 @@
         .footer-status { font-size: 0.7rem; color: var(--text-muted); text-align: center; margin-top: 20px; padding-top: 15px; border-top: 1px solid var(--border); opacity: 0.7; }
         .provider-active { color: var(--accent-green); font-weight: 600; }
 
-        /* Hide pages by default */
+        /* PAGE VISIBILITY */
         .page { display: none; }
         .page.active { display: block; }
     </style>
@@ -174,7 +170,7 @@
             <div class="draft-input-wrap"><input type="number" id="global-draft" value="27"></div>
         </div>
 
-        <button class="btn-primary" id="btn-analyze" onclick="runAnalysis()"> ANALISIS & SIMPAN SNAPSHOT</button>
+        <button class="btn-primary" id="btn-analyze" onclick="runAnalysis()">🧠 ANALISIS & SIMPAN SNAPSHOT</button>
     </div>
 
     <div id="analysis-container">
@@ -217,7 +213,7 @@
         </div>
 
         <div class="result-card">
-            <div class="result-title"> PERFORMANCE & TREND</div>
+            <div class="result-title">📈 PERFORMANCE & TREND</div>
             <div class="perf-display">
                 <div class="grade-big" id="perf-grade">-</div>
                 <div class="grade-desc" id="perf-desc" style="color:var(--text-muted); font-size:0.9rem; margin-bottom:15px;">-</div>
@@ -239,26 +235,9 @@
             </div>
         </div>
     </div>
-    
-    <!-- APP FOOTER INFO -->
-    <div class="app-footer">
-        <div class="app-name">Saka Tracker v5.0.24 (Build 20260708)</div>
-        <div style="margin-bottom: 10px;">Aplikasi monitoring progres SLS berbasis Hybrid AI dengan tracking termin dan komparasi muatan kontrak.</div>
-        <div style="font-weight: bold; color: var(--text-main); margin-bottom: 5px;">Developed by Saka_Omni</div>
-        
-        <div class="dev-contact">
-            <a href="mailto:mlevian@protonmail.com" class="contact-btn">✉️ Email Developer</a>
-            <a href="https://wa.me/6285111330391" target="_blank" class="contact-btn">💬 WhatsApp Direct</a>
-        </div>
-
-        <div class="legal-links">
-            <button class="legal-btn" onclick="openModal('tos')">Terms of Service</button>
-            <button class="legal-btn" onclick="openModal('privacy')">Privacy Policy</button>
-        </div>
-    </div>
 </div>
 
-<!-- DATA SLS PAGE (NEW CRUD TAB) -->
+<!-- DATA SLS PAGE -->
 <div id="page-data" class="page container">
     <div class="header">
         <h1>MANAJEMEN DATA SLS</h1>
@@ -276,7 +255,7 @@
     </div>
 </div>
 
-<!-- SETTINGS PAGE -->
+<!-- SETTINGS PAGE (FIXED: INFO APP MOVED HERE) -->
 <div id="page-settings" class="page container">
     <div class="header">
         <h1>PENGATURAN AI HYBRID</h1>
@@ -300,15 +279,32 @@
         </div>
         
         <button class="btn-success" onclick="saveSettings()">💾 Simpan Konfigurasi API</button>
-        <button class="btn-outline" onclick="testAllApis()">🔍 Uji Koneksi Semua Provider</button>
+        <button class="btn-outline" onclick="testAllApis()"> Uji Koneksi Semua Provider</button>
         <div id="test-results" style="margin-top:15px; font-size:0.85rem; color:var(--text-muted)"></div>
 
         <div style="margin-top: 30px; border-top: 1px solid var(--border); padding-top: 20px;">
             <div class="result-title">BACKUP & RESTORE DATA</div>
-            <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 15px;">Unduh semua data SLS, history, dan API keys ke file JSON. Gunakan fitur restore untuk memulihkan data di perangkat lain.</p>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 15px;">Unduh semua data SLS, history, dan API keys ke file JSON.</p>
             <button class="btn-outline" onclick="backupData()">️ Export Backup (JSON)</button>
             <button class="btn-outline" onclick="document.getElementById('restore-file').click()">⬆️ Import Restore (JSON)</button>
             <input type="file" id="restore-file" accept=".json" style="display: none;" onchange="restoreData(this)">
+        </div>
+
+        <!-- APP INFO BOX (MOVED FROM DASHBOARD FOOTER) -->
+        <div class="app-info-box">
+            <div class="app-name">Saka Tracker v5.1.0 (Build 20260708)</div>
+            <div style="margin-bottom: 10px; font-size: 0.8rem;">Aplikasi monitoring progres SLS berbasis Hybrid AI dengan tracking termin dan komparasi muatan kontrak.</div>
+            <div style="font-weight: bold; color: var(--text-main); margin-bottom: 5px;">Developed by Saka_Omni</div>
+            
+            <div class="dev-contact">
+                <a href="mailto:mlevian@protonmail.com" class="contact-btn">✉️ Email Developer</a>
+                <a href="https://wa.me/6285111330391" target="_blank" class="contact-btn">💬 WhatsApp Direct</a>
+            </div>
+
+            <div class="legal-links">
+                <button class="legal-btn" onclick="openModal('tos')">Terms of Service</button>
+                <button class="legal-btn" onclick="openModal('privacy')">Privacy Policy</button>
+            </div>
         </div>
     </div>
 </div>
@@ -339,54 +335,49 @@
 // ===============================
 // CONFIG & STATE MANAGEMENT
 // ===============================
-const APP_VERSION = "5.0.24";
+const APP_VERSION = "5.1.0";
 const BUILD_DATE = "20260708";
 const CONFIG = {
     startDate: new Date("2026-06-15"), 
     absoluteDeadline: new Date("2026-08-30"),
-    safetyBufferDays: 4,
+    safetyBufferDays: 3, // Clearance 3 days before 30 Aug -> 27 Aug
     termin1TargetDate: new Date("2026-07-13")
 };
 const clearanceDate = new Date(CONFIG.absoluteDeadline);
 clearanceDate.setDate(clearanceDate.getDate() - CONFIG.safetyBufferDays);
 
-let state = JSON.parse(localStorage.getItem('saka_tracker_v5')) || {
-    // Default Config Targets (Will be overwritten by Data SLS if exists)
-    config: { assessment: 696, muatan: 813 },
-    dashboard: { open: 496, draft: 27, submit: 35, reject: 0, pending: 0, approve: 166 },
-    sls: [
-        {kode:"0012",open:61,submit:0,reject:0,pending:0,approve:0, muatan: 90},
-        {kode:"0013",open:44,submit:0,reject:0,pending:0,approve:0, muatan: 85},
-        {kode:"0014",open:48,submit:0,reject:0,pending:0,approve:0, muatan: 92},
-        {kode:"0015",open:4,submit:0,reject:0,pending:0,approve:94, muatan: 98},
-        {kode:"0016",open:6,submit:19,reject:0,pending:0,approve:29, muatan: 54},
-        {kode:"0017",open:50,submit:15,reject:0,pending:0,approve:43, muatan: 108},
-        {kode:"0018",open:124,submit:1,reject:0,pending:0,approve:0, muatan: 125},
-        {kode:"0019",open:78,submit:0,reject:0,pending:0,approve:0, muatan: 78},
-        {kode:"0020",open:81,submit:0,reject:0,pending:0,approve:0, muatan: 83}
-    ],
+// OFFICIAL PRELIST DATA - PPL KAHFI HADIANA
+const DEFAULT_SLS_DATA = [
+    {kode:"0012", nama:"RT 004 RW 03 DUSUN KARANG KOMIS", open:61, submit:0, reject:0, pending:0, approve:0, muatan:81},
+    {kode:"0013", nama:"RT 005 RW 03 DUSUN KARANG KOMIS", open:44, submit:0, reject:0, pending:0, approve:0, muatan:51},
+    {kode:"0014", nama:"RT 006 RW 03 DUSUN KARANG KOMIS", open:48, submit:0, reject:0, pending:0, approve:0, muatan:53},
+    {kode:"0015", nama:"RT 001 RW 04 DUSUN MASJID", open:87, submit:0, reject:0, pending:0, approve:0, muatan:98},
+    {kode:"0016", nama:"RT 002 RW 04 DUSUN MASJID", open:50, submit:0, reject:0, pending:0, approve:0, muatan:61},
+    {kode:"0017", nama:"RT 003 RW 04 DUSUN MASJID", open:101, submit:0, reject:0, pending:0, approve:0, muatan:107},
+    {kode:"0018", nama:"RT 004 RW 04 DUSUN MASJID", open:125, submit:0, reject:0, pending:0, approve:0, muatan:178},
+    {kode:"0019", nama:"RT 005 RW 04 DUSUN MASJID", open:78, submit:0, reject:0, pending:0, approve:0, muatan:93},
+    {kode:"0020", nama:"RT 006 RW 04 DUSUN MASJID", open:81, submit:0, reject:0, pending:0, approve:0, muatan:91}
+];
+
+let state = JSON.parse(localStorage.getItem('saka_tracker_v5_1')) || {
+    config: { assessment: 675, muatan: 813 }, // Default based on prelist
+    dashboard: { open: 0, draft: 27, submit: 0, reject: 0, pending: 0, approve: 0 },
+    sls: JSON.parse(JSON.stringify(DEFAULT_SLS_DATA)), // Deep copy default
     history: [],
     apiKeys: { openai: '', gemini: '', mistral: '' }
 };
 
-// Sync global config targets based on SLS Data
+// Sync global config targets based on current SLS Data (Dynamic Assessment)
 function syncConfigTargets() {
     let totalMuatan = 0;
-    let totalOpenFasih = 0;
+    let totalAssessment = 0;
     state.sls.forEach(s => {
         totalMuatan += (parseInt(s.muatan) || 0);
-        totalOpenFasih += (parseInt(s.open) || 0);
+        // Assessment is dynamic: sum of current Open + Submitted + Approved
+        totalAssessment += (parseInt(s.open) || 0) + (parseInt(s.submit) || 0) + (parseInt(s.approve) || 0);
     });
-    // Assessment is usually Total Open + Total Approved/Submitted in FASIH context
-    // But for simplicity, we use sum of muatan as muatan target, and a fixed ratio or sum for assessment
-    // Here we dynamically update state.config
     state.config.muatan = totalMuatan;
-    // Assuming Assessment is roughly related to total items handled. 
-    // For this logic, let's keep assessment dynamic based on total potential items (Open + Prog) or just use Muatan as base.
-    // Let's set Assessment = Total Muatan for 1:1 mapping unless specified otherwise, 
-    // OR keep the old logic where Assessment is separate. 
-    // To make it "Automatic looping", let's assume Assessment = Sum of Muatan for now.
-    state.config.assessment = totalMuatan; 
+    state.config.assessment = totalAssessment; 
 }
 
 // ===============================
@@ -482,8 +473,8 @@ function getProgress() {
     const p = state.dashboard.submit + state.dashboard.approve;
     return { 
         val: p, 
-        dashP: (p/state.config.assessment)*100, 
-        muatanP: (p/state.config.muatan)*100 
+        dashP: state.config.assessment > 0 ? (p/state.config.assessment)*100 : 0, 
+        muatanP: state.config.muatan > 0 ? (p/state.config.muatan)*100 : 0
     };
 }
 
@@ -500,10 +491,12 @@ function getVelocity() {
         const first = state.history[0].progress;
         const last = state.history[state.history.length-1].progress;
         const histDays = Math.max(1, state.history.length - 1);
+        // STRICT INTEGER ROUNDING
         return Math.ceil((last - first) / histDays);
     }
     
     const currentProg = getProgress().val;
+    // STRICT INTEGER ROUNDING
     return Math.ceil(currentProg / elapsedDays);
 }
 
@@ -531,7 +524,7 @@ function generateSLSDetail(slsItem, rank) {
     if(rank <= 3) strategy = `Prioritas utama. Fokuskan resource untuk menutup ${slsItem.open} item open tersisa.`;
     else if (slsItem.open > 80) strategy = `Volume open sangat tinggi (${slsItem.open}). Butuh delegasi agar tidak jadi bottleneck.`;
     else strategy = `Status: ${status}. Lakukan monitoring mingguan.`;
-    return `<strong>Kode:</strong> ${slsItem.kode} | <strong>Status:</strong> ${status}<br>
+    return `<strong>Kode:</strong> ${slsItem.kode} | <strong>Alamat:</strong> ${slsItem.nama}<br>
             <strong>Detail:</strong> Open: ${slsItem.open}, Submit: ${slsItem.submit}, Approve: ${slsItem.approve}<br><br>
             <strong>Strategi AI:</strong> ${strategy}`;
 }
@@ -557,7 +550,7 @@ async function runAnalysis() {
     const lastHist = state.history[state.history.length-1];
     if(lastHist && lastHist.date === snapshot.date) state.history.pop();
     state.history.push(snapshot);
-    localStorage.setItem('saka_tracker_v5', JSON.stringify(state));
+    localStorage.setItem('saka_tracker_v5_1', JSON.stringify(state));
 
     renderTerminAlert(prog);
     renderForecast();
@@ -580,7 +573,7 @@ async function runAnalysis() {
     container.style.display = 'block';
     setTimeout(()=>container.scrollIntoView({behavior:'smooth',block:'start'}),100);
 
-    btn.disabled = false; btn.innerText = '🧠 ANALISIS & SIMPAN SNAPSHOT';
+    btn.disabled = false; btn.innerText = ' ANALISIS & SIMPAN SNAPSHOT';
 }
 
 function renderTerminAlert(prog) {
@@ -693,12 +686,11 @@ function switchPage(pageName) {
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
     
     document.getElementById(`page-${pageName}`).classList.add('active');
-    // Find nav item by index or attribute, simplified here:
     const navItems = document.querySelectorAll('.nav-item');
     if(pageName === 'dashboard') navItems[0].classList.add('active');
     if(pageName === 'data') {
         navItems[1].classList.add('active');
-        renderDataSLSPage(); // Refresh CRUD list when opening tab
+        renderDataSLSPage();
     }
     if(pageName === 'settings') {
         navItems[2].classList.add('active');
@@ -716,11 +708,12 @@ function renderDataSLSPage() {
     state.sls.forEach((s, idx) => {
         const row = document.createElement('div');
         row.className = 'data-sls-row';
+        row.style.cssText = "display: grid; grid-template-columns: 60px 1fr 1fr 40px; gap: 10px; align-items: center; margin-bottom: 10px; padding: 10px; background: #0f172a; border-radius: 10px; border: 1px solid var(--border);";
         row.innerHTML = `
             <input type="text" value="${s.kode}" onchange="updateDataSLS(${idx}, 'kode', this.value)" style="text-align:center; font-weight:bold; color:var(--accent-blue)">
             <input type="number" value="${s.open}" onchange="updateDataSLS(${idx}, 'open', this.value)" placeholder="Open FASIH">
             <input type="number" value="${s.muatan || 0}" onchange="updateDataSLS(${idx}, 'muatan', this.value)" placeholder="Jml Muatan">
-            <button class="btn-delete" onclick="deleteDataSLS(${idx})">✕</button>
+            <button class="btn-delete" onclick="deleteDataSLS(${idx})" style="background: rgba(239, 68, 68, 0.1); color: var(--accent-red); border: none; width: 30px; height: 30px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center;"></button>
         `;
         list.appendChild(row);
     });
@@ -729,11 +722,10 @@ function renderDataSLSPage() {
 function updateDataSLS(idx, field, val) {
     if(field === 'open' || field === 'muatan') val = parseInt(val) || 0;
     state.sls[idx][field] = val;
-    // Don't save to localstorage yet, wait for "Simpan Perubahan" button
 }
 
 function addNewSLSRow() {
-    state.sls.push({kode: "NEW", open: 0, submit: 0, reject: 0, pending: 0, approve: 0, muatan: 0});
+    state.sls.push({kode: "NEW", nama: "", open: 0, submit: 0, reject: 0, pending: 0, approve: 0, muatan: 0});
     renderDataSLSPage();
 }
 
@@ -745,10 +737,10 @@ function deleteDataSLS(idx) {
 }
 
 function saveDataSLS() {
-    syncConfigTargets(); // Recalculate totals
-    localStorage.setItem('saka_tracker_v5', JSON.stringify(state));
+    syncConfigTargets();
+    localStorage.setItem('saka_tracker_v5_1', JSON.stringify(state));
     alert('✅ Data Master SLS berhasil disimpan! Dashboard akan menggunakan data terbaru.');
-    initForm(); // Refresh dashboard inputs to match new SLS list
+    initForm();
 }
 
 // ===============================
@@ -758,7 +750,7 @@ function saveSettings() {
     state.apiKeys.openai = document.getElementById('api-openai').value.trim();
     state.apiKeys.gemini = document.getElementById('api-gemini').value.trim();
     state.apiKeys.mistral = document.getElementById('api-mistral').value.trim();
-    localStorage.setItem('saka_tracker_v5', JSON.stringify(state));
+    localStorage.setItem('saka_tracker_v5_1', JSON.stringify(state));
     updateApiStatusUI();
     alert('💾 Konfigurasi API Key berhasil disimpan!');
 }
@@ -790,13 +782,13 @@ async function testAllApis() {
         {name:'Mistral', key:state.apiKeys.mistral, url:'https://api.mistral.ai/v1/models', auth:`Bearer ${state.apiKeys.mistral}`}
     ];
     for(const t of tests) {
-        if(!t.key) { output += `<div> ${t.name}: API Key kosong</div>`; continue; }
+        if(!t.key) { output += `<div>❌ ${t.name}: API Key kosong</div>`; continue; }
         try {
             const headers = t.auth ? {'Authorization':t.auth} : {};
             const res = await fetch(t.url, {headers, signal:AbortSignal.timeout(5000)});
             if(res.ok) output += `<div style="color:var(--accent-green)">✅ ${t.name}: Terhubung</div>`;
             else output += `<div style="color:var(--accent-red)">❌ ${t.name}: Gagal (${res.status})</div>`;
-        } catch(e) { output += `<div style="color:var(--accent-red)">️ ${t.name}: ${e.message}</div>`; }
+        } catch(e) { output += `<div style="color:var(--accent-red)">❌ ${t.name}: ${e.message}</div>`; }
     }
     resultsDiv.innerHTML = output;
 }
@@ -814,22 +806,20 @@ function backupData() {
 function restoreData(inputElement) {
     const file = inputElement.files[0];
     if (!file) return;
-    
     const reader = new FileReader();
     reader.onload = function(e) {
         try {
             const restoredState = JSON.parse(e.target.result);
-            // Basic validation
             if(restoredState.sls && restoredState.apiKeys) {
                 state = restoredState;
-                localStorage.setItem('saka_tracker_v5', JSON.stringify(state));
+                localStorage.setItem('saka_tracker_v5_1', JSON.stringify(state));
                 alert('✅ Data berhasil dipulihkan! Halaman akan dimuat ulang.');
                 location.reload();
             } else {
                 alert('❌ File backup tidak valid atau rusak.');
             }
         } catch(err) {
-            alert(' Gagal membaca file backup: ' + err.message);
+            alert('❌ Gagal membaca file backup: ' + err.message);
         }
     };
     reader.readAsText(file);
@@ -842,15 +832,13 @@ function openModal(type) {
     const modal = document.getElementById('legal-modal');
     const title = document.getElementById('modal-title');
     const body = document.getElementById('modal-body');
-    
     modal.style.display = 'flex';
-    
     if(type === 'tos') {
         title.innerText = "Terms of Service (TOS)";
-        body.innerText = `TERMS OF SERVICE - SAKA TRACKER\n\nLast Updated: July 8, 2026\n\n1. ACCEPTANCE OF TERMS\nBy accessing and using Saka Tracker ("Application"), you accept and agree to be bound by the terms and provision of this agreement.\n\n2. DESCRIPTION OF SERVICE\nSaka Tracker is a personal productivity tool designed for monitoring SLS progress, managing FASIH dashboard data, and providing AI-driven insights. \n\n3. USER RESPONSIBILITIES\nYou are responsible for maintaining the confidentiality of your API keys and data entered into the application. The developer (Saka_Omni) is not liable for any data loss due to device failure or clearing browser cache without backup.\n\n4. NO WARRANTY\nTHE APPLICATION IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND. USE AT YOUR OWN RISK.\n\n5. CONTACT\nFor support, contact mlevian@protonmail.com`;
+        body.innerText = `TERMS OF SERVICE - SAKA TRACKER\n\nLast Updated: July 8, 2026\n\n1. ACCEPTANCE OF TERMS\nBy accessing and using Saka Tracker ("Application"), you accept and agree to be bound by the terms and provision of this agreement.\n\n2. DESCRIPTION OF SERVICE\nSaka Tracker is a personal productivity tool designed for monitoring SLS progress, managing FASIH dashboard data, and providing AI-driven insights.\n\n3. USER RESPONSIBILITIES\nYou are responsible for maintaining the confidentiality of your API keys and data entered into the application. The developer (Saka_Omni) is not liable for any data loss due to device failure or clearing browser cache without backup.\n\n4. NO WARRANTY\nTHE APPLICATION IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND. USE AT YOUR OWN RISK.\n\n5. CONTACT\nFor support, contact mlevian@protonmail.com`;
     } else if (type === 'privacy') {
         title.innerText = "Privacy Policy";
-        body.innerText = `PRIVACY POLICY - SAKA TRACKER\n\nLast Updated: July 8, 2026\n\n1. DATA COLLECTION\nSaka Tracker operates entirely on your local device (Client-Side). We DO NOT collect, store, or transmit your SLS data, progress reports, or API keys to any external server.\n\n2. API KEYS\nAPI Keys for OpenAI, Gemini, and Mistral are stored locally in your browser's LocalStorage. They are only sent directly to the respective AI providers when you trigger an analysis. \n\n3. THIRD-PARTY SERVICES\nWhen using the AI Insight feature, your prompt data is sent to OpenAI/Gemini/Mistral servers based on their respective privacy policies. Please review their policies before use.\n\n4. DATA SECURITY\nSince data is stored locally, it is vulnerable if someone gains physical access to your unlocked device. Use the Backup/Restore feature to keep your data safe.\n\n5. CHANGES TO THIS POLICY\nWe may update this policy periodically. Continued use of the app constitutes acceptance of changes.`;
+        body.innerText = `PRIVACY POLICY - SAKA TRACKER\n\nLast Updated: July 8, 2026\n\n1. DATA COLLECTION\nSaka Tracker operates entirely on your local device (Client-Side). We DO NOT collect, store, or transmit your SLS data, progress reports, or API keys to any external server.\n\n2. API KEYS\nAPI Keys for OpenAI, Gemini, and Mistral are stored locally in your browser's LocalStorage. They are only sent directly to the respective AI providers when you trigger an analysis.\n\n3. THIRD-PARTY SERVICES\nWhen using the AI Insight feature, your prompt data is sent to OpenAI/Gemini/Mistral servers based on their respective privacy policies. Please review their policies before use.\n\n4. DATA SECURITY\nSince data is stored locally, it is vulnerable if someone gains physical access to your unlocked device. Use the Backup/Restore feature to keep your data safe.\n\n5. CHANGES TO THIS POLICY\nWe may update this policy periodically. Continued use of the app constitutes acceptance of changes.`;
     }
 }
 
@@ -862,7 +850,7 @@ function closeModal() {
 // INITIALIZATION
 // ===============================
 function initForm() {
-    syncConfigTargets(); // Ensure config matches SLS data on load
+    syncConfigTargets();
     const container = document.getElementById('sls-inputs-container');
     container.innerHTML = '';
     state.sls.forEach((s,idx)=>{
