@@ -1,14 +1,13 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SLS Monitor - Intelligent Tracker</title>
+    <title>SLS Monitor V4.3 - Stable</title>
     <style>
         :root {
             --bg-color: #0b1120;
             --card-bg: #1e293b;
-            --card-hover: #253347;
             --text-main: #f1f5f9;
             --text-muted: #94a3b8;
             --accent-blue: #3b82f6;
@@ -21,7 +20,14 @@
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', system-ui, sans-serif; -webkit-tap-highlight-color: transparent; }
         
-        body { background-color: var(--bg-color); color: var(--text-main); padding-bottom: calc(var(--nav-height) + 30px); min-height: 100vh; line-height: 1.6; }
+        body { 
+            background-color: var(--bg-color); 
+            color: var(--text-main); 
+            padding-bottom: calc(var(--nav-height) + 30px); 
+            min-height: 100vh; 
+            line-height: 1.6; 
+            overflow-x: hidden; /* Mencegah scroll horizontal */
+        }
 
         .container { max-width: 800px; margin: 0 auto; padding: 20px; display: flex; flex-direction: column; gap: 20px; }
         
@@ -30,64 +36,103 @@
         .header h1 { font-size: 1.4rem; font-weight: 700; letter-spacing: -0.5px; }
         .header p { color: var(--text-muted); font-size: 0.85rem; margin-top: 4px; }
 
-        /* Form Section */
-        .form-section { background: var(--card-bg); border-radius: 16px; padding: 20px; border: 1px solid var(--border); }
+        /* Form Section - FIXED GRID LAYOUT */
+        .form-section { background: var(--card-bg); border-radius: 16px; padding: 15px; border: 1px solid var(--border); }
         
-        .input-grid { display: grid; grid-template-columns: 80px repeat(5, 1fr); gap: 8px; align-items: center; margin-bottom: 12px; font-size: 0.8rem; }
-        .input-header { color: var(--text-muted); font-weight: 600; text-align: center; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
-        .input-row { display: contents; }
-        .sls-code { font-weight: bold; color: var(--accent-blue); text-align: left; padding-left: 5px; }
+        /* Grid Input Mobile Friendly */
+        .input-grid { 
+            display: grid; 
+            grid-template-columns: 50px repeat(5, 1fr); 
+            gap: 6px; 
+            align-items: center; 
+            font-size: 0.75rem; 
+            margin-bottom: 10px;
+        }
+        
+        .input-header { 
+            color: var(--text-muted); 
+            font-weight: 600; 
+            text-align: center; 
+            padding-bottom: 8px; 
+            border-bottom: 1px solid var(--border); 
+            font-size: 0.7rem;
+        }
+        
+        .sls-code { 
+            font-weight: bold; 
+            color: var(--accent-blue); 
+            text-align: left; 
+            padding-left: 2px;
+            font-size: 0.8rem;
+        }
         
         input[type="number"] {
-            background: #0f172a; border: 1px solid var(--border); color: white;
-            padding: 10px 5px; border-radius: 8px; width: 100%; text-align: center; 
-            font-size: 0.9rem; transition: all 0.2s;
+            background: #0f172a; 
+            border: 1px solid var(--border); 
+            color: white;
+            padding: 10px 2px; 
+            border-radius: 8px; 
+            width: 100%; 
+            text-align: center; 
+            font-size: 0.9rem; 
+            transition: all 0.2s;
+            -moz-appearance: textfield; /* Hilangkan spinner Firefox */
         }
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; } /* Hilangkan spinner Chrome */
+        
         input[type="number"]:focus { outline: none; border-color: var(--accent-blue); background: #172033; }
 
-        .draft-row { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-top: 1px solid var(--border); margin-top: 10px; }
+        .draft-row { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            padding: 15px 5px; 
+            border-top: 1px solid var(--border); 
+            margin-top: 10px; 
+        }
         .draft-label { font-weight: bold; font-size: 0.9rem; }
-        .draft-input { width: 100px !important; }
+        .draft-input-wrap { width: 100px; }
 
         .btn-analyze {
             background: linear-gradient(135deg, var(--accent-blue), #2563eb); 
             color: white; border: none; padding: 16px; border-radius: 12px; 
             font-weight: 700; cursor: pointer; width: 100%; font-size: 1rem;
-            transition: all 0.3s ease; margin-top: 15px; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.2);
+            transition: all 0.3s ease; margin-top: 15px; 
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.2);
         }
         .btn-analyze:active { transform: scale(0.98); }
         .btn-analyze:disabled { opacity: 0.7; cursor: wait; filter: grayscale(0.5); }
 
-        /* Analysis Results */
+        /* Analysis Results Animation */
         #analysis-container { display: none; animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
         @keyframes fadeUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
 
         .result-card { background: var(--card-bg); border-radius: 16px; padding: 20px; border: 1px solid var(--border); margin-bottom: 16px; }
-        .result-title { font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 700; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .result-title { font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 700; margin-bottom: 15px; }
 
-        /* Forecast Box */
+        /* Forecast & Metrics */
         .forecast-box { padding: 15px; border-radius: 10px; font-size: 0.9rem; font-weight: 500; margin-bottom: 10px; }
         .forecast-ok { background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); color: var(--accent-green); }
         .forecast-warn { background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); color: var(--accent-orange); }
         .forecast-crit { background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: var(--accent-red); }
 
-        /* Metrics Grid */
         .metrics-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         .metric-item { display: flex; flex-direction: column; gap: 4px; }
         .metric-label { font-size: 0.8rem; color: var(--text-muted); }
         .metric-value { font-size: 1.1rem; font-weight: 700; }
 
-        /* Priority Accordion List */
+        /* Priority Accordion */
         .priority-list { display: flex; flex-direction: column; gap: 10px; }
-        .priority-item { background: #0f172a; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; transition: all 0.2s; }
+        .priority-item { background: #0f172a; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
         .priority-header { padding: 15px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
-        .priority-header:hover { background: var(--card-hover); }
+        .priority-header:hover { background: #1e293b; }
         
         .p-rank { width: 24px; height: 24px; background: var(--border); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: bold; margin-right: 12px; }
         .p-info { flex: 1; }
         .p-code { font-weight: bold; font-size: 0.95rem; }
-        .p-score { font-size: 0.8rem; color: var(--text-muted); margin-top: 2px; }
-        .p-action { font-size: 0.75rem; padding: 4px 10px; border-radius: 20px; font-weight: 600; }
+        .p-score { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; }
+        .p-action { font-size: 0.7rem; padding: 4px 10px; border-radius: 20px; font-weight: 600; }
         .action-lanjut { background: rgba(59, 130, 246, 0.15); color: var(--accent-blue); }
         .action-mulai { background: rgba(245, 158, 11, 0.15); color: var(--accent-orange); }
         .action-done { background: rgba(16, 185, 129, 0.15); color: var(--accent-green); }
@@ -95,18 +140,15 @@
         .priority-detail { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; background: #162032; border-top: 1px solid var(--border); }
         .priority-detail.open { max-height: 500px; }
         .detail-content { padding: 15px; font-size: 0.85rem; color: var(--text-muted); line-height: 1.6; }
-        .detail-content strong { color: var(--text-main); }
         .toggle-icon { transition: transform 0.3s; font-size: 0.8rem; color: var(--text-muted); }
         .priority-item.expanded .toggle-icon { transform: rotate(180deg); }
 
-        /* Performance Card */
+        /* Performance & AI Text */
         .perf-display { text-align: center; padding: 10px 0; }
         .grade-big { font-size: 3.5rem; font-weight: 800; line-height: 1; margin-bottom: 5px; }
-        .grade-desc { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 15px; }
         .progress-track { height: 8px; background: #334155; border-radius: 4px; overflow: hidden; margin-top: 10px; }
-        .progress-fill { height: 100%; transition: width 1s cubic-bezier(0.4, 0, 0.2, 1); }
+        .progress-fill { height: 100%; transition: width 1s ease; }
 
-        /* AI Insight Clean Format */
         .ai-text { font-size: 0.95rem; color: var(--text-main); line-height: 1.7; }
         .ai-text p { margin-bottom: 12px; }
         .ai-highlight { background: rgba(59, 130, 246, 0.15); color: #60a5fa; padding: 2px 6px; border-radius: 4px; font-weight: 600; }
@@ -116,7 +158,7 @@
         /* Settings Page */
         #settings-page { display: none; padding: 20px; max-width: 600px; margin: 0 auto; }
         .setting-group { margin-bottom: 20px; }
-        .setting-group label { display: block; color: var(--text-muted); margin-bottom: 8px; font-size: 0.9rem; font-weight: 500; }
+        .setting-group label { display: block; color: var(--text-muted); margin-bottom: 8px; font-size: 0.9rem; }
         .api-status { font-size: 0.8rem; margin-top: 6px; display: flex; align-items: center; gap: 6px; }
         .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border); }
         .status-dot.active { background: var(--accent-green); box-shadow: 0 0 8px var(--accent-green); }
@@ -130,18 +172,12 @@
             border-top: 1px solid var(--border); display: flex; justify-content: space-around;
             align-items: center; z-index: 1000; padding-bottom: env(safe-area-inset-bottom);
         }
-        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-muted); text-decoration: none; font-size: 0.7rem; padding: 10px 20px; transition: all 0.2s; cursor: pointer; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-muted); text-decoration: none; font-size: 0.7rem; padding: 10px 20px; cursor: pointer; }
         .nav-item.active { color: var(--accent-blue); }
         .nav-icon { font-size: 1.4rem; margin-bottom: 2px; }
 
         .footer-status { font-size: 0.7rem; color: var(--text-muted); text-align: center; margin-top: 20px; padding-top: 15px; border-top: 1px solid var(--border); opacity: 0.7; }
         .provider-active { color: var(--accent-green); font-weight: 600; }
-
-        @media (max-width: 480px) {
-            .input-grid { grid-template-columns: 60px repeat(5, 1fr); gap: 4px; font-size: 0.7rem; }
-            input[type="number"] { padding: 8px 2px; font-size: 0.8rem; }
-            .metrics-grid { grid-template-columns: 1fr; gap: 10px; }
-        }
     </style>
 </head>
 <body>
@@ -154,6 +190,7 @@
     </div>
 
     <div class="form-section">
+        <!-- Grid Header -->
         <div class="input-grid">
             <div class="input-header">Kode</div>
             <div class="input-header">Open</div>
@@ -162,26 +199,28 @@
             <div class="input-header">Pend</div>
             <div class="input-header">App</div>
             
+            <!-- Dynamic Rows Container -->
             <div id="sls-inputs-container" style="display:contents"></div>
         </div>
 
         <div class="draft-row">
             <span class="draft-label">DRAFT TOTAL</span>
-            <input type="number" id="global-draft" class="draft-input" value="27">
+            <div class="draft-input-wrap">
+                <input type="number" id="global-draft" value="27">
+            </div>
         </div>
 
         <button class="btn-analyze" id="btn-analyze" onclick="runAnalysis()">🧠 ANALISIS & SIMPAN SNAPSHOT</button>
     </div>
 
+    <!-- ANALYSIS RESULTS (Hidden by default) -->
     <div id="analysis-container">
-        <!-- Forecast -->
         <div class="result-card">
             <div class="result-title">🔮 FORECAST ENGINE (CLEARANCE)</div>
             <div id="forecast-status"></div>
             <div id="forecast-details" style="font-size:0.8rem; color:var(--text-muted); margin-top:8px;"></div>
         </div>
 
-        <!-- Daily Targets -->
         <div class="result-card">
             <div class="result-title">🎯 TARGET HARIAN REALISTIS</div>
             <div class="metrics-grid">
@@ -200,18 +239,16 @@
             </div>
         </div>
 
-        <!-- Priority Accordion -->
         <div class="result-card">
             <div class="result-title">⚡ PRIORITAS KERJA OPTIMAL</div>
             <div class="priority-list" id="priority-list"></div>
         </div>
 
-        <!-- Performance -->
         <div class="result-card">
             <div class="result-title">📊 PERFORMANCE & TREND</div>
             <div class="perf-display">
                 <div class="grade-big" id="perf-grade">-</div>
-                <div class="grade-desc" id="perf-desc">-</div>
+                <div class="grade-desc" id="perf-desc" style="color:var(--text-muted); font-size:0.9rem; margin-bottom:15px;">-</div>
             </div>
             <div style="display:flex; justify-content:space-between; font-size:0.85rem; margin-top:10px;">
                 <span>Progress Dashboard</span>
@@ -220,7 +257,6 @@
             <div class="progress-track"><div class="progress-fill" id="dash-bar" style="background:var(--accent-green); width:0%"></div></div>
         </div>
 
-        <!-- AI Insight -->
         <div class="result-card">
             <div class="result-title">🧠 MULTI-AI STRATEGIC INSIGHT</div>
             <div id="ai-insights" class="ai-text">
@@ -279,14 +315,14 @@
 // ===============================
 const CONFIG = {
     assessment: 696, muatan: 813,
-    startDate: new Date("2026-06-15"), // Tanggal mulai kerja
+    startDate: new Date("2026-06-15"), 
     absoluteDeadline: new Date("2026-08-30"),
     safetyBufferDays: 4
 };
 const clearanceDate = new Date(CONFIG.absoluteDeadline);
 clearanceDate.setDate(clearanceDate.getDate() - CONFIG.safetyBufferDays);
 
-let state = JSON.parse(localStorage.getItem('sls_monitor_v4')) || {
+let state = JSON.parse(localStorage.getItem('sls_monitor_v4_3')) || {
     dashboard: { open: 496, draft: 27, submit: 35, reject: 0, pending: 0, approve: 166 },
     sls: [
         {kode:"0012",open:61,submit:0,reject:0,pending:0,approve:0},
@@ -318,8 +354,6 @@ class HybridAIOrchestrator {
     }
 
     async generateInsight(prompt) {
-        let lastError = null;
-        
         for (const provider of this.providers) {
             if (!provider.key) continue;
             try {
@@ -329,13 +363,14 @@ class HybridAIOrchestrator {
                 this.updateStatus(provider.name, 'active');
                 return this.cleanMarkdown(response);
             } catch (err) {
-                lastError = err;
                 console.warn(`${provider.name} failed:`, err.message);
                 this.updateStatus(provider.name, 'error');
-                if (err.status === 429 || err.status >= 500 || err.status === 401) continue;
+                // Lanjut ke provider berikutnya jika error
+                continue;
             }
         }
         
+        // Fallback jika semua gagal
         this.activeProvider = 'Deterministic Fallback';
         this.updateStatus('Fallback', 'active');
         return this.deterministicFallback();
@@ -343,37 +378,37 @@ class HybridAIOrchestrator {
 
     async callProvider(provider, prompt) {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 15000);
+        const timeoutId = setTimeout(() => controller.abort(), 12000);
 
         let body, headers;
         if (provider.name === 'Gemini') {
             body = JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] });
             headers = { 'Content-Type': 'application/json', 'x-goog-api-key': provider.key };
         } else {
-            body = JSON.stringify({ model: provider.model, messages: [{ role: 'user', content: prompt }], temperature: 0.3, max_tokens: 600 });
+            body = JSON.stringify({ model: provider.model, messages: [{ role: 'user', content: prompt }], temperature: 0.3, max_tokens: 500 });
             headers = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${provider.key}` };
         }
 
         const res = await fetch(provider.endpoint, { method: 'POST', headers, body, signal: controller.signal });
         clearTimeout(timeoutId);
 
-        if (!res.ok) { const err = new Error(`HTTP ${res.status}`); err.status = res.status; throw err; }
-        const data = await res.json();
+        if (!res.ok) { 
+            const errData = await res.json().catch(() => ({}));
+            const err = new Error(errData.error?.message || `HTTP ${res.status}`);
+            err.status = res.status;
+            throw err; 
+        }
         
-        if (provider.name === 'Gemini') return data.candidates?.[0]?.content?.parts?.[0]?.text || 'No response';
-        return data.choices?.[0]?.message?.content || 'No response';
+        const data = await res.json();
+        if (provider.name === 'Gemini') return data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+        return data.choices?.[0]?.message?.content || '';
     }
 
-    // Membersihkan format markdown AI menjadi HTML clean
     cleanMarkdown(text) {
         if(!text) return '';
-        // Remove ** bold markers and replace with span
         let cleaned = text.replace(/\*\*(.*?)\*\*/g, '<span class="ai-highlight">$1</span>');
-        // Replace * italic with em
         cleaned = cleaned.replace(/\*(.*?)\*/g, '<em>$1</em>');
-        // Wrap paragraphs
         cleaned = cleaned.split('\n\n').map(p => `<p>${p.trim()}</p>`).join('');
-        // Handle single newlines as breaks if not in paragraph
         cleaned = cleaned.replace(/\n/g, '<br>');
         return cleaned;
     }
@@ -382,27 +417,26 @@ class HybridAIOrchestrator {
         const prog = getProgress();
         const sisaHari = getSisaHariKeClearance();
         const remaining = CONFIG.assessment - prog.val;
-        const reqVel = Math.ceil(remaining / sisaHari);
+        const reqVel = Math.ceil(remaining / Math.max(1, sisaHari));
         const currVel = getVelocity();
         const isOnTrack = currVel >= reqVel;
-        const top3 = prioritasSLS().slice(0,3).map(s=>s.kode).join(', ');
+        const top3 = prioritasSLS().slice(0,3).map(s => `${s.kode} (${s.open} open)`).join(', ');
         
-        const statusClass = isOnTrack ? 'ai-success' : 'ai-warn';
-        const statusText = isOnTrack ? 'ON TRACK' : 'AT RISK';
-        
-        return `<p><span class="${statusClass}">${statusText}</span>: Ritme saat ini ${currVel.toFixed(1)} data/hari ${isOnTrack?'cukup':'kurang'} untuk clearance sebelum ${clearanceDate.toLocaleDateString('id-ID')}.</p>
-                <p>Prioritaskan penyelesaian <span class="ai-highlight">${top3}</span> untuk memaksimalkan throughput harian minimal ${reqVel} data.</p>`;
+        const statusTag = isOnTrack ? '<span class="ai-success">ON TRACK</span>' : '<span class="ai-warn">AT RISK</span>';
+        return `<p>${statusTag}: Ritme saat ini <strong>${currVel.toFixed(1)} data/hari</strong> ${isOnTrack ? 'memenuhi' : 'belum memenuhi'} target clearance.</p>
+                <p>Sisa data: <strong>${remaining}</strong>. Kebutuhan harian: <strong>${reqVel} data</strong>.</p>
+                <p>Fokus prioritas: <span class="ai-highlight">${top3}</span>.</p>`;
     }
 
     updateStatus(name, status) {
         const el = document.getElementById('ai-provider-status');
-        const className = status === 'active' ? 'provider-active' : status === 'error' ? 'provider-error' : 'provider-fallback';
+        const className = status === 'active' ? 'provider-active' : 'provider-error';
         el.innerHTML = `Multi-AI Orchestrator | Provider Aktif: <span class="${className}">${name}</span>`;
     }
 }
 
 // ===============================
-// CORE BUSINESS LOGIC
+// CORE LOGIC
 // ===============================
 function getProgress() {
     const p = state.dashboard.submit + state.dashboard.approve;
@@ -413,16 +447,11 @@ function getSisaHariKeClearance() {
     return Math.max(1, Math.ceil((clearanceDate - new Date())/(1000*60*60*24)));
 }
 
-// LOGIKA TARGET HARIAN YANG DIPERBAIKI
 function getVelocity() {
     const today = new Date();
-    // Hitung selisih hari dari 15 Juni 2026 sampai hari ini
     const diffTime = Math.abs(today - CONFIG.startDate);
     const elapsedDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) || 1; 
     
-    const currentProg = getProgress().val;
-    
-    // Jika ada history, gunakan rata-rata historis untuk akurasi lebih tinggi
     if (state.history.length >= 2) {
         const first = state.history[0].progress;
         const last = state.history[state.history.length-1].progress;
@@ -430,7 +459,7 @@ function getVelocity() {
         return (last - first) / histDays;
     }
     
-    // Fallback: Progress saat ini dibagi hari kerja efektif sejak 15 Juni
+    const currentProg = getProgress().val;
     return currentProg / elapsedDays;
 }
 
@@ -452,19 +481,12 @@ function performanceGrade(dashP) {
     return {g:'E',d:'Kritis',c:'var(--accent-red)'};
 }
 
-// Generate AI Detail untuk setiap SLS
 function generateSLSDetail(slsItem, rank) {
     const status = slsItem.persen === 100 ? 'selesai' : slsItem.prog > 0 ? 'sedang berjalan' : 'belum dimulai';
-    const action = slsItem.persen === 100 ? 'Maintenance' : slsItem.prog > 0 ? 'Akselerasi' : 'Inisiasi';
-    
     let strategy = '';
-    if(rank <= 3) {
-        strategy = `SLS ini adalah <span class="ai-highlight">prioritas utama</span>. Dengan ${slsItem.open} item open tersisa, fokuskan resource untuk menutup gap approve.`;
-    } else if (slsItem.open > 80) {
-        strategy = `Volume open sangat tinggi (${slsItem.open}). <span class="ai-warn">Butuh delegasi atau tambahan manpower</span> agar tidak menjadi bottleneck di fase akhir.`;
-    } else {
-        strategy = `Status: ${status}. Lakukan ${action} sesuai kapasitas tim saat ini. Monitor weekly untuk mencegah stagnasi.`;
-    }
+    if(rank <= 3) strategy = `Prioritas utama. Fokuskan resource untuk menutup ${slsItem.open} item open tersisa.`;
+    else if (slsItem.open > 80) strategy = `Volume open sangat tinggi (${slsItem.open}). Butuh delegasi agar tidak jadi bottleneck.`;
+    else strategy = `Status: ${status}. Lakukan monitoring mingguan.`;
     
     return `<strong>Kode:</strong> ${slsItem.kode} | <strong>Status:</strong> ${status}<br>
             <strong>Detail:</strong> Open: ${slsItem.open}, Submit: ${slsItem.submit}, Approve: ${slsItem.approve}<br><br>
@@ -472,16 +494,15 @@ function generateSLSDetail(slsItem, rank) {
 }
 
 // ===============================
-// MAIN ANALYSIS ACTION
+// MAIN ACTION
 // ===============================
 async function runAnalysis() {
     const btn = document.getElementById('btn-analyze');
     btn.disabled = true;
-    btn.innerText = '⏳ Sedang Menganalisis...';
+    btn.innerText = ' Sedang Menganalisis...';
 
     state.dashboard.draft = parseInt(document.getElementById('global-draft').value)||0;
     
-    // Save snapshot
     const prog = getProgress();
     const perf = performanceGrade(prog.dashP);
     const snapshot = {
@@ -489,36 +510,34 @@ async function runAnalysis() {
         progress: prog.val, dashP: prog.dashP,
         velocity: getVelocity(), grade: perf.g
     };
+    
     const lastHist = state.history[state.history.length-1];
     if(lastHist && lastHist.date === snapshot.date) state.history.pop();
     state.history.push(snapshot);
-    localStorage.setItem('sls_monitor_v4', JSON.stringify(state));
+    localStorage.setItem('sls_monitor_v4_3', JSON.stringify(state));
 
-    // Render deterministic parts immediately
     renderForecast();
     renderTargets();
     renderPriorityAccordions();
     renderPerformance(prog, perf);
 
-    // Call Hybrid AI for Strategic Insight
     const orchestrator = new HybridAIOrchestrator(state.apiKeys);
     const top3 = prioritasSLS().slice(0,3);
     const aiPrompt = `Analisis progres SLS: Progress ${prog.val}/${CONFIG.assessment} (${prog.dashP.toFixed(2)}%). 
     Velocity rata-rata sejak 15 Juni 2026: ${getVelocity().toFixed(1)} data/hari.
-    Sisa hari ke clearance ${clearanceDate.toLocaleDateString('id-ID')}: ${getSisaHariKeClearance()} hari.
-    Top 3 SLS prioritas: ${top3.map(s=>`${s.kode} (${s.open} open, ${s.prog} progress)`).join(', ')}.
-    Berikan insight strategis singkat 2-3 paragraf. Gunakan bahasa Indonesia profesional. Highlight angka penting dan nama SLS.`;
+    Sisa hari ke clearance: ${getSisaHariKeClearance()} hari.
+    Top 3 SLS prioritas: ${top3.map(s=>`${s.kode} (${s.open} open)`).join(', ')}.
+    Berikan insight strategis singkat 2-3 paragraf. Highlight angka penting.`;
     
     const insight = await orchestrator.generateInsight(aiPrompt);
     document.getElementById('ai-insights').innerHTML = insight;
 
-    // Show container with animation
     const container = document.getElementById('analysis-container');
     container.style.display = 'block';
     setTimeout(()=>container.scrollIntoView({behavior:'smooth',block:'start'}),100);
 
     btn.disabled = false;
-    btn.innerText = '🧠 ANALISIS & SIMPAN SNAPSHOT';
+    btn.innerText = ' ANALISIS & SIMPAN SNAPSHOT';
 }
 
 // ===============================
@@ -537,16 +556,15 @@ function renderForecast() {
     const detailDiv = document.getElementById('forecast-details');
     
     let boxClass = isOnTrack ? 'forecast-ok' : (currVel >= reqVel * 0.7 ? 'forecast-warn' : 'forecast-crit');
-    let icon = isOnTrack ? '✅' : (currVel >= reqVel * 0.7 ? '⚠️' : '');
-    let text = isOnTrack ? `ON TRACK: Clearance aman sebelum ${dateStr}` : 
-               (currVel >= reqVel * 0.7 ? `WARNING: Margin tipis untuk clearance ${dateStr}` : `CRITICAL: Tidak mencapai clearance ${dateStr}`);
+    let text = isOnTrack ? `✅ ON TRACK: Clearance aman sebelum ${dateStr}` : 
+               (currVel >= reqVel * 0.7 ? `⚠️ WARNING: Margin tipis untuk clearance ${dateStr}` : ` CRITICAL: Tidak mencapai clearance ${dateStr}`);
                
-    statusDiv.innerHTML = `<div class="forecast-box ${boxClass}">${icon} ${text}</div>`;
+    statusDiv.innerHTML = `<div class="forecast-box ${boxClass}">${text}</div>`;
     
     if(isOnTrack) {
-        detailDiv.innerHTML = `Ritme <strong>${currVel.toFixed(1)} data/hari</strong> cukup. Buffer waktu: <strong>${sisaHari - Math.ceil(remaining/currVel)} hari</strong>.`;
+        detailDiv.innerHTML = `Ritme <strong>${currVel.toFixed(1)} data/hari</strong> cukup. Buffer: <strong>${sisaHari - Math.ceil(remaining/currVel)} hari</strong>.`;
     } else {
-        detailDiv.innerHTML = `Kekurangan ritme: <strong>${(reqVel-currVel).toFixed(1)} data/hari</strong>. Estimasi terlambat <strong>${Math.ceil(remaining/Math.max(0.1,currVel))-sisaHari} hari</strong> dari target clearance.`;
+        detailDiv.innerHTML = `Kekurangan ritme: <strong>${(reqVel-currVel).toFixed(1)} data/hari</strong>. Estimasi terlambat <strong>${Math.ceil(remaining/Math.max(0.1,currVel))-sisaHari} hari</strong>.`;
     }
 }
 
@@ -580,7 +598,7 @@ function renderPriorityAccordions() {
                     <div class="p-rank">${i+1}</div>
                     <div class="p-info">
                         <div class="p-code">${s.kode}</div>
-                        <div class="p-score">Score: ${s.score.toFixed(0)} | Progress: ${s.persen.toFixed(0)}%</div>
+                        <div class="p-score">Score: ${s.score.toFixed(0)} | Prog: ${s.persen.toFixed(0)}%</div>
                     </div>
                 </div>
                 <div style="display:flex; align-items:center; gap:10px;">
@@ -612,7 +630,7 @@ function renderPerformance(prog, perf) {
 }
 
 // ===============================
-// SETTINGS & NAVIGATION
+// SETTINGS & NAV
 // ===============================
 function switchPage(page) {
     document.querySelectorAll('.nav-item').forEach(el=>el.classList.remove('active'));
@@ -633,7 +651,7 @@ function saveApiKeys() {
     state.apiKeys.openai = document.getElementById('api-openai').value.trim();
     state.apiKeys.gemini = document.getElementById('api-gemini').value.trim();
     state.apiKeys.mistral = document.getElementById('api-mistral').value.trim();
-    localStorage.setItem('sls_monitor_v4', JSON.stringify(state));
+    localStorage.setItem('sls_monitor_v4_3', JSON.stringify(state));
     updateApiStatusUI();
     alert('Konfigurasi API berhasil disimpan!');
 }
@@ -674,14 +692,14 @@ async function testAllApis() {
             if(res.ok) output += `<div style="color:var(--accent-green)">✅ ${t.name}: Terhubung</div>`;
             else output += `<div style="color:var(--accent-red)">❌ ${t.name}: Gagal (${res.status})</div>`;
         } catch(e) {
-            output += `<div style="color:var(--accent-red)">❌ ${t.name}: ${e.message}</div>`;
+            output += `<div style="color:var(--accent-red)"> ${t.name}: ${e.message}</div>`;
         }
     }
     resultsDiv.innerHTML = output;
 }
 
 // ===============================
-// INITIALIZATION
+// INIT
 // ===============================
 function initForm() {
     const container = document.getElementById('sls-inputs-container');
@@ -689,6 +707,8 @@ function initForm() {
     state.sls.forEach((s,idx)=>{
         const row = document.createElement('div');
         row.className = 'input-row';
+        // Menggunakan style inline display:contents agar masuk grid parent
+        row.style.display = 'contents'; 
         row.innerHTML = `
             <div class="sls-code">${s.kode}</div>
             <input type="number" value="${s.open}" onchange="updateSLS(${idx},'open',this.value)">
@@ -702,7 +722,15 @@ function initForm() {
     document.getElementById('current-date').innerText = new Date().toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
 }
 
-function updateSLS(idx,field,val) { state.sls[idx][field]=parseInt(val)||0; }
+function updateSLS(idx, field, val) {
+    const num = parseInt(val);
+    if (isNaN(num) || num < 0) {
+        state.sls[idx][field] = 0;
+        event.target.value = 0;
+        return;
+    }
+    state.sls[idx][field] = num;
+}
 
 initForm();
 loadApiKeys();
