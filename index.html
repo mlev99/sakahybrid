@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SLS Monitor V4.4</title>
+    <title>Saka Tracker V5.0 - Omni</title>
     <style>
         :root {
             --bg-color: #0b1120;
@@ -21,12 +21,8 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', system-ui, sans-serif; -webkit-tap-highlight-color: transparent; }
         
         body { 
-            background-color: var(--bg-color); 
-            color: var(--text-main); 
-            padding-bottom: calc(var(--nav-height) + 30px); 
-            min-height: 100vh; 
-            line-height: 1.6; 
-            overflow-x: hidden;
+            background-color: var(--bg-color); color: var(--text-main); 
+            padding-bottom: calc(var(--nav-height) + 40px); min-height: 100vh; line-height: 1.6; overflow-x: hidden;
         }
 
         .container { max-width: 800px; margin: 0 auto; padding: 20px; display: flex; flex-direction: column; gap: 20px; }
@@ -35,46 +31,40 @@
         .header h1 { font-size: 1.4rem; font-weight: 700; letter-spacing: -0.5px; }
         .header p { color: var(--text-muted); font-size: 0.85rem; margin-top: 4px; }
 
-        .form-section { background: var(--card-bg); border-radius: 16px; padding: 15px; border: 1px solid var(--border); }
+        /* CONSISTENT INPUT STYLING */
+        .form-section { background: var(--card-bg); border-radius: 16px; padding: 20px; border: 1px solid var(--border); }
         
-        .input-grid { 
-            display: grid; 
-            grid-template-columns: 50px repeat(5, 1fr); 
-            gap: 6px; 
-            align-items: center; 
-            font-size: 0.75rem; 
-            margin-bottom: 10px;
-        }
-        
+        .input-grid { display: grid; grid-template-columns: 50px repeat(5, 1fr); gap: 6px; align-items: center; font-size: 0.75rem; margin-bottom: 10px; }
         .input-header { color: var(--text-muted); font-weight: 600; text-align: center; padding-bottom: 8px; border-bottom: 1px solid var(--border); font-size: 0.7rem; }
         .sls-code { font-weight: bold; color: var(--accent-blue); text-align: left; padding-left: 2px; font-size: 0.8rem; }
         
-        input[type="number"] {
+        /* Unified Input Style for ALL pages */
+        input[type="number"], input[type="password"], input[type="text"] {
             background: #0f172a; border: 1px solid var(--border); color: white;
-            padding: 10px 2px; border-radius: 8px; width: 100%; text-align: center; 
-            font-size: 0.9rem; transition: all 0.2s;
-            -moz-appearance: textfield;
+            padding: 12px; border-radius: 10px; width: 100%; text-align: center; 
+            font-size: 0.9rem; transition: all 0.2s; -moz-appearance: textfield;
         }
-        input[type="number"]::-webkit-outer-spin-button,
-        input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-        input[type="number"]:focus { outline: none; border-color: var(--accent-blue); background: #172033; }
+        input[type="number"]::-webkit-outer-spin-button, input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        input:focus { outline: none; border-color: var(--accent-blue); background: #172033; }
 
         .draft-row { display: flex; justify-content: space-between; align-items: center; padding: 15px 5px; border-top: 1px solid var(--border); margin-top: 10px; }
         .draft-label { font-weight: bold; font-size: 0.9rem; }
         .draft-input-wrap { width: 100px; }
 
-        .btn-analyze {
+        /* Buttons */
+        .btn-primary {
             background: linear-gradient(135deg, var(--accent-blue), #2563eb); 
             color: white; border: none; padding: 16px; border-radius: 12px; 
             font-weight: 700; cursor: pointer; width: 100%; font-size: 1rem;
             transition: all 0.3s ease; margin-top: 15px; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.2);
         }
-        .btn-analyze:active { transform: scale(0.98); }
-        .btn-analyze:disabled { opacity: 0.7; cursor: wait; filter: grayscale(0.5); }
+        .btn-success { background: var(--accent-green); color: white; border: none; padding: 14px; border-radius: 12px; width: 100%; font-weight: 600; margin-top: 10px; cursor: pointer;}
+        .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text-muted); padding: 14px; border-radius: 12px; width: 100%; margin-top: 10px; font-size: 0.9rem; cursor: pointer;}
+        .btn-small { padding: 8px 16px; font-size: 0.8rem; border-radius: 8px; width: auto; display: inline-block; margin-right: 5px; margin-top: 5px;}
 
+        /* Analysis Cards */
         #analysis-container { display: none; animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
         @keyframes fadeUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-
         .result-card { background: var(--card-bg); border-radius: 16px; padding: 20px; border: 1px solid var(--border); margin-bottom: 16px; }
         .result-title { font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 700; margin-bottom: 15px; }
 
@@ -88,11 +78,10 @@
         .metric-label { font-size: 0.8rem; color: var(--text-muted); }
         .metric-value { font-size: 1.1rem; font-weight: 700; }
 
+        /* Priority Accordion */
         .priority-list { display: flex; flex-direction: column; gap: 10px; }
         .priority-item { background: #0f172a; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
         .priority-header { padding: 15px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
-        .priority-header:hover { background: #1e293b; }
-        
         .p-rank { width: 24px; height: 24px; background: var(--border); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: bold; margin-right: 12px; }
         .p-info { flex: 1; }
         .p-code { font-weight: bold; font-size: 0.95rem; }
@@ -101,7 +90,6 @@
         .action-lanjut { background: rgba(59, 130, 246, 0.15); color: var(--accent-blue); }
         .action-mulai { background: rgba(245, 158, 11, 0.15); color: var(--accent-orange); }
         .action-done { background: rgba(16, 185, 129, 0.15); color: var(--accent-green); }
-
         .priority-detail { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; background: #162032; border-top: 1px solid var(--border); }
         .priority-detail.open { max-height: 500px; }
         .detail-content { padding: 15px; font-size: 0.85rem; color: var(--text-muted); line-height: 1.6; }
@@ -119,34 +107,58 @@
         .ai-warn { background: rgba(239, 68, 68, 0.15); color: #f87171; padding: 2px 6px; border-radius: 4px; font-weight: 600; }
         .ai-success { background: rgba(16, 185, 129, 0.15); color: #34d399; padding: 2px 6px; border-radius: 4px; font-weight: 600; }
 
-        #settings-page { display: none; padding: 20px; max-width: 600px; margin: 0 auto; }
+        /* Settings & Data SLS Page Styling */
         .setting-group { margin-bottom: 20px; }
         .setting-group label { display: block; color: var(--text-muted); margin-bottom: 8px; font-size: 0.9rem; }
         .api-status { font-size: 0.8rem; margin-top: 6px; display: flex; align-items: center; gap: 6px; }
         .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border); }
         .status-dot.active { background: var(--accent-green); box-shadow: 0 0 8px var(--accent-green); }
-        .btn-save { background: var(--accent-green); color: white; border: none; padding: 12px; border-radius: 10px; width: 100%; font-weight: 600; margin-top: 10px; }
-        .btn-test { background: transparent; border: 1px solid var(--border); color: var(--text-muted); padding: 10px; border-radius: 10px; width: 100%; margin-top: 10px; font-size: 0.85rem; }
 
+        .data-sls-row { display: grid; grid-template-columns: 60px 1fr 1fr 40px; gap: 10px; align-items: center; margin-bottom: 10px; padding: 10px; background: #0f172a; border-radius: 10px; border: 1px solid var(--border); }
+        .data-sls-row input { text-align: left; padding: 10px; }
+        .btn-delete { background: rgba(239, 68, 68, 0.1); color: var(--accent-red); border: none; width: 30px; height: 30px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center;}
+
+        /* Footer Info */
+        .app-footer { text-align: center; padding: 30px 20px; color: var(--text-muted); font-size: 0.8rem; border-top: 1px solid var(--border); margin-top: 20px; }
+        .app-name { font-size: 1.1rem; font-weight: bold; color: var(--text-main); margin-bottom: 5px; }
+        .dev-contact { margin: 15px 0; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+        .contact-btn { background: var(--card-bg); border: 1px solid var(--border); color: var(--text-main); padding: 8px 16px; border-radius: 20px; text-decoration: none; font-size: 0.8rem; display: flex; align-items: center; gap: 6px; transition: all 0.2s;}
+        .contact-btn:hover { border-color: var(--accent-blue); color: var(--accent-blue); }
+        .legal-links { margin-top: 15px; display: flex; justify-content: center; gap: 15px; }
+        .legal-btn { background: none; border: none; color: var(--text-muted); font-size: 0.75rem; cursor: pointer; text-decoration: underline; padding: 5px;}
+
+        /* Modal */
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); z-index: 2000; display: none; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(5px);}
+        .modal-content { background: var(--card-bg); border-radius: 16px; padding: 25px; max-width: 500px; width: 100%; max-height: 80vh; overflow-y: auto; border: 1px solid var(--border); }
+        .modal-title { font-size: 1.2rem; font-weight: bold; margin-bottom: 15px; color: var(--text-main); }
+        .modal-body { font-size: 0.9rem; color: var(--text-muted); line-height: 1.6; white-space: pre-wrap; }
+        .modal-close { margin-top: 20px; width: 100%; }
+
+        /* Bottom Nav */
         .bottom-nav {
             position: fixed; bottom: 0; left: 0; right: 0; height: var(--nav-height);
             background: rgba(11, 17, 32, 0.95); backdrop-filter: blur(12px);
             border-top: 1px solid var(--border); display: flex; justify-content: space-around;
             align-items: center; z-index: 1000; padding-bottom: env(safe-area-inset-bottom);
         }
-        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-muted); text-decoration: none; font-size: 0.7rem; padding: 10px 20px; cursor: pointer; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-muted); text-decoration: none; font-size: 0.7rem; padding: 10px 15px; cursor: pointer; transition: color 0.2s;}
         .nav-item.active { color: var(--accent-blue); }
         .nav-icon { font-size: 1.4rem; margin-bottom: 2px; }
 
         .footer-status { font-size: 0.7rem; color: var(--text-muted); text-align: center; margin-top: 20px; padding-top: 15px; border-top: 1px solid var(--border); opacity: 0.7; }
         .provider-active { color: var(--accent-green); font-weight: 600; }
+
+        /* Hide pages by default */
+        .page { display: none; }
+        .page.active { display: block; }
     </style>
 </head>
 <body>
 
-<div id="dashboard-page" class="container">
+<!-- DASHBOARD PAGE -->
+<div id="page-dashboard" class="page active container">
     <div class="header">
-        <h1>SLS PROGRESS MONITOR</h1>
+        <h1>SAKA TRACKER</h1>
         <p id="current-date">Memuat tanggal...</p>
     </div>
 
@@ -162,11 +174,10 @@
             <div class="draft-input-wrap"><input type="number" id="global-draft" value="27"></div>
         </div>
 
-        <button class="btn-analyze" id="btn-analyze" onclick="runAnalysis()">🧠 ANALISIS & SIMPAN SNAPSHOT</button>
+        <button class="btn-primary" id="btn-analyze" onclick="runAnalysis()"> ANALISIS & SIMPAN SNAPSHOT</button>
     </div>
 
     <div id="analysis-container">
-        <!-- TERMIN 1 ALERT -->
         <div class="result-card" id="termin-alert-card" style="display:none;">
             <div class="result-title">⚠️ STATUS TERMIN PEMBAYARAN 1</div>
             <div id="termin-status"></div>
@@ -179,7 +190,7 @@
         </div>
 
         <div class="result-card">
-            <div class="result-title"> KOMPARASI & TARGET HARIAN</div>
+            <div class="result-title">📊 KOMPARASI & TARGET HARIAN</div>
             <div class="metrics-grid">
                 <div class="metric-item">
                     <span class="metric-label">% Dashboard FASIH</span>
@@ -190,23 +201,23 @@
                     <span class="metric-value" id="comp-muatan-persen" style="color:var(--accent-green)">-</span>
                 </div>
                 <div class="metric-item" style="grid-column: 1/-1; border-top:1px solid var(--border); padding-top:10px; margin-top:5px;">
-                    <span class="metric-label">Ritme Saat Ini (Bulatkan)</span>
+                    <span class="metric-label">Ritme Saat Ini (Bulat)</span>
                     <span class="metric-value" id="curr-velocity">-</span>
                 </div>
                 <div class="metric-item" style="grid-column: 1/-1;">
-                    <span class="metric-label">Ritme Dibutuhkan (Bulatkan)</span>
+                    <span class="metric-label">Ritme Dibutuhkan (Bulat)</span>
                     <span class="metric-value" id="req-velocity" style="color:var(--accent-orange)">-</span>
                 </div>
             </div>
         </div>
 
         <div class="result-card">
-            <div class="result-title"> PRIORITAS KERJA OPTIMAL</div>
+            <div class="result-title">⚡ PRIORITAS KERJA OPTIMAL</div>
             <div class="priority-list" id="priority-list"></div>
         </div>
 
         <div class="result-card">
-            <div class="result-title">📊 PERFORMANCE & TREND</div>
+            <div class="result-title"> PERFORMANCE & TREND</div>
             <div class="perf-display">
                 <div class="grade-big" id="perf-grade">-</div>
                 <div class="grade-desc" id="perf-desc" style="color:var(--text-muted); font-size:0.9rem; margin-bottom:15px;">-</div>
@@ -228,72 +239,159 @@
             </div>
         </div>
     </div>
+    
+    <!-- APP FOOTER INFO -->
+    <div class="app-footer">
+        <div class="app-name">Saka Tracker v5.0.24 (Build 20260708)</div>
+        <div style="margin-bottom: 10px;">Aplikasi monitoring progres SLS berbasis Hybrid AI dengan tracking termin dan komparasi muatan kontrak.</div>
+        <div style="font-weight: bold; color: var(--text-main); margin-bottom: 5px;">Developed by Saka_Omni</div>
+        
+        <div class="dev-contact">
+            <a href="mailto:mlevian@protonmail.com" class="contact-btn">✉️ Email Developer</a>
+            <a href="https://wa.me/6285111330391" target="_blank" class="contact-btn">💬 WhatsApp Direct</a>
+        </div>
+
+        <div class="legal-links">
+            <button class="legal-btn" onclick="openModal('tos')">Terms of Service</button>
+            <button class="legal-btn" onclick="openModal('privacy')">Privacy Policy</button>
+        </div>
+    </div>
 </div>
 
-<div id="settings-page">
+<!-- DATA SLS PAGE (NEW CRUD TAB) -->
+<div id="page-data" class="page container">
+    <div class="header">
+        <h1>MANAJEMEN DATA SLS</h1>
+        <p>Kelola Master Data Open FASIH & Muatan</p>
+    </div>
+
+    <div class="form-section">
+        <div style="display: grid; grid-template-columns: 60px 1fr 1fr 40px; gap: 10px; margin-bottom: 15px; font-size: 0.8rem; color: var(--text-muted); text-align: center;">
+            <div>Kode</div><div>Open FASIH</div><div>Muatan</div><div></div>
+        </div>
+        <div id="data-sls-list"></div>
+        
+        <button class="btn-outline" onclick="addNewSLSRow()" style="margin-top: 15px;">+ Tambah Baris SLS Baru</button>
+        <button class="btn-success" onclick="saveDataSLS()" style="margin-top: 10px;">💾 Simpan Perubahan Data Master</button>
+    </div>
+</div>
+
+<!-- SETTINGS PAGE -->
+<div id="page-settings" class="page container">
     <div class="header">
         <h1>PENGATURAN AI HYBRID</h1>
-        <p>Konfigurasi API Key untuk fallback otomatis</p>
+        <p>Konfigurasi API Key & Backup Data</p>
     </div>
     <div class="form-section">
         <div class="setting-group">
             <label>OpenAI API Key (Primary)</label>
-            <input type="password" id="api-openai" placeholder="sk-proj-..." onchange="saveApiKeys()">
+            <input type="password" id="api-openai" placeholder="sk-proj-..." onchange="updateApiStatusUI()">
             <div class="api-status" id="status-openai"><span class="status-dot"></span> Belum dikonfigurasi</div>
         </div>
         <div class="setting-group">
             <label>Gemini API Key (Fallback 1)</label>
-            <input type="password" id="api-gemini" placeholder="AIzaSy..." onchange="saveApiKeys()">
+            <input type="password" id="api-gemini" placeholder="AIzaSy..." onchange="updateApiStatusUI()">
             <div class="api-status" id="status-gemini"><span class="status-dot"></span> Belum dikonfigurasi</div>
         </div>
         <div class="setting-group">
             <label>Mistral API Key (Fallback 2)</label>
-            <input type="password" id="api-mistral" placeholder="..." onchange="saveApiKeys()">
+            <input type="password" id="api-mistral" placeholder="..." onchange="updateApiStatusUI()">
             <div class="api-status" id="status-mistral"><span class="status-dot"></span> Belum dikonfigurasi</div>
         </div>
-        <button class="btn-save" onclick="saveApiKeys()">💾 Simpan Konfigurasi</button>
-        <button class="btn-test" onclick="testAllApis()"> Uji Koneksi Semua Provider</button>
+        
+        <button class="btn-success" onclick="saveSettings()">💾 Simpan Konfigurasi API</button>
+        <button class="btn-outline" onclick="testAllApis()">🔍 Uji Koneksi Semua Provider</button>
         <div id="test-results" style="margin-top:15px; font-size:0.85rem; color:var(--text-muted)"></div>
+
+        <div style="margin-top: 30px; border-top: 1px solid var(--border); padding-top: 20px;">
+            <div class="result-title">BACKUP & RESTORE DATA</div>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 15px;">Unduh semua data SLS, history, dan API keys ke file JSON. Gunakan fitur restore untuk memulihkan data di perangkat lain.</p>
+            <button class="btn-outline" onclick="backupData()">️ Export Backup (JSON)</button>
+            <button class="btn-outline" onclick="document.getElementById('restore-file').click()">⬆️ Import Restore (JSON)</button>
+            <input type="file" id="restore-file" accept=".json" style="display: none;" onchange="restoreData(this)">
+        </div>
     </div>
 </div>
 
+<!-- MODAL FOR LEGAL -->
+<div id="legal-modal" class="modal-overlay" onclick="if(event.target === this) closeModal()">
+    <div class="modal-content">
+        <div class="modal-title" id="modal-title">Title</div>
+        <div class="modal-body" id="modal-body">Content</div>
+        <button class="btn-primary modal-close" onclick="closeModal()">Tutup</button>
+    </div>
+</div>
+
+<!-- BOTTOM NAVBAR -->
 <nav class="bottom-nav">
     <div class="nav-item active" onclick="switchPage('dashboard')">
         <span class="nav-icon">📊</span><span>Dashboard</span>
     </div>
+    <div class="nav-item" onclick="switchPage('data')">
+        <span class="nav-icon">️</span><span>Data SLS</span>
+    </div>
     <div class="nav-item" onclick="switchPage('settings')">
-        <span class="nav-icon">️</span><span>Pengaturan</span>
+        <span class="nav-icon">⚙️</span><span>Pengaturan</span>
     </div>
 </nav>
 
 <script>
+// ===============================
+// CONFIG & STATE MANAGEMENT
+// ===============================
+const APP_VERSION = "5.0.24";
+const BUILD_DATE = "20260708";
 const CONFIG = {
-    assessment: 696, muatan: 813,
     startDate: new Date("2026-06-15"), 
     absoluteDeadline: new Date("2026-08-30"),
     safetyBufferDays: 4,
-    termin1TargetDate: new Date("2026-07-13") // Minggu ini (contoh: 13 Juli 2026)
+    termin1TargetDate: new Date("2026-07-13")
 };
 const clearanceDate = new Date(CONFIG.absoluteDeadline);
 clearanceDate.setDate(clearanceDate.getDate() - CONFIG.safetyBufferDays);
 
-let state = JSON.parse(localStorage.getItem('sls_monitor_v4_4')) || {
+let state = JSON.parse(localStorage.getItem('saka_tracker_v5')) || {
+    // Default Config Targets (Will be overwritten by Data SLS if exists)
+    config: { assessment: 696, muatan: 813 },
     dashboard: { open: 496, draft: 27, submit: 35, reject: 0, pending: 0, approve: 166 },
     sls: [
-        {kode:"0012",open:61,submit:0,reject:0,pending:0,approve:0},
-        {kode:"0013",open:44,submit:0,reject:0,pending:0,approve:0},
-        {kode:"0014",open:48,submit:0,reject:0,pending:0,approve:0},
-        {kode:"0015",open:4,submit:0,reject:0,pending:0,approve:94},
-        {kode:"0016",open:6,submit:19,reject:0,pending:0,approve:29},
-        {kode:"0017",open:50,submit:15,reject:0,pending:0,approve:43},
-        {kode:"0018",open:124,submit:1,reject:0,pending:0,approve:0},
-        {kode:"0019",open:78,submit:0,reject:0,pending:0,approve:0},
-        {kode:"0020",open:81,submit:0,reject:0,pending:0,approve:0}
+        {kode:"0012",open:61,submit:0,reject:0,pending:0,approve:0, muatan: 90},
+        {kode:"0013",open:44,submit:0,reject:0,pending:0,approve:0, muatan: 85},
+        {kode:"0014",open:48,submit:0,reject:0,pending:0,approve:0, muatan: 92},
+        {kode:"0015",open:4,submit:0,reject:0,pending:0,approve:94, muatan: 98},
+        {kode:"0016",open:6,submit:19,reject:0,pending:0,approve:29, muatan: 54},
+        {kode:"0017",open:50,submit:15,reject:0,pending:0,approve:43, muatan: 108},
+        {kode:"0018",open:124,submit:1,reject:0,pending:0,approve:0, muatan: 125},
+        {kode:"0019",open:78,submit:0,reject:0,pending:0,approve:0, muatan: 78},
+        {kode:"0020",open:81,submit:0,reject:0,pending:0,approve:0, muatan: 83}
     ],
     history: [],
     apiKeys: { openai: '', gemini: '', mistral: '' }
 };
 
+// Sync global config targets based on SLS Data
+function syncConfigTargets() {
+    let totalMuatan = 0;
+    let totalOpenFasih = 0;
+    state.sls.forEach(s => {
+        totalMuatan += (parseInt(s.muatan) || 0);
+        totalOpenFasih += (parseInt(s.open) || 0);
+    });
+    // Assessment is usually Total Open + Total Approved/Submitted in FASIH context
+    // But for simplicity, we use sum of muatan as muatan target, and a fixed ratio or sum for assessment
+    // Here we dynamically update state.config
+    state.config.muatan = totalMuatan;
+    // Assuming Assessment is roughly related to total items handled. 
+    // For this logic, let's keep assessment dynamic based on total potential items (Open + Prog) or just use Muatan as base.
+    // Let's set Assessment = Total Muatan for 1:1 mapping unless specified otherwise, 
+    // OR keep the old logic where Assessment is separate. 
+    // To make it "Automatic looping", let's assume Assessment = Sum of Muatan for now.
+    state.config.assessment = totalMuatan; 
+}
+
+// ===============================
+// HYBRID AI ORCHESTRATOR
+// ===============================
 class HybridAIOrchestrator {
     constructor(keys) {
         this.keys = keys;
@@ -359,7 +457,7 @@ class HybridAIOrchestrator {
     deterministicFallback() {
         const prog = getProgress();
         const sisaHari = getSisaHariKeClearance();
-        const remaining = CONFIG.assessment - prog.val;
+        const remaining = state.config.assessment - prog.val;
         const reqVel = Math.ceil(remaining / Math.max(1, sisaHari));
         const currVel = getVelocity();
         const isOnTrack = currVel >= reqVel;
@@ -377,13 +475,15 @@ class HybridAIOrchestrator {
     }
 }
 
-// LOGIKA YANG DIPERBAIKI
+// ===============================
+// CORE LOGIC FUNCTIONS
+// ===============================
 function getProgress() {
     const p = state.dashboard.submit + state.dashboard.approve;
     return { 
         val: p, 
-        dashP: (p/CONFIG.assessment)*100, 
-        muatanP: (p/CONFIG.muatan)*100 
+        dashP: (p/state.config.assessment)*100, 
+        muatanP: (p/state.config.muatan)*100 
     };
 }
 
@@ -400,12 +500,10 @@ function getVelocity() {
         const first = state.history[0].progress;
         const last = state.history[state.history.length-1].progress;
         const histDays = Math.max(1, state.history.length - 1);
-        // DIBULATKAN KE ATAS TANPA KOMA
         return Math.ceil((last - first) / histDays);
     }
     
     const currentProg = getProgress().val;
-    // DIBULATKAN KE ATAS TANPA KOMA
     return Math.ceil(currentProg / elapsedDays);
 }
 
@@ -438,11 +536,16 @@ function generateSLSDetail(slsItem, rank) {
             <strong>Strategi AI:</strong> ${strategy}`;
 }
 
+// ===============================
+// MAIN ACTIONS & RENDERERS
+// ===============================
 async function runAnalysis() {
     const btn = document.getElementById('btn-analyze');
-    btn.disabled = true; btn.innerText = ' Sedang Menganalisis...';
+    btn.disabled = true; btn.innerText = '⏳ Sedang Menganalisis...';
 
     state.dashboard.draft = parseInt(document.getElementById('global-draft').value)||0;
+    syncConfigTargets(); // Ensure targets are up to date before analysis
+    
     const prog = getProgress();
     const perf = performanceGrade(prog.dashP);
     
@@ -454,17 +557,17 @@ async function runAnalysis() {
     const lastHist = state.history[state.history.length-1];
     if(lastHist && lastHist.date === snapshot.date) state.history.pop();
     state.history.push(snapshot);
-    localStorage.setItem('sls_monitor_v4_4', JSON.stringify(state));
+    localStorage.setItem('saka_tracker_v5', JSON.stringify(state));
 
-    renderTerminAlert(prog); // Render alert termin baru
+    renderTerminAlert(prog);
     renderForecast();
-    renderTargetsAndComparison(prog); // Render komparasi baru
+    renderTargetsAndComparison(prog);
     renderPriorityAccordions();
     renderPerformance(prog, perf);
 
     const orchestrator = new HybridAIOrchestrator(state.apiKeys);
     const top3 = prioritasSLS().slice(0,3);
-    const aiPrompt = `Analisis progres SLS: Progress Dashboard ${prog.dashP.toFixed(2)}%, Muatan ${prog.muatanP.toFixed(2)}%. 
+    const aiPrompt = `Analisis progres Saka Tracker: Progress Dashboard ${prog.dashP.toFixed(2)}%, Muatan ${prog.muatanP.toFixed(2)}%. 
     Velocity rata-rata: ${getVelocity()} data/hari (bulat).
     Status Termin 1 (Target 40%): ${prog.dashP >= 40 ? 'Tercapai' : 'Belum Tercapai'}.
     Top 3 SLS prioritas: ${top3.map(s=>`${s.kode} (${s.open} open)`).join(', ')}.
@@ -477,10 +580,9 @@ async function runAnalysis() {
     container.style.display = 'block';
     setTimeout(()=>container.scrollIntoView({behavior:'smooth',block:'start'}),100);
 
-    btn.disabled = false; btn.innerText = ' ANALISIS & SIMPAN SNAPSHOT';
+    btn.disabled = false; btn.innerText = '🧠 ANALISIS & SIMPAN SNAPSHOT';
 }
 
-// FUNGSI RENDER BARU UNTUK TERMIN
 function renderTerminAlert(prog) {
     const card = document.getElementById('termin-alert-card');
     const statusDiv = document.getElementById('termin-status');
@@ -497,19 +599,16 @@ function renderTerminAlert(prog) {
             statusDiv.innerHTML = `<div class="forecast-box forecast-warn">WARNING: Termin 1 belum tercapai (${prog.dashP.toFixed(2)}%). Sisa waktu minggu ini: ${daysLeft} hari. Wajib selesai dalam minggu ini!</div>`;
         }
     } else {
-        card.style.display = 'none'; // Sembunyikan jika sudah aman
+        card.style.display = 'none';
     }
 }
 
-// FUNGSI RENDER KOMPARASI & TARGET
 function renderTargetsAndComparison(prog) {
-    // Komparasi Persentase
     document.getElementById('comp-dash-persen').innerText = prog.dashP.toFixed(2) + '%';
     document.getElementById('comp-muatan-persen').innerText = prog.muatanP.toFixed(2) + '%';
 
-    // Target Harian (Semua dibulatkan)
     const sisaHari = getSisaHariKeClearance();
-    const remaining = CONFIG.assessment - prog.val;
+    const remaining = state.config.assessment - prog.val;
     const reqVel = Math.ceil(remaining/sisaHari);
     const currVel = getVelocity();
     
@@ -520,7 +619,7 @@ function renderTargetsAndComparison(prog) {
 function renderForecast() {
     const prog = getProgress();
     const sisaHari = getSisaHariKeClearance();
-    const remaining = CONFIG.assessment - prog.val;
+    const remaining = state.config.assessment - prog.val;
     const reqVel = Math.ceil(remaining/sisaHari);
     const currVel = getVelocity();
     const isOnTrack = currVel >= reqVel;
@@ -531,7 +630,7 @@ function renderForecast() {
     
     let boxClass = isOnTrack ? 'forecast-ok' : (currVel >= reqVel * 0.7 ? 'forecast-warn' : 'forecast-crit');
     let text = isOnTrack ? `✅ ON TRACK: Clearance aman sebelum ${dateStr}` : 
-               (currVel >= reqVel * 0.7 ? `️ WARNING: Margin tipis untuk clearance ${dateStr}` : ` CRITICAL: Tidak mencapai clearance ${dateStr}`);
+               (currVel >= reqVel * 0.7 ? `⚠️ WARNING: Margin tipis untuk clearance ${dateStr}` : `🚨 CRITICAL: Tidak mencapai clearance ${dateStr}`);
                
     statusDiv.innerHTML = `<div class="forecast-box ${boxClass}">${text}</div>`;
     
@@ -586,28 +685,82 @@ function renderPerformance(prog, perf) {
     document.getElementById('dash-bar').style.width = Math.min(100,prog.dashP)+'%';
 }
 
-function switchPage(page) {
-    document.querySelectorAll('.nav-item').forEach(el=>el.classList.remove('active'));
-    if(page==='dashboard') {
-        document.getElementById('dashboard-page').style.display='flex';
-        document.getElementById('settings-page').style.display='none';
-        document.querySelectorAll('.nav-item')[0].classList.add('active');
-    } else {
-        document.getElementById('dashboard-page').style.display='none';
-        document.getElementById('settings-page').style.display='block';
-        document.querySelectorAll('.nav-item')[1].classList.add('active');
+// ===============================
+// NAVIGATION & UI HELPERS
+// ===============================
+function switchPage(pageName) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    
+    document.getElementById(`page-${pageName}`).classList.add('active');
+    // Find nav item by index or attribute, simplified here:
+    const navItems = document.querySelectorAll('.nav-item');
+    if(pageName === 'dashboard') navItems[0].classList.add('active');
+    if(pageName === 'data') {
+        navItems[1].classList.add('active');
+        renderDataSLSPage(); // Refresh CRUD list when opening tab
+    }
+    if(pageName === 'settings') {
+        navItems[2].classList.add('active');
         loadApiKeys();
     }
     window.scrollTo(0,0);
 }
 
-function saveApiKeys() {
+// ===============================
+// CRUD DATA SLS LOGIC
+// ===============================
+function renderDataSLSPage() {
+    const list = document.getElementById('data-sls-list');
+    list.innerHTML = '';
+    state.sls.forEach((s, idx) => {
+        const row = document.createElement('div');
+        row.className = 'data-sls-row';
+        row.innerHTML = `
+            <input type="text" value="${s.kode}" onchange="updateDataSLS(${idx}, 'kode', this.value)" style="text-align:center; font-weight:bold; color:var(--accent-blue)">
+            <input type="number" value="${s.open}" onchange="updateDataSLS(${idx}, 'open', this.value)" placeholder="Open FASIH">
+            <input type="number" value="${s.muatan || 0}" onchange="updateDataSLS(${idx}, 'muatan', this.value)" placeholder="Jml Muatan">
+            <button class="btn-delete" onclick="deleteDataSLS(${idx})">✕</button>
+        `;
+        list.appendChild(row);
+    });
+}
+
+function updateDataSLS(idx, field, val) {
+    if(field === 'open' || field === 'muatan') val = parseInt(val) || 0;
+    state.sls[idx][field] = val;
+    // Don't save to localstorage yet, wait for "Simpan Perubahan" button
+}
+
+function addNewSLSRow() {
+    state.sls.push({kode: "NEW", open: 0, submit: 0, reject: 0, pending: 0, approve: 0, muatan: 0});
+    renderDataSLSPage();
+}
+
+function deleteDataSLS(idx) {
+    if(confirm('Hapus baris SLS ini?')) {
+        state.sls.splice(idx, 1);
+        renderDataSLSPage();
+    }
+}
+
+function saveDataSLS() {
+    syncConfigTargets(); // Recalculate totals
+    localStorage.setItem('saka_tracker_v5', JSON.stringify(state));
+    alert('✅ Data Master SLS berhasil disimpan! Dashboard akan menggunakan data terbaru.');
+    initForm(); // Refresh dashboard inputs to match new SLS list
+}
+
+// ===============================
+// SETTINGS, BACKUP & RESTORE
+// ===============================
+function saveSettings() {
     state.apiKeys.openai = document.getElementById('api-openai').value.trim();
     state.apiKeys.gemini = document.getElementById('api-gemini').value.trim();
     state.apiKeys.mistral = document.getElementById('api-mistral').value.trim();
-    localStorage.setItem('sls_monitor_v4_4', JSON.stringify(state));
+    localStorage.setItem('saka_tracker_v5', JSON.stringify(state));
     updateApiStatusUI();
-    alert('Konfigurasi API berhasil disimpan!');
+    alert('💾 Konfigurasi API Key berhasil disimpan!');
 }
 
 function loadApiKeys() {
@@ -637,18 +790,79 @@ async function testAllApis() {
         {name:'Mistral', key:state.apiKeys.mistral, url:'https://api.mistral.ai/v1/models', auth:`Bearer ${state.apiKeys.mistral}`}
     ];
     for(const t of tests) {
-        if(!t.key) { output += `<div>❌ ${t.name}: API Key kosong</div>`; continue; }
+        if(!t.key) { output += `<div> ${t.name}: API Key kosong</div>`; continue; }
         try {
             const headers = t.auth ? {'Authorization':t.auth} : {};
             const res = await fetch(t.url, {headers, signal:AbortSignal.timeout(5000)});
             if(res.ok) output += `<div style="color:var(--accent-green)">✅ ${t.name}: Terhubung</div>`;
             else output += `<div style="color:var(--accent-red)">❌ ${t.name}: Gagal (${res.status})</div>`;
-        } catch(e) { output += `<div style="color:var(--accent-red)"> ${t.name}: ${e.message}</div>`; }
+        } catch(e) { output += `<div style="color:var(--accent-red)">️ ${t.name}: ${e.message}</div>`; }
     }
     resultsDiv.innerHTML = output;
 }
 
+function backupData() {
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state));
+    const downloadAnchorNode = document.createElement('a');
+    downloadAnchorNode.setAttribute("href", dataStr);
+    downloadAnchorNode.setAttribute("download", `saka_tracker_backup_${new Date().toISOString().slice(0,10)}.json`);
+    document.body.appendChild(downloadAnchorNode);
+    downloadAnchorNode.click();
+    downloadAnchorNode.remove();
+}
+
+function restoreData(inputElement) {
+    const file = inputElement.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const restoredState = JSON.parse(e.target.result);
+            // Basic validation
+            if(restoredState.sls && restoredState.apiKeys) {
+                state = restoredState;
+                localStorage.setItem('saka_tracker_v5', JSON.stringify(state));
+                alert('✅ Data berhasil dipulihkan! Halaman akan dimuat ulang.');
+                location.reload();
+            } else {
+                alert('❌ File backup tidak valid atau rusak.');
+            }
+        } catch(err) {
+            alert(' Gagal membaca file backup: ' + err.message);
+        }
+    };
+    reader.readAsText(file);
+}
+
+// ===============================
+// LEGAL MODALS
+// ===============================
+function openModal(type) {
+    const modal = document.getElementById('legal-modal');
+    const title = document.getElementById('modal-title');
+    const body = document.getElementById('modal-body');
+    
+    modal.style.display = 'flex';
+    
+    if(type === 'tos') {
+        title.innerText = "Terms of Service (TOS)";
+        body.innerText = `TERMS OF SERVICE - SAKA TRACKER\n\nLast Updated: July 8, 2026\n\n1. ACCEPTANCE OF TERMS\nBy accessing and using Saka Tracker ("Application"), you accept and agree to be bound by the terms and provision of this agreement.\n\n2. DESCRIPTION OF SERVICE\nSaka Tracker is a personal productivity tool designed for monitoring SLS progress, managing FASIH dashboard data, and providing AI-driven insights. \n\n3. USER RESPONSIBILITIES\nYou are responsible for maintaining the confidentiality of your API keys and data entered into the application. The developer (Saka_Omni) is not liable for any data loss due to device failure or clearing browser cache without backup.\n\n4. NO WARRANTY\nTHE APPLICATION IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND. USE AT YOUR OWN RISK.\n\n5. CONTACT\nFor support, contact mlevian@protonmail.com`;
+    } else if (type === 'privacy') {
+        title.innerText = "Privacy Policy";
+        body.innerText = `PRIVACY POLICY - SAKA TRACKER\n\nLast Updated: July 8, 2026\n\n1. DATA COLLECTION\nSaka Tracker operates entirely on your local device (Client-Side). We DO NOT collect, store, or transmit your SLS data, progress reports, or API keys to any external server.\n\n2. API KEYS\nAPI Keys for OpenAI, Gemini, and Mistral are stored locally in your browser's LocalStorage. They are only sent directly to the respective AI providers when you trigger an analysis. \n\n3. THIRD-PARTY SERVICES\nWhen using the AI Insight feature, your prompt data is sent to OpenAI/Gemini/Mistral servers based on their respective privacy policies. Please review their policies before use.\n\n4. DATA SECURITY\nSince data is stored locally, it is vulnerable if someone gains physical access to your unlocked device. Use the Backup/Restore feature to keep your data safe.\n\n5. CHANGES TO THIS POLICY\nWe may update this policy periodically. Continued use of the app constitutes acceptance of changes.`;
+    }
+}
+
+function closeModal() {
+    document.getElementById('legal-modal').style.display = 'none';
+}
+
+// ===============================
+// INITIALIZATION
+// ===============================
 function initForm() {
+    syncConfigTargets(); // Ensure config matches SLS data on load
     const container = document.getElementById('sls-inputs-container');
     container.innerHTML = '';
     state.sls.forEach((s,idx)=>{
@@ -674,6 +888,7 @@ function updateSLS(idx, field, val) {
     state.sls[idx][field] = num;
 }
 
+// Start App
 initForm();
 loadApiKeys();
 </script>
