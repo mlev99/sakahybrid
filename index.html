@@ -116,6 +116,7 @@
         .action-lanjut { background: rgba(59, 130, 246, 0.15); color: var(--accent-blue); }
         .action-mulai { background: rgba(245, 158, 11, 0.15); color: var(--accent-orange); }
         .action-done { background: rgba(16, 185, 129, 0.15); color: var(--accent-green); }
+        .action-urgent { background: rgba(239, 68, 68, 0.15); color: var(--accent-red); }
         .priority-detail { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; background: #162032; border-top: 1px solid var(--border); }
         .priority-detail.open { max-height: 500px; }
         .detail-content { padding: 15px; font-size: 0.85rem; color: var(--text-muted); line-height: 1.6; }
@@ -237,7 +238,7 @@
                     <span class="metric-value" id="comp-muatan-persen" style="color:var(--accent-green)">-</span>
                 </div>
                 <div class="metric-item" style="grid-column: 1/-1; border-top:1px solid var(--border); padding-top:10px; margin-top:5px;">
-                    <span class="metric-label">Ritme Saat Ini (Bulat)</span>
+                    <span class="metric-label">Ritme Saat Ini (7 Hari Terakhir)</span>
                     <span class="metric-value" id="curr-velocity">-</span>
                 </div>
                 <div class="metric-item" style="grid-column: 1/-1;">
@@ -270,6 +271,7 @@
             <div class="perf-display">
                 <div class="grade-big" id="perf-grade">-</div>
                 <div class="grade-desc" id="perf-desc" style="color:var(--text-muted); font-size:0.9rem; margin-bottom:15px;">-</div>
+                <div style="font-size:0.8rem; color:var(--text-muted);" id="perf-delta">-</div>
             </div>
             <div style="display:flex; justify-content:space-between; font-size:0.85rem; margin-top:10px;">
                 <span>Progress Dashboard</span>
@@ -421,17 +423,54 @@ let state = JSON.parse(localStorage.getItem('saka_tracker_v5_4')) || {
     isAccumulationMode: false
 };
 
-// Sync global config targets based on current SLS Data (Dynamic Assessment)
+// ===============================
+// HELPER FUNCTIONS
+// ===============================
+function getElapsedDays() {
+    const diffTime = Math.abs(new Date() - CONFIG.startDate);
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24)) || 1;
+}
+
+function getSisaHariKeClearance() {
+    return Math.max(1, Math.ceil((clearanceDate - new Date()) / (1000 * 60 * 60 * 24)));
+}
+
+// ===============================
+// SYNC FUNCTIONS
+// ===============================
+function syncDashboardFromSLS() {
+    let totalSubmit = 0;
+    let totalApprove = 0;
+    let totalOpen = 0;
+    let totalReject = 0;
+    let totalPending = 0;
+    
+    state.sls.forEach(s => {
+        totalOpen += parseInt(s.open) || 0;
+        totalSubmit += parseInt(s.submit) || 0;
+        totalApprove += parseInt(s.approve) || 0;
+        totalReject += parseInt(s.reject) || 0;
+        totalPending += parseInt(s.pending) || 0;
+    });
+    
+    state.dashboard.open = totalOpen;
+    state.dashboard.submit = totalSubmit;
+    state.dashboard.approve = totalApprove;
+    state.dashboard.reject = totalReject;
+    state.dashboard.pending = totalPending;
+    
+    syncConfigTargets();
+}
+
 function syncConfigTargets() {
     let totalMuatan = 0;
     let totalAssessment = 0;
     state.sls.forEach(s => {
         totalMuatan += (parseInt(s.muatan) || 0);
-        // Assessment is dynamic: sum of current Open + Submitted + Approved
         totalAssessment += (parseInt(s.open) || 0) + (parseInt(s.submit) || 0) + (parseInt(s.approve) || 0);
     });
     state.config.muatan = totalMuatan;
-    state.config.assessment = totalAssessment; 
+    state.config.assessment = totalAssessment;
 }
 
 // ===============================
@@ -446,40 +485,55 @@ function toggleInputMode() {
     
     if (state.isAccumulationMode) {
         toggleLabel.innerHTML = '<i class="bi bi-calendar-range"></i> Mode Akumulasi (Rentang Tanggal)';
-        dateDisplay.style.display = "block";
-        initForm(); 
+        if(dateDisplay) dateDisplay.style.display = "block";
     } else {
         toggleLabel.innerHTML = '<i class="bi bi-calendar-event"></i> Mode Input Harian';
-        dateDisplay.style.display = "none";
-        initForm();
+        if(dateDisplay) dateDisplay.style.display = "none";
     }
     localStorage.setItem('saka_tracker_v5_4', JSON.stringify(state));
 }
 
-// Fungsi update SLS: OPEN JADI 0 JIKA MINUS, SELISIH DIANALISA TERPISAH
 function updateSLS(idx, field, val) {
     const num = parseInt(val);
     
-    // HANYA cegah jika user sengaja mengetik angka negatif
     if (isNaN(num) || num < 0) { 
         state.sls[idx][field] = 0; 
-        event.target.value = 0; 
+        if(event && event.target) event.target.value = 0; 
         return; 
     }
 
     const oldVal = state.sls[idx][field];
     const diff = num - oldVal;
 
+    // VALIDASI KONSISTENSI DATA
+    if (field === 'submit') {
+        const maxSubmit = state.sls[idx].open + oldVal;
+        if (num > maxSubmit) {
+            alert(`⚠️ Submit tidak boleh melebihi Open (${state.sls[idx].open})`);
+            if(event && event.target) event.target.value = oldVal;
+            return;
+        }
+    }
+    
+    if (field === 'approve') {
+        const maxApprove = state.sls[idx].submit + oldVal;
+        if (num > maxApprove) {
+            alert(`⚠️ Approve tidak boleh melebihi Submit (${state.sls[idx].submit})`);
+            if(event && event.target) event.target.value = oldVal;
+            return;
+        }
+    }
+
     // LOGIKA AUTO DECREMENT DENGAN CLAMP TO ZERO
     if (field === 'submit' || field === 'approve') {
         state.sls[idx].open -= diff;
-        // CLAMP TO ZERO: Jika Open jadi negatif, set ke 0
         if (state.sls[idx].open < 0) {
             state.sls[idx].open = 0;
         }
     }
 
     state.sls[idx][field] = num;
+    syncDashboardFromSLS();
     
     // Update tampilan Open secara real-time
     if ((field === 'submit' || field === 'approve') && diff !== 0) {
@@ -488,6 +542,564 @@ function updateSLS(idx, field, val) {
             openInput.value = state.sls[idx].open;
         }
     }
+}
+
+// ===============================
+// AUTO-SAVE HARIAN
+// ===============================
+function autoSaveDaily() {
+    const today = new Date().toLocaleDateString('id-ID');
+    const lastSave = localStorage.getItem('saka_last_save_date');
+    
+    if (lastSave !== today) {
+        const prog = getProgress();
+        const snapshot = {
+            date: today,
+            progress: prog.val,
+            dashP: prog.dashP,
+            velocity: getVelocity()
+        };
+        
+        // Cek duplikat
+        const existing = state.history.find(h => h.date === today);
+        if (!existing) {
+            state.history.push(snapshot);
+            localStorage.setItem('saka_tracker_v5_4', JSON.stringify(state));
+            localStorage.setItem('saka_last_save_date', today);
+            console.log('✅ Auto-save harian berhasil:', snapshot);
+        }
+    }
+}
+
+// ===============================
+// CORE LOGIC FUNCTIONS
+// ===============================
+function getProgress() {
+    const p = state.dashboard.submit + state.dashboard.approve;
+    return { 
+        val: p, 
+        dashP: state.config.assessment > 0 ? (p / state.config.assessment) * 100 : 0, 
+        muatanP: state.config.muatan > 0 ? (p / state.config.muatan) * 100 : 0
+    };
+}
+
+function getVelocity() {
+    // Gunakan 7 hari terakhir jika history cukup
+    if (state.history.length >= 7) {
+        const last7Days = state.history.slice(-7);
+        const first = last7Days[0].progress;
+        const last = last7Days[last7Days.length - 1].progress;
+        const diff = last - first;
+        if (diff > 0) {
+            return Math.ceil(diff / 6); // 6 interval dalam 7 hari
+        }
+    }
+    
+    // Fallback: dari start date
+    const elapsedDays = getElapsedDays();
+    const currentProg = getProgress().val;
+    return Math.ceil(currentProg / Math.max(1, elapsedDays));
+}
+
+function prioritasSLS() {
+    return [...state.sls].map(item => {
+        const prog = item.submit + item.approve;
+        const total = item.open + prog;
+        const persen = total === 0 ? 0 : (prog / total) * 100;
+        
+        // SCORING KOMPREHENSIF
+        const progressScore = persen >= 80 ? 10 : 
+                             persen >= 50 ? 20 : 
+                             persen >= 20 ? 30 : 40;
+        
+        const openScore = Math.min(item.open * 0.5, 30);
+        const approveScore = item.approve * 0.2;
+        const muatanFactor = item.muatan ? (item.muatan / 100) : 1;
+        
+        const score = (progressScore + openScore + approveScore) * muatanFactor;
+        
+        // Action recommendation
+        let action = 'Monitor';
+        let actionClass = 'action-lanjut';
+        if (persen >= 100) {
+            action = 'Selesai ✅';
+            actionClass = 'action-done';
+        } else if (item.open > 50 && persen < 30) {
+            action = 'URGENT! 🚨';
+            actionClass = 'action-urgent';
+        } else if (item.open > 30 && persen < 50) {
+            action = 'Prioritas Tinggi';
+            actionClass = 'action-urgent';
+        } else if (persen > 0) {
+            action = 'Lanjutkan';
+            actionClass = 'action-lanjut';
+        } else {
+            action = 'Mulai';
+            actionClass = 'action-mulai';
+        }
+        
+        return { ...item, score, persen, prog, action, actionClass };
+    }).sort((a, b) => b.score - a.score);
+}
+
+function performanceGrade(dashP) {
+    const elapsedDays = getElapsedDays();
+    const totalDays = Math.ceil((CONFIG.absoluteDeadline - CONFIG.startDate) / (1000 * 60 * 60 * 24));
+    const expectedProgress = (elapsedDays / totalDays) * 100;
+    const delta = dashP - expectedProgress;
+    
+    let grade, desc, color;
+    
+    if (dashP >= 80 && delta > 10) {
+        grade = 'A+'; desc = 'Excellent 🏆'; color = 'var(--accent-green)';
+    } else if (dashP >= 70 && delta > 5) {
+        grade = 'A'; desc = 'Luar Biasa ⭐'; color = 'var(--accent-green)';
+    } else if (dashP >= 60 && delta >= 0) {
+        grade = 'B'; desc = 'Baik & On Track ✅'; color = '#3b82f6';
+    } else if (dashP >= 50 && delta >= -5) {
+        grade = 'C'; desc = 'Sedang, Perlu Percepatan ⚠️'; color = 'var(--accent-orange)';
+    } else if (dashP >= 40 && delta >= -10) {
+        grade = 'D'; desc = 'Di Bawah Target 📉'; color = '#f59e0b';
+    } else {
+        grade = 'E'; desc = 'Kritis! Butuh Aksi Cepat 🚨'; color = 'var(--accent-red)';
+    }
+    
+    return { g: grade, d: desc, c: color, delta: delta.toFixed(1) };
+}
+
+function generateSLSDetail(slsItem, rank) {
+    const status = slsItem.persen === 100 ? 'selesai' : slsItem.prog > 0 ? 'sedang berjalan' : 'belum dimulai';
+    let strategy = '';
+    if(rank <= 3) strategy = `🔴 PRIORITAS UTAMA. Fokuskan resource untuk menutup ${slsItem.open} item open tersisa.`;
+    else if (slsItem.open > 80) strategy = `📊 Volume open sangat tinggi (${slsItem.open}). Butuh delegasi agar tidak jadi bottleneck.`;
+    else if (slsItem.persen < 20) strategy = `⏳ Progress rendah (${slsItem.persen.toFixed(0)}%). Mulai percepatan dengan pendekatan door-to-door.`;
+    else strategy = `📌 Status: ${status}. Lakukan monitoring mingguan.`;
+    
+    return `<strong>Kode:</strong> ${slsItem.kode} | <strong>Alamat:</strong> ${slsItem.nama}<br>
+            <strong>Detail:</strong> Open: ${slsItem.open}, Submit: ${slsItem.submit}, Approve: ${slsItem.approve}<br>
+            <strong>Progress:</strong> ${slsItem.persen.toFixed(0)}% (${slsItem.prog} dari ${slsItem.open + slsItem.prog})<br><br>
+            <strong>🎯 Strategi AI:</strong> ${strategy}`;
+}
+
+// ===============================
+// MAIN ACTIONS & RENDERERS
+// ===============================
+async function runAnalysis() {
+    const btn = document.getElementById('btn-analyze');
+    btn.disabled = true; 
+    btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Sedang Menganalisis...';
+
+    syncDashboardFromSLS();
+    syncConfigTargets();
+    state.dashboard.draft = parseInt(document.getElementById('global-draft').value)||0;
+    
+    // Auto-save harian
+    autoSaveDaily();
+    
+    const prog = getProgress();
+    const perf = performanceGrade(prog.dashP);
+    
+    // SIMULASI HISTORY BACKDATE UNTUK AKUMULASI PERTAMA
+    const todayStr = new Date().toLocaleDateString('id-ID');
+    const isFirstAnalysis = state.history.length === 0 || 
+                            (state.history.length === 1 && state.history[0].date === todayStr);
+
+    if (isFirstAnalysis && prog.val > 0) {
+        const startDate = new Date("2026-06-15");
+        const endDate = new Date(); 
+        const daysDiff = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
+        
+        state.history = [{
+            date: "15/06/2026", progress: 0, dashP: 0, velocity: 0, grade: 'E'
+        }];
+        state.history.push({
+            date: todayStr, progress: prog.val, dashP: prog.dashP,
+            velocity: Math.ceil(prog.val / daysDiff), grade: perf.g
+        });
+    } else {
+        const snapshot = {
+            date: todayStr, progress: prog.val, dashP: prog.dashP,
+            velocity: getVelocity(), grade: perf.g
+        };
+        const lastHist = state.history[state.history.length-1];
+        if(lastHist && lastHist.date === snapshot.date) {
+            // Update existing snapshot
+            state.history[state.history.length-1] = snapshot;
+        } else {
+            state.history.push(snapshot);
+        }
+    }
+
+    localStorage.setItem('saka_tracker_v5_4', JSON.stringify(state));
+
+    renderTerminAlert(prog);
+    renderForecast();
+    renderTargetsAndComparison(prog);
+    renderDifferenceAnalysis();
+    renderPriorityAccordions();
+    renderPerformance(prog, perf);
+
+    // AI Orchestrator
+    const orchestrator = new HybridAIOrchestrator(state.apiKeys);
+    const top3 = prioritasSLS().slice(0,3);
+    const elapsedDays = state.history.length > 1 ? state.history.length - 1 : 23;
+    const modeText = state.isAccumulationMode ? `(Akumulasi ${elapsedDays} hari)` : "(Harian)";
+    
+    const aiPrompt = `Analisis progres Saka Tracker ${modeText}: 
+    Progress Dashboard ${prog.dashP.toFixed(2)}% (${prog.val} unit).
+    Ritme rata-rata 7 hari: ${getVelocity()} data/hari.
+    Status Termin 1 (Target 40%): ${prog.dashP >= 40 ? 'Tercapai' : 'Belum Tercapai'}.
+    Top 3 SLS prioritas: ${top3.map(s=>`${s.kode} (${s.open} open)`).join(', ')}.
+    Berikan insight strategis singkat.`;
+    
+    const insight = await orchestrator.generateInsight(aiPrompt);
+    document.getElementById('ai-insights').innerHTML = insight;
+
+    const container = document.getElementById('analysis-container');
+    container.style.display = 'block';
+    setTimeout(()=>container.scrollIntoView({behavior:'smooth',block:'start'}),100);
+
+    btn.disabled = false; 
+    btn.innerHTML = '<i class="bi bi-cpu"></i> ANALISIS & SIMPAN SNAPSHOT';
+}
+
+function renderTerminAlert(prog) {
+    const card = document.getElementById('termin-alert-card');
+    const statusDiv = document.getElementById('termin-status');
+    const today = new Date();
+    const targetDate = CONFIG.termin1TargetDate;
+    const isPastDeadline = today > targetDate;
+    const isTargetMet = prog.dashP >= 40;
+
+    if (!isTargetMet) {
+        card.style.display = 'block';
+        if (isPastDeadline) {
+            statusDiv.innerHTML = `<div class="forecast-box forecast-crit"><i class="bi bi-exclamation-octagon-fill"></i> CRITICAL: Termin 1 BELUM tercapai (${prog.dashP.toFixed(2)}%) dan MELEWATI BATAS WAKTU (${targetDate.toLocaleDateString('id-ID')}). Segera percepat approval!</div>`;
+        } else {
+            const daysLeft = Math.ceil((targetDate - today) / (1000 * 60 * 60 * 24));
+            const persenTarget = ((prog.val / state.config.assessment) * 100);
+            const targetPerHari = daysLeft > 0 ? (40 - persenTarget) / daysLeft : 0;
+            
+            let warningLevel = 'forecast-warn';
+            let icon = '<i class="bi bi-exclamation-triangle-fill"></i>';
+            let additionalInfo = '';
+            
+            if (daysLeft <= 3 && persenTarget < 30) {
+                warningLevel = 'forecast-crit';
+                icon = '<i class="bi bi-exclamation-octagon-fill"></i>';
+                additionalInfo = ` <strong>⚠️ KRITIS!</strong> Hanya ${daysLeft} hari tersisa!`;
+            } else if (targetPerHari > 5) {
+                additionalInfo = ` Butuh percepatan ${targetPerHari.toFixed(1)}% per hari.`;
+            } else if (targetPerHari > 0) {
+                additionalInfo = ` Butuh ${targetPerHari.toFixed(1)}% per hari.`;
+            }
+            
+            statusDiv.innerHTML = `
+                <div class="forecast-box ${warningLevel}">
+                    ${icon} Termin 1 belum tercapai (${prog.dashP.toFixed(2)}%). 
+                    Target: 40% pada ${targetDate.toLocaleDateString('id-ID')}. 
+                    Sisa waktu: <strong>${daysLeft} hari</strong>.
+                    ${additionalInfo}
+                </div>
+            `;
+        }
+    } else {
+        card.style.display = 'none';
+    }
+}
+
+function renderForecast() {
+    const prog = getProgress();
+    const sisaHari = getSisaHariKeClearance();
+    const remaining = state.config.assessment - prog.val;
+    const reqVel = Math.ceil(remaining / sisaHari);
+    const currVel = getVelocity();
+    const isOnTrack = currVel >= reqVel;
+    const dateStr = clearanceDate.toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'});
+    
+    const statusDiv = document.getElementById('forecast-status');
+    const detailDiv = document.getElementById('forecast-details');
+    
+    let boxClass, icon, text;
+    
+    if (currVel === 0) {
+        boxClass = 'forecast-crit';
+        icon = '<i class="bi bi-x-octagon-fill"></i>';
+        text = `❌ BELUM ADA RITME: Butuh ${reqVel} data/hari untuk clearance ${dateStr}`;
+        detailDiv.innerHTML = `Belum ada progress yang tercatat. Mulai input data harian untuk tracking yang akurat.`;
+    } else if (isOnTrack) {
+        boxClass = 'forecast-ok';
+        icon = '<i class="bi bi-check-circle-fill"></i>';
+        text = `✅ ON TRACK: Clearance aman sebelum ${dateStr}`;
+        const estimatedDays = Math.ceil(remaining / currVel);
+        const bufferDays = sisaHari - estimatedDays;
+        detailDiv.innerHTML = `Ritme <strong>${currVel} data/hari</strong> cukup. Estimasi selesai: <strong>${estimatedDays} hari</strong> (buffer ${bufferDays > 0 ? bufferDays : 0} hari).`;
+    } else {
+        boxClass = currVel >= reqVel * 0.7 ? 'forecast-warn' : 'forecast-crit';
+        icon = currVel >= reqVel * 0.7 ? '<i class="bi bi-exclamation-triangle-fill"></i>' : '<i class="bi bi-x-octagon-fill"></i>';
+        text = currVel >= reqVel * 0.7 ? `⚠️ WARNING: Margin tipis untuk clearance ${dateStr}` : `❌ CRITICAL: Tidak mencapai clearance ${dateStr}`;
+        const estimatedDays = Math.ceil(remaining / currVel);
+        const keterlambatan = estimatedDays - sisaHari;
+        detailDiv.innerHTML = `Kekurangan ritme: <strong>${(reqVel-currVel)} data/hari</strong>. Estimasi selesai: <strong>${estimatedDays} hari</strong> (terlambat ${keterlambatan > 0 ? keterlambatan : 0} hari).`;
+    }
+    
+    statusDiv.innerHTML = `<div class="forecast-box ${boxClass}">${icon} ${text}</div>`;
+}
+
+function renderTargetsAndComparison(prog) {
+    document.getElementById('comp-dash-persen').innerText = prog.dashP.toFixed(2) + '%';
+    document.getElementById('comp-muatan-persen').innerText = prog.muatanP.toFixed(2) + '%';
+
+    const sisaHari = getSisaHariKeClearance();
+    const remaining = state.config.assessment - prog.val;
+    const reqVel = Math.ceil(remaining / sisaHari);
+    const currVel = getVelocity();
+    
+    document.getElementById('curr-velocity').innerText = currVel + ' data/hari';
+    document.getElementById('req-velocity').innerText = reqVel + ' data/hari';
+}
+
+function renderDifferenceAnalysis() {
+    const baselineAssessment = 675;
+    const baselineMuatan = 813;
+    
+    const currentAssessment = state.config.assessment;
+    const currentMuatan = state.config.muatan;
+    
+    const diffAssessment = currentAssessment - baselineAssessment;
+    const diffMuatan = currentMuatan - baselineMuatan;
+    
+    const box = document.getElementById('diff-analysis-box');
+    const diffAssEl = document.getElementById('diff-assessment');
+    const diffMutEl = document.getElementById('diff-muatan');
+    
+    if (diffAssessment !== 0 || diffMuatan !== 0) {
+        box.style.display = 'block';
+        
+        const formatDiff = (val) => {
+            if (val > 0) return `<span style="color:var(--accent-green)">+${val} unit</span>`;
+            if (val < 0) return `<span style="color:var(--accent-red)">${val} unit</span>`;
+            return `0 unit`;
+        };
+        
+        diffAssEl.innerHTML = formatDiff(diffAssessment);
+        diffMutEl.innerHTML = formatDiff(diffMuatan);
+    } else {
+        box.style.display = 'none';
+    }
+}
+
+function renderPriorityAccordions() {
+    const list = prioritasSLS();
+    const container = document.getElementById('priority-list');
+    container.innerHTML = '';
+    list.forEach((s, i) => {
+        const item = document.createElement('div');
+        item.className = 'priority-item';
+        item.innerHTML = `
+            <div class="priority-header" onclick="toggleDetail(this)">
+                <div style="display:flex; align-items:center;">
+                    <div class="p-rank">${i+1}</div>
+                    <div class="p-info">
+                        <div class="p-code">${s.kode}</div>
+                        <div class="p-score">Score: ${s.score.toFixed(0)} | Prog: ${s.persen.toFixed(0)}%</div>
+                    </div>
+                </div>
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <span class="p-action ${s.actionClass}">${s.action}</span>
+                    <i class="bi bi-chevron-down toggle-icon"></i>
+                </div>
+            </div>
+            <div class="priority-detail"><div class="detail-content">${generateSLSDetail(s, i+1)}</div></div>
+        `;
+        container.appendChild(item);
+    });
+}
+
+function toggleDetail(headerEl) {
+    const item = headerEl.parentElement;
+    const detail = item.querySelector('.priority-detail');
+    item.classList.toggle('expanded');
+    detail.classList.toggle('open');
+}
+
+function renderPerformance(prog, perf) {
+    const gradeEl = document.getElementById('perf-grade');
+    gradeEl.innerText = perf.g; 
+    gradeEl.style.color = perf.c;
+    document.getElementById('perf-desc').innerText = perf.d;
+    document.getElementById('perf-delta').innerHTML = `📊 ${perf.delta > 0 ? 'Di atas target' : 'Di bawah target'} ${Math.abs(perf.delta)}%`;
+    document.getElementById('dash-persen').innerText = prog.dashP.toFixed(2)+'%';
+    document.getElementById('dash-bar').style.width = Math.min(100,prog.dashP)+'%';
+}
+
+// ===============================
+// NAVIGATION & UI HELPERS
+// ===============================
+function switchPage(pageName) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    
+    document.getElementById(`page-${pageName}`).classList.add('active');
+    const navItems = document.querySelectorAll('.nav-item');
+    if(pageName === 'dashboard') navItems[0].classList.add('active');
+    if(pageName === 'data') {
+        navItems[1].classList.add('active');
+        renderDataSLSPage();
+    }
+    if(pageName === 'settings') {
+        navItems[2].classList.add('active');
+        loadApiKeys();
+    }
+    window.scrollTo(0,0);
+}
+
+// ===============================
+// CRUD DATA SLS LOGIC
+// ===============================
+function renderDataSLSPage() {
+    const list = document.getElementById('data-sls-list');
+    list.innerHTML = '';
+    state.sls.forEach((s, idx) => {
+        const row = document.createElement('div');
+        row.className = 'data-sls-row';
+        row.style.cssText = "display: grid; grid-template-columns: 60px 1fr 1fr 40px; gap: 10px; align-items: center; margin-bottom: 10px; padding: 10px; background: #0f172a; border-radius: 10px; border: 1px solid var(--border);";
+        row.innerHTML = `
+            <input type="text" value="${s.kode}" onchange="updateDataSLS(${idx}, 'kode', this.value)" style="text-align:center; font-weight:bold; color:var(--accent-blue)">
+            <input type="number" value="${s.open}" onchange="updateDataSLS(${idx}, 'open', this.value)" placeholder="Open FASIH">
+            <input type="number" value="${s.muatan || 0}" onchange="updateDataSLS(${idx}, 'muatan', this.value)" placeholder="Jml Muatan">
+            <button class="btn-delete" onclick="deleteDataSLS(${idx})" style="background: rgba(239, 68, 68, 0.1); color: var(--accent-red); border: none; width: 30px; height: 30px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center;"><i class="bi bi-x-lg"></i></button>
+        `;
+        list.appendChild(row);
+    });
+}
+
+function updateDataSLS(idx, field, val) {
+    if(field === 'open' || field === 'muatan') val = parseInt(val) || 0;
+    state.sls[idx][field] = val;
+}
+
+function addNewSLSRow() {
+    state.sls.push({kode: "NEW", nama: "", open: 0, submit: 0, reject: 0, pending: 0, approve: 0, muatan: 0});
+    renderDataSLSPage();
+}
+
+function deleteDataSLS(idx) {
+    if(confirm('Hapus baris SLS ini?')) {
+        state.sls.splice(idx, 1);
+        renderDataSLSPage();
+    }
+}
+
+function saveDataSLS() {
+    syncConfigTargets();
+    syncDashboardFromSLS();
+    localStorage.setItem('saka_tracker_v5_4', JSON.stringify(state));
+    alert('✅ Data Master SLS berhasil disimpan! Dashboard akan menggunakan data terbaru.');
+    initForm();
+}
+
+// ===============================
+// SETTINGS, BACKUP & RESTORE
+// ===============================
+function saveSettings() {
+    state.apiKeys.openai = document.getElementById('api-openai').value.trim();
+    state.apiKeys.gemini = document.getElementById('api-gemini').value.trim();
+    state.apiKeys.mistral = document.getElementById('api-mistral').value.trim();
+    localStorage.setItem('saka_tracker_v5_4', JSON.stringify(state));
+    updateApiStatusUI();
+    alert('✅ Konfigurasi API Key berhasil disimpan!');
+}
+
+function loadApiKeys() {
+    document.getElementById('api-openai').value = state.apiKeys.openai||'';
+    document.getElementById('api-gemini').value = state.apiKeys.gemini||'';
+    document.getElementById('api-mistral').value = state.apiKeys.mistral||'';
+    updateApiStatusUI();
+}
+
+function updateApiStatusUI() {
+    ['openai','gemini','mistral'].forEach(key=>{
+        const hasKey = !!state.apiKeys[key];
+        const dot = document.getElementById(`status-${key}`).querySelector('.status-dot');
+        const text = document.getElementById(`status-${key}`);
+        dot.className = `status-dot ${hasKey?'active':''}`;
+        text.innerHTML = `<span class="status-dot ${hasKey?'active':''}"></span> ${hasKey?'✅ Terkonfigurasi':'❌ Belum dikonfigurasi'}`;
+    });
+}
+
+async function testAllApis() {
+    const resultsDiv = document.getElementById('test-results');
+    resultsDiv.innerHTML = '🔄 Menguji koneksi...';
+    let output = '';
+    const tests = [
+        {name:'OpenAI', key:state.apiKeys.openai, url:'https://api.openai.com/v1/models', auth:`Bearer ${state.apiKeys.openai}`},
+        {name:'Gemini', key:state.apiKeys.gemini, url:`https://generativelanguage.googleapis.com/v1beta/models?key=${state.apiKeys.gemini}`, auth:null},
+        {name:'Mistral', key:state.apiKeys.mistral, url:'https://api.mistral.ai/v1/models', auth:`Bearer ${state.apiKeys.mistral}`}
+    ];
+    for(const t of tests) {
+        if(!t.key) { output += `<div><i class="bi bi-x-circle"></i> ${t.name}: API Key kosong</div>`; continue; }
+        try {
+            const headers = t.auth ? {'Authorization':t.auth} : {};
+            const res = await fetch(t.url, {headers, signal:AbortSignal.timeout(5000)});
+            if(res.ok) output += `<div style="color:var(--accent-green)"><i class="bi bi-check-circle"></i> ${t.name}: Terhubung ✅</div>`;
+            else output += `<div style="color:var(--accent-red)"><i class="bi bi-x-circle"></i> ${t.name}: Gagal (${res.status})</div>`;
+        } catch(e) { output += `<div style="color:var(--accent-red)"><i class="bi bi-x-circle"></i> ${t.name}: ${e.message}</div>`; }
+    }
+    resultsDiv.innerHTML = output;
+}
+
+function backupData() {
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state));
+    const downloadAnchorNode = document.createElement('a');
+    downloadAnchorNode.setAttribute("href", dataStr);
+    downloadAnchorNode.setAttribute("download", `saka_tracker_backup_${new Date().toISOString().slice(0,10)}.json`);
+    document.body.appendChild(downloadAnchorNode);
+    downloadAnchorNode.click();
+    downloadAnchorNode.remove();
+}
+
+function restoreData(inputElement) {
+    const file = inputElement.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const restoredState = JSON.parse(e.target.result);
+            if(restoredState.sls && restoredState.apiKeys) {
+                state = restoredState;
+                localStorage.setItem('saka_tracker_v5_4', JSON.stringify(state));
+                alert('✅ Data berhasil dipulihkan! Halaman akan dimuat ulang.');
+                location.reload();
+            } else {
+                alert('❌ File backup tidak valid atau rusak.');
+            }
+        } catch(err) {
+            alert('❌ Gagal membaca file backup: ' + err.message);
+        }
+    };
+    reader.readAsText(file);
+}
+
+// ===============================
+// LEGAL MODALS
+// ===============================
+function openModal(type) {
+    const modal = document.getElementById('legal-modal');
+    const title = document.getElementById('modal-title');
+    const body = document.getElementById('modal-body');
+    modal.style.display = 'flex';
+    if(type === 'tos') {
+        title.innerHTML = '<i class="bi bi-shield-check"></i> Terms of Service (TOS)';
+        body.innerText = `TERMS OF SERVICE - SAKA TRACKER\n\nLast Updated: July 8, 2026\n\n1. ACCEPTANCE OF TERMS\nBy accessing and using Saka Tracker ("Application"), you accept and agree to be bound by the terms and provision of this agreement.\n\n2. DESCRIPTION OF SERVICE\nSaka Tracker is a personal productivity tool designed for monitoring SLS progress, managing FASIH dashboard data, and providing AI-driven insights.\n\n3. USER RESPONSIBILITIES\nYou are responsible for maintaining the confidentiality of your API keys and data entered into the application. The developer (Saka_Omni) is not liable for any data loss due to device failure or clearing browser cache without backup.\n\n4. NO WARRANTY\nTHE APPLICATION IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND. USE AT YOUR OWN RISK.\n\n5. CONTACT\nFor support, contact mlevian@protonmail.com`;
+    } else if (type === 'privacy') {
+        title.innerHTML = '<i class="bi bi-lock-fill"></i> Privacy Policy';
+        body.innerText = `PRIVACY POLICY - SAKA TRACKER\n\nLast Updated: July 8, 2026\n\n1. DATA COLLECTION\nSaka Tracker operates entirely on your local device (Client-Side). We DO NOT collect, store, or transmit your SLS data, progress reports, or API keys to any external server.\n\n2. API KEYS\nAPI Keys for OpenAI, Gemini, and Mistral are stored locally in your browser's LocalStorage. They are only sent directly to the respective AI providers when you trigger an analysis.\n\n3. THIRD-PARTY SERVICES\nWhen using the AI Insight feature, your prompt data is sent to OpenAI/Gemini/Mistral servers based on their respective privacy policies. Please review their policies before use.\n\n4. DATA SECURITY\nSince data is stored locally, it is vulnerable if someone gains physical access to your unlocked device. Use the Backup/Restore feature to keep your data safe.\n\n5. CHANGES TO THIS POLICY\nWe may update this policy periodically. Continued use of the app constitutes acceptance of changes.`;
+    }
+}
+
+function closeModal() {
+    document.getElementById('legal-modal').style.display = 'none';
 }
 
 // ===============================
@@ -563,474 +1175,28 @@ class HybridAIOrchestrator {
         const currVel = getVelocity();
         const isOnTrack = currVel >= reqVel;
         const top3 = prioritasSLS().slice(0,3).map(s => `${s.kode} (${s.open} open)`).join(', ');
-        const statusTag = isOnTrack ? '<span class="ai-success">ON TRACK</span>' : '<span class="ai-warn">AT RISK</span>';
+        const statusTag = isOnTrack ? '<span class="ai-success">✅ ON TRACK</span>' : '<span class="ai-warn">⚠️ AT RISK</span>';
+        
+        if (currVel === 0) {
+            return `<p>${statusTag}: Belum ada data progres yang tercatat.</p>
+                    <p>📌 Mulai input data harian untuk mendapatkan analisis yang akurat.</p>
+                    <p>Target clearance: <strong>${clearanceDate.toLocaleDateString('id-ID')}</strong></p>`;
+        }
+        
         return `<p>${statusTag}: Ritme saat ini <strong>${currVel} data/hari</strong> ${isOnTrack ? 'memenuhi' : 'belum memenuhi'} target clearance.</p>
                 <p>Sisa data: <strong>${remaining}</strong>. Kebutuhan harian: <strong>${reqVel} data</strong>.</p>
-                <p>Fokus prioritas: <span class="ai-highlight">${top3}</span>.</p>`;
+                <p>Fokus prioritas: <span class="ai-highlight">${top3}</span>.</p>
+                ${!isOnTrack ? `<p>💡 Strategi: Percepat approval di SLS prioritas dan evaluasi bottleneck harian.</p>` : ''}`;
     }
 
     updateStatus(name, status) {
         const el = document.getElementById('ai-provider-status');
-        const className = status === 'active' ? 'provider-active' : 'provider-error';
-        el.innerHTML = `Multi-AI Orchestrator | Provider Aktif: <span class="${className}">${name}</span>`;
+        let statusText = '🟢';
+        if (status === 'calling') statusText = '🔄';
+        else if (status === 'error') statusText = '🔴';
+        else if (status === 'active') statusText = '🟢';
+        el.innerHTML = `Multi-AI Orchestrator | Provider: <span class="provider-active">${statusText} ${name}</span>`;
     }
-}
-
-// ===============================
-// CORE LOGIC FUNCTIONS
-// ===============================
-function getProgress() {
-    const p = state.dashboard.submit + state.dashboard.approve;
-    return { 
-        val: p, 
-        dashP: state.config.assessment > 0 ? (p/state.config.assessment)*100 : 0, 
-        muatanP: state.config.muatan > 0 ? (p/state.config.muatan)*100 : 0
-    };
-}
-
-function getSisaHariKeClearance() {
-    return Math.max(1, Math.ceil((clearanceDate - new Date())/(1000*60*60*24)));
-}
-
-function getVelocity() {
-    const today = new Date();
-    const diffTime = Math.abs(today - CONFIG.startDate);
-    const elapsedDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) || 1; 
-    
-    if (state.history.length >= 2) {
-        const first = state.history[0].progress;
-        const last = state.history[state.history.length-1].progress;
-        const histDays = Math.max(1, state.history.length - 1);
-        return Math.ceil((last - first) / histDays);
-    }
-    
-    const currentProg = getProgress().val;
-    return Math.ceil(currentProg / elapsedDays);
-}
-
-function prioritasSLS() {
-    return [...state.sls].map(item => {
-        const prog = item.submit + item.approve;
-        const total = item.open + prog;
-        const score = (item.approve*3)+(item.submit*2)-(item.open*0.5);
-        const persen = total===0?0:(prog/total)*100;
-        return { ...item, score, persen, prog };
-    }).sort((a,b)=>b.score-a.score);
-}
-
-function performanceGrade(dashP) {
-    if(dashP>=80) return {g:'A',d:'Luar Biasa',c:'var(--accent-green)'};
-    if(dashP>=60) return {g:'B',d:'Baik & Konsisten',c:'#3b82f6'};
-    if(dashP>=40) return {g:'C',d:'On Track',c:'var(--accent-orange)'};
-    if(dashP>=20) return {g:'D',d:'Di Bawah Target',c:'#f59e0b'};
-    return {g:'E',d:'Kritis',c:'var(--accent-red)'};
-}
-
-function generateSLSDetail(slsItem, rank) {
-    const status = slsItem.persen === 100 ? 'selesai' : slsItem.prog > 0 ? 'sedang berjalan' : 'belum dimulai';
-    let strategy = '';
-    if(rank <= 3) strategy = `Prioritas utama. Fokuskan resource untuk menutup ${slsItem.open} item open tersisa.`;
-    else if (slsItem.open > 80) strategy = `Volume open sangat tinggi (${slsItem.open}). Butuh delegasi agar tidak jadi bottleneck.`;
-    else strategy = `Status: ${status}. Lakukan monitoring mingguan.`;
-    return `<strong>Kode:</strong> ${slsItem.kode} | <strong>Alamat:</strong> ${slsItem.nama}<br>
-            <strong>Detail:</strong> Open: ${slsItem.open}, Submit: ${slsItem.submit}, Approve: ${slsItem.approve}<br><br>
-            <strong>Strategi AI:</strong> ${strategy}`;
-}
-
-// ===============================
-// MAIN ACTIONS & RENDERERS
-// ===============================
-async function runAnalysis() {
-    const btn = document.getElementById('btn-analyze');
-    btn.disabled = true; btn.innerText = ' Sedang Menganalisis...';
-
-    state.dashboard.draft = parseInt(document.getElementById('global-draft').value)||0;
-    syncConfigTargets(); 
-    
-    const prog = getProgress();
-    const perf = performanceGrade(prog.dashP);
-    
-    // SIMULASI HISTORY BACKDATE UNTUK AKUMULASI PERTAMA
-    const todayStr = new Date().toLocaleDateString('id-ID');
-    const isFirstAnalysis = state.history.length === 0 || 
-                            (state.history.length === 1 && state.history[0].date === todayStr);
-
-    if (isFirstAnalysis && prog.val > 0) {
-        const startDate = new Date("2026-06-15");
-        const endDate = new Date(); 
-        const daysDiff = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
-        
-        state.history = [{
-            date: "15/06/2026", progress: 0, dashP: 0, velocity: 0, grade: 'E'
-        }];
-        state.history.push({
-            date: todayStr, progress: prog.val, dashP: prog.dashP,
-            velocity: Math.ceil(prog.val / daysDiff), grade: perf.g
-        });
-    } else {
-        const snapshot = {
-            date: todayStr, progress: prog.val, dashP: prog.dashP,
-            velocity: getVelocity(), grade: perf.g
-        };
-        const lastHist = state.history[state.history.length-1];
-        if(lastHist && lastHist.date === snapshot.date) state.history.pop();
-        state.history.push(snapshot);
-    }
-
-    localStorage.setItem('saka_tracker_v5_4', JSON.stringify(state));
-
-    renderTerminAlert(prog);
-    renderForecast();
-    renderTargetsAndComparison(prog);
-    renderDifferenceAnalysis(); // Render selisih data
-    renderPriorityAccordions();
-    renderPerformance(prog, perf);
-
-    const orchestrator = new HybridAIOrchestrator(state.apiKeys);
-    const top3 = prioritasSLS().slice(0,3);
-    const elapsedDays = state.history.length > 1 ? state.history.length - 1 : 23;
-    const modeText = state.isAccumulationMode ? `(Akumulasi ${elapsedDays} hari)` : "(Harian)";
-    
-    const aiPrompt = `Analisis progres Saka Tracker ${modeText}: 
-    Progress Dashboard ${prog.dashP.toFixed(2)}% (${prog.val} unit).
-    Ritme rata-rata: ${getVelocity()} data/hari.
-    Status Termin 1 (Target 40%): ${prog.dashP >= 40 ? 'Tercapai' : 'Belum Tercapai'}.
-    Top 3 SLS prioritas: ${top3.map(s=>`${s.kode} (${s.open} open)`).join(', ')}.
-    Berikan insight strategis singkat.`;
-    
-    const insight = await orchestrator.generateInsight(aiPrompt);
-    document.getElementById('ai-insights').innerHTML = insight;
-
-    const container = document.getElementById('analysis-container');
-    container.style.display = 'block';
-    setTimeout(()=>container.scrollIntoView({behavior:'smooth',block:'start'}),100);
-
-    btn.disabled = false; btn.innerText = '<i class="bi bi-cpu"></i> ANALISIS & SIMPAN SNAPSHOT';
-}
-
-function renderTerminAlert(prog) {
-    const card = document.getElementById('termin-alert-card');
-    const statusDiv = document.getElementById('termin-status');
-    const today = new Date();
-    const isPastDeadline = today > CONFIG.termin1TargetDate;
-    const isTargetMet = prog.dashP >= 40;
-
-    if (!isTargetMet) {
-        card.style.display = 'block';
-        if (isPastDeadline) {
-            statusDiv.innerHTML = `<div class="forecast-box forecast-crit"><i class="bi bi-exclamation-octagon-fill"></i> CRITICAL: Termin 1 BELUM tercapai (${prog.dashP.toFixed(2)}%) dan melewati batas waktu minggu ini. Segera percepat approval!</div>`;
-        } else {
-            const daysLeft = Math.ceil((CONFIG.termin1TargetDate - today)/(1000*60*60*24));
-            statusDiv.innerHTML = `<div class="forecast-box forecast-warn"><i class="bi bi-exclamation-triangle-fill"></i> WARNING: Termin 1 belum tercapai (${prog.dashP.toFixed(2)}%). Sisa waktu minggu ini: ${daysLeft} hari. Wajib selesai dalam minggu ini!</div>`;
-        }
-    } else {
-        card.style.display = 'none';
-    }
-}
-
-function renderTargetsAndComparison(prog) {
-    document.getElementById('comp-dash-persen').innerText = prog.dashP.toFixed(2) + '%';
-    document.getElementById('comp-muatan-persen').innerText = prog.muatanP.toFixed(2) + '%';
-
-    const sisaHari = getSisaHariKeClearance();
-    const remaining = state.config.assessment - prog.val;
-    const reqVel = Math.ceil(remaining/sisaHari);
-    const currVel = getVelocity();
-    
-    document.getElementById('curr-velocity').innerText = currVel + ' data/hari';
-    document.getElementById('req-velocity').innerText = reqVel + ' data/hari';
-}
-
-// FUNGSI BARU: RENDER ANALISIS SELISIH DATA
-function renderDifferenceAnalysis() {
-    const baselineAssessment = 675; // Dari prelist resmi
-    const baselineMuatan = 813;     // Dari prelist resmi
-    
-    const currentAssessment = state.config.assessment;
-    const currentMuatan = state.config.muatan;
-    
-    const diffAssessment = currentAssessment - baselineAssessment;
-    const diffMuatan = currentMuatan - baselineMuatan;
-    
-    const box = document.getElementById('diff-analysis-box');
-    const diffAssEl = document.getElementById('diff-assessment');
-    const diffMutEl = document.getElementById('diff-muatan');
-    
-    // Tampilkan hanya jika ada selisih (positif atau negatif)
-    if (diffAssessment !== 0 || diffMuatan !== 0) {
-        box.style.display = 'block';
-        
-        // Format tampilan selisih
-        const formatDiff = (val) => {
-            if (val > 0) return `<span style="color:var(--accent-green)">+${val} unit</span>`;
-            if (val < 0) return `<span style="color:var(--accent-red)">${val} unit</span>`;
-            return `0 unit`;
-        };
-        
-        diffAssEl.innerHTML = formatDiff(diffAssessment);
-        diffMutEl.innerHTML = formatDiff(diffMuatan);
-    } else {
-        box.style.display = 'none';
-    }
-}
-
-function renderForecast() {
-    const prog = getProgress();
-    const sisaHari = getSisaHariKeClearance();
-    const remaining = state.config.assessment - prog.val;
-    const reqVel = Math.ceil(remaining/sisaHari);
-    const currVel = getVelocity();
-    const isOnTrack = currVel >= reqVel;
-    const dateStr = clearanceDate.toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'});
-    
-    const statusDiv = document.getElementById('forecast-status');
-    const detailDiv = document.getElementById('forecast-details');
-    
-    let boxClass = isOnTrack ? 'forecast-ok' : (currVel >= reqVel * 0.7 ? 'forecast-warn' : 'forecast-crit');
-    let icon = isOnTrack ? '<i class="bi bi-check-circle-fill"></i>' : (currVel >= reqVel * 0.7 ? '<i class="bi bi-exclamation-triangle-fill"></i>' : '<i class="bi bi-x-octagon-fill"></i>');
-    let text = isOnTrack ? `ON TRACK: Clearance aman sebelum ${dateStr}` : 
-               (currVel >= reqVel * 0.7 ? `WARNING: Margin tipis untuk clearance ${dateStr}` : `CRITICAL: Tidak mencapai clearance ${dateStr}`);
-               
-    statusDiv.innerHTML = `<div class="forecast-box ${boxClass}">${icon} ${text}</div>`;
-    
-    if(isOnTrack) {
-        detailDiv.innerHTML = `Ritme <strong>${currVel} data/hari</strong> cukup. Buffer: <strong>${sisaHari - Math.ceil(remaining/currVel)} hari</strong>.`;
-    } else {
-        detailDiv.innerHTML = `Kekurangan ritme: <strong>${(reqVel-currVel)} data/hari</strong>. Estimasi terlambat <strong>${Math.ceil(remaining/Math.max(1,currVel))-sisaHari} hari</strong>.`;
-    }
-}
-
-function renderPriorityAccordions() {
-    const list = prioritasSLS();
-    const container = document.getElementById('priority-list');
-    container.innerHTML = '';
-    list.forEach((s,i)=>{
-        let actionClass = s.persen===100?'action-done':s.prog>0?'action-lanjut':'action-mulai';
-        let actionText = s.persen===100?'Selesai':s.prog>0?'Lanjutkan':'Mulai';
-        const item = document.createElement('div');
-        item.className = 'priority-item';
-        item.innerHTML = `
-            <div class="priority-header" onclick="toggleDetail(this)">
-                <div style="display:flex; align-items:center;">
-                    <div class="p-rank">${i+1}</div>
-                    <div class="p-info">
-                        <div class="p-code">${s.kode}</div>
-                        <div class="p-score">Score: ${s.score.toFixed(0)} | Prog: ${s.persen.toFixed(0)}%</div>
-                    </div>
-                </div>
-                <div style="display:flex; align-items:center; gap:10px;">
-                    <span class="p-action ${actionClass}">${actionText}</span>
-                    <i class="bi bi-chevron-down toggle-icon"></i>
-                </div>
-            </div>
-            <div class="priority-detail"><div class="detail-content">${generateSLSDetail(s, i+1)}</div></div>
-        `;
-        container.appendChild(item);
-    });
-}
-
-function toggleDetail(headerEl) {
-    const item = headerEl.parentElement;
-    const detail = item.querySelector('.priority-detail');
-    item.classList.toggle('expanded');
-    detail.classList.toggle('open');
-}
-
-function renderPerformance(prog, perf) {
-    const gradeEl = document.getElementById('perf-grade');
-    gradeEl.innerText = perf.g; gradeEl.style.color = perf.c;
-    document.getElementById('perf-desc').innerText = perf.d;
-    document.getElementById('dash-persen').innerText = prog.dashP.toFixed(2)+'%';
-    document.getElementById('dash-bar').style.width = Math.min(100,prog.dashP)+'%';
-}
-
-// ===============================
-// NAVIGATION & UI HELPERS
-// ===============================
-function switchPage(pageName) {
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-    
-    document.getElementById(`page-${pageName}`).classList.add('active');
-    const navItems = document.querySelectorAll('.nav-item');
-    if(pageName === 'dashboard') navItems[0].classList.add('active');
-    if(pageName === 'data') {
-        navItems[1].classList.add('active');
-        renderDataSLSPage();
-    }
-    if(pageName === 'settings') {
-        navItems[2].classList.add('active');
-        loadApiKeys();
-    }
-    window.scrollTo(0,0);
-}
-
-// ===============================
-// CRUD DATA SLS LOGIC
-// ===============================
-function renderDataSLSPage() {
-    const list = document.getElementById('data-sls-list');
-    list.innerHTML = '';
-    state.sls.forEach((s, idx) => {
-        const row = document.createElement('div');
-        row.className = 'data-sls-row';
-        row.style.cssText = "display: grid; grid-template-columns: 60px 1fr 1fr 40px; gap: 10px; align-items: center; margin-bottom: 10px; padding: 10px; background: #0f172a; border-radius: 10px; border: 1px solid var(--border);";
-        row.innerHTML = `
-            <input type="text" value="${s.kode}" onchange="updateDataSLS(${idx}, 'kode', this.value)" style="text-align:center; font-weight:bold; color:var(--accent-blue)">
-            <input type="number" value="${s.open}" onchange="updateDataSLS(${idx}, 'open', this.value)" placeholder="Open FASIH">
-            <input type="number" value="${s.muatan || 0}" onchange="updateDataSLS(${idx}, 'muatan', this.value)" placeholder="Jml Muatan">
-            <button class="btn-delete" onclick="deleteDataSLS(${idx})" style="background: rgba(239, 68, 68, 0.1); color: var(--accent-red); border: none; width: 30px; height: 30px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center;"><i class="bi bi-x-lg"></i></button>
-        `;
-        list.appendChild(row);
-    });
-}
-
-function updateDataSLS(idx, field, val) {
-    if(field === 'open' || field === 'muatan') val = parseInt(val) || 0;
-    state.sls[idx][field] = val;
-}
-
-function addNewSLSRow() {
-    state.sls.push({kode: "NEW", nama: "", open: 0, submit: 0, reject: 0, pending: 0, approve: 0, muatan: 0});
-    renderDataSLSPage();
-}
-
-function deleteDataSLS(idx) {
-    if(confirm('Hapus baris SLS ini?')) {
-        state.sls.splice(idx, 1);
-        renderDataSLSPage();
-    }
-}
-
-function saveDataSLS() {
-    syncConfigTargets();
-    localStorage.setItem('saka_tracker_v5_4', JSON.stringify(state));
-    alert('Data Master SLS berhasil disimpan! Dashboard akan menggunakan data terbaru.');
-    initForm();
-}
-
-// ===============================
-// SETTINGS, BACKUP & RESTORE
-// ===============================
-function saveSettings() {
-    state.apiKeys.openai = document.getElementById('api-openai').value.trim();
-    state.apiKeys.gemini = document.getElementById('api-gemini').value.trim();
-    state.apiKeys.mistral = document.getElementById('api-mistral').value.trim();
-    localStorage.setItem('saka_tracker_v5_4', JSON.stringify(state));
-    updateApiStatusUI();
-    alert('Konfigurasi API Key berhasil disimpan!');
-}
-
-function loadApiKeys() {
-    document.getElementById('api-openai').value = state.apiKeys.openai||'';
-    document.getElementById('api-gemini').value = state.apiKeys.gemini||'';
-    document.getElementById('api-mistral').value = state.apiKeys.mistral||'';
-    updateApiStatusUI();
-}
-
-function updateApiStatusUI() {
-    ['openai','gemini','mistral'].forEach(key=>{
-        const hasKey = !!state.apiKeys[key];
-        const dot = document.getElementById(`status-${key}`).querySelector('.status-dot');
-        const text = document.getElementById(`status-${key}`);
-        dot.className = `status-dot ${hasKey?'active':''}`;
-        text.innerHTML = `<span class="status-dot ${hasKey?'active':''}"></span> ${hasKey?'Terkonfigurasi':'Belum dikonfigurasi'}`;
-    });
-}
-
-async function testAllApis() {
-    const resultsDiv = document.getElementById('test-results');
-    resultsDiv.innerHTML = 'Menguji koneksi...';
-    let output = '';
-    const tests = [
-        {name:'OpenAI', key:state.apiKeys.openai, url:'https://api.openai.com/v1/models', auth:`Bearer ${state.apiKeys.openai}`},
-        {name:'Gemini', key:state.apiKeys.gemini, url:`https://generativelanguage.googleapis.com/v1beta/models?key=${state.apiKeys.gemini}`, auth:null},
-        {name:'Mistral', key:state.apiKeys.mistral, url:'https://api.mistral.ai/v1/models', auth:`Bearer ${state.apiKeys.mistral}`}
-    ];
-    for(const t of tests) {
-        if(!t.key) { output += `<div><i class="bi bi-x-circle"></i> ${t.name}: API Key kosong</div>`; continue; }
-        try {
-            const headers = t.auth ? {'Authorization':t.auth} : {};
-            const res = await fetch(t.url, {headers, signal:AbortSignal.timeout(5000)});
-            if(res.ok) output += `<div style="color:var(--accent-green)"><i class="bi bi-check-circle"></i> ${t.name}: Terhubung</div>`;
-            else output += `<div style="color:var(--accent-red)"><i class="bi bi-x-circle"></i> ${t.name}: Gagal (${res.status})</div>`;
-        } catch(e) { output += `<div style="color:var(--accent-red)"><i class="bi bi-x-circle"></i> ${t.name}: ${e.message}</div>`; }
-    }
-    resultsDiv.innerHTML = output;
-}
-
-function backupData() {
-    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state));
-    const downloadAnchorNode = document.createElement('a');
-    downloadAnchorNode.setAttribute("href", dataStr);
-    downloadAnchorNode.setAttribute("download", `saka_tracker_backup_${new Date().toISOString().slice(0,10)}.json`);
-    document.body.appendChild(downloadAnchorNode);
-    downloadAnchorNode.click();
-    downloadAnchorNode.remove();
-}
-
-function restoreData(inputElement) {
-    const file = inputElement.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        try {
-            const restoredState = JSON.parse(e.target.result);
-            if(restoredState.sls && restoredState.apiKeys) {
-                state = restoredState;
-                localStorage.setItem('saka_tracker_v5_4', JSON.stringify(state));
-                alert('Data berhasil dipulihkan! Halaman akan dimuat ulang.');
-                location.reload();
-            } else {
-                alert('File backup tidak valid atau rusak.');
-            }
-        } catch(err) {
-            alert('Gagal membaca file backup: ' + err.message);
-        }
-    };
-    reader.readAsText(file);
-}
-
-// ===============================
-// LEGAL MODALS
-// ===============================
-function openModal(type) {
-    const modal = document.getElementById('legal-modal');
-    const title = document.getElementById('modal-title');
-    const body = document.getElementById('modal-body');
-    modal.style.display = 'flex';
-    if(type === 'tos') {
-        title.innerHTML = '<i class="bi bi-shield-check"></i> Terms of Service (TOS)';
-        body.innerText = `TERMS OF SERVICE - SAKA TRACKER\n\nLast Updated: July 8, 2026\n\n1. ACCEPTANCE OF TERMS\nBy accessing and using Saka Tracker ("Application"), you accept and agree to be bound by the terms and provision of this agreement.\n\n2. DESCRIPTION OF SERVICE\nSaka Tracker is a personal productivity tool designed for monitoring SLS progress, managing FASIH dashboard data, and providing AI-driven insights.\n\n3. USER RESPONSIBILITIES\nYou are responsible for maintaining the confidentiality of your API keys and data entered into the application. The developer (Saka_Omni) is not liable for any data loss due to device failure or clearing browser cache without backup.\n\n4. NO WARRANTY\nTHE APPLICATION IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND. USE AT YOUR OWN RISK.\n\n5. CONTACT\nFor support, contact mlevian@protonmail.com`;
-    } else if (type === 'privacy') {
-        title.innerHTML = '<i class="bi bi-lock-fill"></i> Privacy Policy';
-        body.innerText = `PRIVACY POLICY - SAKA TRACKER\n\nLast Updated: July 8, 2026\n\n1. DATA COLLECTION\nSaka Tracker operates entirely on your local device (Client-Side). We DO NOT collect, store, or transmit your SLS data, progress reports, or API keys to any external server.\n\n2. API KEYS\nAPI Keys for OpenAI, Gemini, and Mistral are stored locally in your browser's LocalStorage. They are only sent directly to the respective AI providers when you trigger an analysis.\n\n3. THIRD-PARTY SERVICES\nWhen using the AI Insight feature, your prompt data is sent to OpenAI/Gemini/Mistral servers based on their respective privacy policies. Please review their policies before use.\n\n4. DATA SECURITY\nSince data is stored locally, it is vulnerable if someone gains physical access to your unlocked device. Use the Backup/Restore feature to keep your data safe.\n\n5. CHANGES TO THIS POLICY\nWe may update this policy periodically. Continued use of the app constitutes acceptance of changes.`;
-    }
-}
-
-function closeModal() {
-    document.getElementById('legal-modal').style.display = 'none';
-}
-
- 
-// ===============================
-// SMART INPUT LOGIC (CLAMP TO ZERO)
-// ===============================
-function toggleInputMode() {
-    const checkbox = document.getElementById('mode-akumulasi');
-    state.isAccumulationMode = checkbox.checked;
-    
-    const dateDisplay = document.getElementById('date-range-display');
-    const toggleLabel = document.querySelector('.toggle-label');
-    
-    if (state.isAccumulationMode) {
-        toggleLabel.innerHTML = '<i class="bi bi-calendar-range"></i> Mode Akumulasi (Rentang Tanggal)';
-        dateDisplay.style.display = "block";
-    } else {
-        toggleLabel.innerHTML = '<i class="bi bi-calendar-event"></i> Mode Input Harian';
-        dateDisplay.style.display = "none";
-    }
-    localStorage.setItem('saka_tracker_v5_4', JSON.stringify(state));
 }
 
 // ===============================
@@ -1038,26 +1204,26 @@ function toggleInputMode() {
 // ===============================
 function initForm() {
     syncConfigTargets();
+    syncDashboardFromSLS();
     
-    // Set toggle state from storage - TANPA MEMANGGIL toggleInputMode()
+    // Set toggle state from storage
     const checkbox = document.getElementById('mode-akumulasi');
     if(checkbox) {
         checkbox.checked = state.isAccumulationMode;
-        // Terapkan visual state secara langsung
         const dateDisplay = document.getElementById('date-range-display');
         const toggleLabel = document.querySelector('.toggle-label');
         
         if (state.isAccumulationMode) {
             toggleLabel.innerHTML = '<i class="bi bi-calendar-range"></i> Mode Akumulasi (Rentang Tanggal)';
-            dateDisplay.style.display = "block";
+            if(dateDisplay) dateDisplay.style.display = "block";
         } else {
             toggleLabel.innerHTML = '<i class="bi bi-calendar-event"></i> Mode Input Harian';
-            dateDisplay.style.display = "none";
+            if(dateDisplay) dateDisplay.style.display = "none";
         }
     }
 
     const container = document.getElementById('sls-inputs-container');
-    if(!container) return; // Safety check
+    if(!container) return;
     
     container.innerHTML = '';
     state.sls.forEach((s,idx)=>{
@@ -1078,16 +1244,18 @@ function initForm() {
     
     const dateEl = document.getElementById('current-date');
     if(dateEl) dateEl.innerText = new Date().toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+    
+    // Auto-save harian
+    autoSaveDaily();
 }
 
-// Start App with Delay to ensure DOM and Icons are ready
+// Start App
 window.addEventListener('DOMContentLoaded', () => {
     setTimeout(() => {
         initForm();
         loadApiKeys();
     }, 100);
 });
- 
 </script>
 </body>
-</html>
+    </html>
