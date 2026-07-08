@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Saka Tracker V5.4.1 - Stable</title>
+    <title>Saka Tracker V5.4.4 - Stable</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <style>
         :root {
@@ -43,6 +43,7 @@
         
         .header { text-align: center; padding: 10px 0 12px; border-bottom: 1px solid var(--border); margin-bottom: 4px; }
         .header h1 { font-size: 1.4rem; font-weight: 700; letter-spacing: -0.5px; display: flex; align-items: center; justify-content: center; gap: 10px;}
+        .header .version-badge { font-size: 0.65rem; background: var(--accent-blue); color: white; padding: 2px 10px; border-radius: 20px; font-weight: 600; }
         .header p { color: var(--text-muted); font-size: 0.85rem; margin-top: 4px; }
 
         .form-section { 
@@ -98,7 +99,6 @@
         .btn-danger { background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); color: var(--accent-red); padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 0.8rem; transition: all 0.2s; display: flex; align-items: center; gap: 6px; }
         .btn-danger:hover { background: rgba(239, 68, 68, 0.25); }
         
-        /* ANALYSIS CARDS - PERBAIKAN JARAK */
         #analysis-container { 
             display: none; 
             animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
@@ -118,7 +118,6 @@
         }
         .result-title { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.8px; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;}
 
-        /* HISTORY CARDS */
         .history-card {
             background: var(--card-bg);
             border-radius: 16px;
@@ -274,6 +273,23 @@
         }
         .empty-state i { font-size: 3rem; margin-bottom: 12px; opacity: 0.3; }
 
+        .legend-box {
+            background: #0f172a;
+            border-radius: 8px;
+            padding: 10px 12px;
+            margin-top: 10px;
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 6px;
+        }
+        .legend-item { display: flex; align-items: center; gap: 6px; }
+        .legend-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+        .legend-dot.open { background: var(--accent-blue); }
+        .legend-dot.submit { background: var(--accent-orange); }
+        .legend-dot.approve { background: var(--accent-green); }
+
         @media (max-width: 480px) {
             .container { padding: 8px 10px 16px; }
             .form-section { padding: 12px 14px; }
@@ -285,6 +301,7 @@
             .result-card { padding: 14px 16px; }
             .header h1 { font-size: 1rem; }
             .history-stats { grid-template-columns: 1fr 1fr; }
+            .legend-box { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -293,7 +310,10 @@
 <!-- DASHBOARD PAGE -->
 <div id="page-dashboard" class="page active container">
     <div class="header">
-        <h1><i class="bi bi-graph-up-arrow"></i> SAKA TRACKER</h1>
+        <h1>
+            <i class="bi bi-graph-up-arrow"></i> SAKA TRACKER
+            <span class="version-badge">v5.4.4</span>
+        </h1>
         <p id="current-date">Memuat tanggal...</p>
     </div>
 
@@ -307,6 +327,13 @@
                 <input type="checkbox" id="mode-akumulasi" onchange="toggleInputMode()">
                 <span class="slider"></span>
             </label>
+        </div>
+
+        <!-- LEGEND -->
+        <div class="legend-box">
+            <div class="legend-item"><span class="legend-dot open"></span> Open = Belum dikerjakan</div>
+            <div class="legend-item"><span class="legend-dot submit"></span> Submit = Sudah dikerjakan</div>
+            <div class="legend-item"><span class="legend-dot approve"></span> Approve = Sudah divalidasi PML</div>
         </div>
 
         <div class="input-grid">
@@ -418,7 +445,7 @@
     </div>
 </div>
 
-<!-- HISTORY PAGE - TAB BARU -->
+<!-- HISTORY PAGE -->
 <div id="page-history" class="page container">
     <div class="header">
         <h1><i class="bi bi-clock-history"></i> HISTORY ANALISIS</h1>
@@ -476,7 +503,7 @@
         </div>
 
         <div class="app-info-box">
-            <div class="app-name">Saka Tracker v5.4.1 (Build 20260708)</div>
+            <div class="app-name">Saka Tracker v5.4.4 (Build 20260708)</div>
             <div style="margin-bottom: 10px; font-size: 0.8rem;">Aplikasi monitoring progres SLS berbasis Hybrid AI dengan tracking termin dan komparasi muatan kontrak.</div>
             <div style="font-weight: bold; color: var(--text-main); margin-bottom: 5px;">Developed by Saka_Omni</div>
             
@@ -524,10 +551,14 @@
 
 <script>
 // ===============================
+// VERSI APLIKASI - UPDATE OTOMATIS
+// ===============================
+const APP_VERSION = "5.4.4";
+const BUILD_DATE = "20260708";
+
+// ===============================
 // CONFIG & STATE MANAGEMENT
 // ===============================
-const APP_VERSION = "5.4.1";
-const BUILD_DATE = "20260708";
 const CONFIG = {
     startDate: new Date("2026-06-15"), 
     absoluteDeadline: new Date("2026-08-30"),
@@ -571,10 +602,43 @@ function getSisaHariKeClearance() {
 }
 
 // ===============================
-// SYNC FUNCTIONS
+// SYNC FUNCTIONS - ASSESSMENT DINAMIS
 // ===============================
+function syncConfigTargets() {
+    let totalMuatan = 0;
+    let totalAssessment = 0;
+    let totalOpen = 0;
+    let totalSubmit = 0;
+    let totalApprove = 0;
+    
+    state.sls.forEach(s => {
+        const open = parseInt(s.open) || 0;
+        const submit = parseInt(s.submit) || 0;
+        const approve = parseInt(s.approve) || 0;
+        const muatan = parseInt(s.muatan) || 0;
+        
+        totalOpen += open;
+        totalSubmit += submit;
+        totalApprove += approve;
+        totalMuatan += muatan;
+        // Assessment = OPEN + SUBMIT + APPROVE (termasuk temuan baru)
+        totalAssessment += open + submit + approve;
+    });
+    
+    state.config.muatan = totalMuatan;
+    state.config.assessment = totalAssessment;
+    state.dashboard.open = totalOpen;
+    state.dashboard.submit = totalSubmit;
+    state.dashboard.approve = totalApprove;
+}
+
 function syncDashboardFromSLS() {
-    let totalSubmit = 0, totalApprove = 0, totalOpen = 0, totalReject = 0, totalPending = 0;
+    let totalSubmit = 0;
+    let totalApprove = 0;
+    let totalOpen = 0;
+    let totalReject = 0;
+    let totalPending = 0;
+    
     state.sls.forEach(s => {
         totalOpen += parseInt(s.open) || 0;
         totalSubmit += parseInt(s.submit) || 0;
@@ -582,26 +646,18 @@ function syncDashboardFromSLS() {
         totalReject += parseInt(s.reject) || 0;
         totalPending += parseInt(s.pending) || 0;
     });
+    
     state.dashboard.open = totalOpen;
     state.dashboard.submit = totalSubmit;
     state.dashboard.approve = totalApprove;
     state.dashboard.reject = totalReject;
     state.dashboard.pending = totalPending;
+    
     syncConfigTargets();
 }
 
-function syncConfigTargets() {
-    let totalMuatan = 0, totalAssessment = 0;
-    state.sls.forEach(s => {
-        totalMuatan += (parseInt(s.muatan) || 0);
-        totalAssessment += (parseInt(s.open) || 0) + (parseInt(s.submit) || 0) + (parseInt(s.approve) || 0);
-    });
-    state.config.muatan = totalMuatan;
-    state.config.assessment = totalAssessment;
-}
-
 // ===============================
-// INPUT LOGIC
+// INPUT LOGIC - APPROVE TIDAK DIVALIDASI
 // ===============================
 function toggleInputMode() {
     const checkbox = document.getElementById('mode-akumulasi');
@@ -620,13 +676,17 @@ function toggleInputMode() {
 
 function updateSLS(idx, field, val) {
     const num = parseInt(val);
+    
     if (isNaN(num) || num < 0) { 
         state.sls[idx][field] = 0; 
         if(event && event.target) event.target.value = 0; 
         return; 
     }
+
     const oldVal = state.sls[idx][field];
     const diff = num - oldVal;
+
+    // VALIDASI: Submit tidak boleh melebihi (Open + Submit sebelumnya)
     if (field === 'submit') {
         const maxSubmit = state.sls[idx].open + oldVal;
         if (num > maxSubmit) {
@@ -634,36 +694,53 @@ function updateSLS(idx, field, val) {
             if(event && event.target) event.target.value = oldVal;
             return;
         }
-    }
-    if (field === 'approve') {
-        const maxApprove = state.sls[idx].submit + oldVal;
-        if (num > maxApprove) {
-            alert('⚠️ Approve tidak boleh melebihi Submit (' + state.sls[idx].submit + ')');
-            if(event && event.target) event.target.value = oldVal;
-            return;
+        // Open berkurang sebesar selisih submit
+        state.sls[idx].open -= diff;
+        if (state.sls[idx].open < 0) {
+            state.sls[idx].open = 0;
         }
     }
-    if (field === 'submit' || field === 'approve') {
-        state.sls[idx].open -= diff;
-        if (state.sls[idx].open < 0) state.sls[idx].open = 0;
+    
+    // APPROVE TIDAK DIVALIDASI - bisa lebih besar dari Submit atau Open
+    // karena bisa ada temuan asesmen baru di lapangan
+    if (field === 'approve') {
+        // Approve tidak perlu validasi apapun
+        // Open TIDAK berkurang otomatis dari approve
+        // karena approve bisa berasal dari temuan baru
+        // User bisa update Open secara manual jika diperlukan
     }
+
     state.sls[idx][field] = num;
-    syncDashboardFromSLS();
-    if ((field === 'submit' || field === 'approve') && diff !== 0) {
+    
+    // RE-SYNC assessment setelah perubahan
+    syncConfigTargets();
+    
+    // Update tampilan Open jika berubah
+    if (field === 'submit' && diff !== 0) {
         const openInput = document.querySelectorAll('#sls-inputs-container input')[idx * 5]; 
-        if(openInput) openInput.value = state.sls[idx].open;
+        if(openInput) {
+            openInput.value = state.sls[idx].open;
+        }
     }
+    
+    // Simpan ke localStorage
+    localStorage.setItem('saka_tracker_v5_4', JSON.stringify(state));
 }
 
 // ===============================
-// CORE LOGIC
+// CORE LOGIC - PROGRESS = SUBMIT + APPROVE
 // ===============================
 function getProgress() {
     const p = state.dashboard.submit + state.dashboard.approve;
+    const assessment = state.config.assessment;
     return { 
         val: p, 
-        dashP: state.config.assessment > 0 ? (p / state.config.assessment) * 100 : 0, 
-        muatanP: state.config.muatan > 0 ? (p / state.config.muatan) * 100 : 0
+        dashP: assessment > 0 ? (p / assessment) * 100 : 0, 
+        muatanP: state.config.muatan > 0 ? (p / state.config.muatan) * 100 : 0,
+        open: state.dashboard.open,
+        submit: state.dashboard.submit,
+        approve: state.dashboard.approve,
+        assessment: assessment
     };
 }
 
@@ -685,17 +762,35 @@ function prioritasSLS() {
         const prog = item.submit + item.approve;
         const total = item.open + prog;
         const persen = total === 0 ? 0 : (prog / total) * 100;
-        const progressScore = persen >= 80 ? 10 : persen >= 50 ? 20 : persen >= 20 ? 30 : 40;
-        const openScore = Math.min(item.open * 0.5, 30);
-        const approveScore = item.approve * 0.2;
+        
+        // Skor berdasarkan Open (semakin tinggi, semakin urgent)
+        // dan Approve (semakin tinggi, semakin banyak valid)
+        const openScore = Math.min(item.open * 0.8, 40);
+        const approveScore = item.approve * 0.3;
+        const submitScore = item.submit * 0.1;
         const muatanFactor = item.muatan ? (item.muatan / 100) : 1;
-        const score = (progressScore + openScore + approveScore) * muatanFactor;
-        let action = 'Monitor', actionClass = 'action-lanjut';
-        if (persen >= 100) { action = 'Selesai ✅'; actionClass = 'action-done'; }
-        else if (item.open > 50 && persen < 30) { action = 'URGENT! 🚨'; actionClass = 'action-urgent'; }
-        else if (item.open > 30 && persen < 50) { action = 'Prioritas Tinggi'; actionClass = 'action-urgent'; }
-        else if (persen > 0) { action = 'Lanjutkan'; actionClass = 'action-lanjut'; }
-        else { action = 'Mulai'; actionClass = 'action-mulai'; }
+        
+        const score = (openScore + approveScore + submitScore) * muatanFactor;
+        
+        let action = 'Monitor';
+        let actionClass = 'action-lanjut';
+        if (persen >= 100) { 
+            action = 'Selesai ✅'; 
+            actionClass = 'action-done'; 
+        } else if (item.open > 50 && persen < 30) { 
+            action = 'URGENT! 🚨'; 
+            actionClass = 'action-urgent'; 
+        } else if (item.open > 30 && persen < 50) { 
+            action = 'Prioritas Tinggi'; 
+            actionClass = 'action-urgent'; 
+        } else if (persen > 0) { 
+            action = 'Lanjutkan'; 
+            actionClass = 'action-lanjut'; 
+        } else { 
+            action = 'Mulai'; 
+            actionClass = 'action-mulai'; 
+        }
+        
         return { ...item, score, persen, prog, action, actionClass };
     }).sort((a, b) => b.score - a.score);
 }
@@ -729,7 +824,7 @@ function generateSLSDetail(slsItem, rank) {
 }
 
 // ===============================
-// RENDER TERMIN ALERT (LENGKAP)
+// RENDER TERMIN ALERT
 // ===============================
 function renderTerminAlert(prog) {
     const card = document.getElementById('termin-alert-card');
@@ -903,7 +998,6 @@ function renderTerminAlert(prog) {
         }
         statusDiv.innerHTML = statusHTML;
     } else {
-        const progressToFinal = (currentData / target100Data) * 100;
         const gapToFinalData = target100Data - currentData;
         const daysToClearance = getSisaHariKeClearance();
         const dataPerDayToFinal = daysToClearance > 0 ? Math.ceil(gapToFinalData / daysToClearance) : 0;
@@ -1064,8 +1158,6 @@ function renderHistory() {
     }
     
     countEl.innerText = state.history.length;
-    
-    // Urutkan dari terbaru ke terlama
     const sortedHistory = [...state.history].reverse();
     
     container.innerHTML = '';
@@ -1148,7 +1240,6 @@ async function runAnalysis() {
     
     const todayStr = new Date().toLocaleDateString('id-ID');
     
-    // Cek apakah sudah ada snapshot hari ini
     const existingToday = state.history.find(h => h.date === todayStr);
     if (!existingToday) {
         state.history.push({
@@ -1159,7 +1250,6 @@ async function runAnalysis() {
             grade: perf.g
         });
     } else {
-        // Update snapshot hari ini
         existingToday.progress = prog.val;
         existingToday.dashP = prog.dashP;
         existingToday.velocity = getVelocity();
@@ -1168,7 +1258,6 @@ async function runAnalysis() {
 
     localStorage.setItem('saka_tracker_v5_4', JSON.stringify(state));
 
-    // Render semua komponen
     renderTerminAlert(prog);
     renderForecast();
     renderTargetsAndComparison(prog);
@@ -1176,7 +1265,6 @@ async function runAnalysis() {
     renderPriorityAccordions();
     renderPerformance(prog, perf);
 
-    // AI Orchestrator
     const orchestrator = new HybridAIOrchestrator(state.apiKeys);
     const top3 = prioritasSLS().slice(0,3);
     const elapsedDays = state.history.length > 1 ? state.history.length - 1 : 23;
@@ -1201,7 +1289,6 @@ async function runAnalysis() {
     btn.disabled = false; 
     btn.innerHTML = '<i class="bi bi-cpu"></i> ANALISIS & SIMPAN SNAPSHOT';
     
-    // Update history jika sedang di halaman history
     if (document.getElementById('page-history').classList.contains('active')) {
         renderHistory();
     }
@@ -1223,7 +1310,6 @@ function switchPage(pageName) {
         navItems[pageMap[pageName]].classList.add('active');
     }
     
-    // Render history jika halaman history
     if (pageName === 'history') renderHistory();
     
     window.scrollTo({ top: 0, behavior: 'smooth' });
