@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Saka Tracker V5.4.4 - Stable</title>
+    <title>Saka Tracker V5.4.5 - Stable</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <style>
         :root {
@@ -216,7 +216,15 @@
         .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); z-index: 99999; display: none; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(5px);}
         .modal-content { background: var(--card-bg); border-radius: 16px; padding: 25px; max-width: 500px; width: 100%; max-height: 80vh; overflow-y: auto; border: 1px solid var(--border); }
         .modal-title { font-size: 1.2rem; font-weight: bold; margin-bottom: 15px; color: var(--text-main); display: flex; align-items: center; gap: 8px;}
-        .modal-body { font-size: 0.9rem; color: var(--text-muted); line-height: 1.6; white-space: pre-wrap; }
+        .modal-body { font-size: 0.9rem; color: var(--text-muted); line-height: 1.6; }
+        .modal-body .legal-updated { font-size: 0.75rem; color: var(--text-muted); opacity: 0.8; margin-bottom: 16px; display:block; }
+        .modal-body h4 { color: var(--text-main); font-size: 0.9rem; margin: 16px 0 6px; display: flex; align-items: center; gap: 6px; }
+        .modal-body h4:first-of-type { margin-top: 0; }
+        .modal-body p { margin-bottom: 8px; }
+        .modal-body ul { margin: 4px 0 8px 18px; padding: 0; }
+        .modal-body li { margin-bottom: 4px; }
+        .modal-body strong { color: var(--text-main); }
+        .modal-body .legal-note { background: rgba(59,130,246,0.08); border-left: 3px solid var(--accent-blue); border-radius: 8px; padding: 10px 12px; margin: 10px 0; font-size: 0.85rem; }
         .modal-close { margin-top: 20px; width: 100%; }
 
         .bottom-nav {
@@ -312,7 +320,7 @@
     <div class="header">
         <h1>
             <i class="bi bi-graph-up-arrow"></i> SAKA TRACKER
-            <span class="version-badge">v5.4.4</span>
+            <span class="version-badge">v5.4.5</span>
         </h1>
         <p id="current-date">Memuat tanggal...</p>
     </div>
@@ -503,8 +511,11 @@
         </div>
 
         <div class="app-info-box">
-            <div class="app-name">Saka Tracker v5.4.4 (Build 20260708)</div>
+            <div class="app-name">Saka Tracker v5.4.5 (Build 20260708)</div>
             <div style="margin-bottom: 10px; font-size: 0.8rem;">Aplikasi monitoring progres SLS berbasis Hybrid AI dengan tracking termin dan komparasi muatan kontrak.</div>
+            <div style="margin-bottom: 10px; font-size: 0.72rem; color: var(--text-muted); background:#0b1120; border:1px solid var(--border); border-radius:8px; padding:8px 10px; text-align:left;">
+                <strong style="color:var(--text-main); font-size:0.75rem;"><i class="bi bi-clock-history"></i> v5.4.5</strong> — Penyempurnaan Terms of Service &amp; Privacy Policy: cakupan lebih lengkap soal penyimpanan lokal, pengiriman data ke provider AI pihak ketiga, dan status aplikasi sebagai alat bantu internal (bukan aplikasi resmi BPS).
+            </div>
             <div style="font-weight: bold; color: var(--text-main); margin-bottom: 5px;">Developed by Saka_Omni</div>
             
             <div class="dev-contact">
@@ -553,7 +564,7 @@
 // ===============================
 // VERSI APLIKASI - UPDATE OTOMATIS
 // ===============================
-const APP_VERSION = "5.4.4";
+const APP_VERSION = "5.4.5";
 const BUILD_DATE = "20260708";
 
 // ===============================
@@ -1452,10 +1463,93 @@ function openModal(type) {
     modal.style.display = 'flex';
     if(type === 'tos') {
         title.innerHTML = '<i class="bi bi-shield-check"></i> Terms of Service';
-        body.innerText = 'TERMS OF SERVICE - SAKA TRACKER\n\nLast Updated: July 8, 2026\n\n1. ACCEPTANCE OF TERMS\nBy accessing and using Saka Tracker, you accept and agree to be bound by the terms and provision of this agreement.\n\n2. DESCRIPTION OF SERVICE\nSaka Tracker is a personal productivity tool designed for monitoring SLS progress, managing FASIH dashboard data, and providing AI-driven insights.\n\n3. USER RESPONSIBILITIES\nYou are responsible for maintaining the confidentiality of your API keys and data entered into the application.\n\n4. NO WARRANTY\nTHE APPLICATION IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.\n\n5. CONTACT\nFor support, contact mlevian@protonmail.com';
+        body.innerHTML = `
+            <span class="legal-updated">Terakhir diperbarui: 8 Juli 2026 &middot; Versi 5.4.5</span>
+
+            <div class="legal-note"><i class="bi bi-info-circle-fill"></i> Saka Tracker adalah <strong>alat bantu internal</strong> untuk monitoring progres lapangan Sensus Ekonomi 2026 (SE2026). Aplikasi ini <strong>bukan produk resmi Badan Pusat Statistik (BPS)</strong> dan tidak berafiliasi dengan BPS.</div>
+
+            <h4><i class="bi bi-1-circle-fill"></i> Penerimaan Ketentuan</h4>
+            <p>Dengan mengakses dan menggunakan Saka Tracker, Anda menyatakan telah membaca, memahami, dan menyetujui seluruh ketentuan dalam dokumen ini. Jika Anda tidak menyetujui ketentuan ini, mohon untuk tidak menggunakan aplikasi.</p>
+
+            <h4><i class="bi bi-2-circle-fill"></i> Deskripsi Layanan</h4>
+            <p>Saka Tracker menyediakan fitur pencatatan progres SLS (open/submit/reject/pending/approve), perhitungan target &amp; forecast, prioritisasi kerja, serta ringkasan analisis berbasis AI. Seluruh perhitungan bersifat estimasi untuk membantu pengambilan keputusan lapangan, dan <strong>bukan merupakan sumber data resmi</strong> untuk pelaporan ke BPS.</p>
+
+            <h4><i class="bi bi-3-circle-fill"></i> Tanggung Jawab Pengguna</h4>
+            <ul>
+                <li>Anda bertanggung jawab penuh atas keakuratan data yang diinput ke dalam aplikasi.</li>
+                <li>Anda bertanggung jawab menjaga kerahasiaan API key pihak ketiga (OpenAI, Gemini, Mistral) yang Anda masukkan sendiri ke aplikasi.</li>
+                <li>Anda bertanggung jawab menjaga keamanan perangkat yang digunakan, karena seluruh data tersimpan secara lokal di perangkat tersebut.</li>
+                <li><strong>Dilarang</strong> memasukkan data pribadi responden sensus (nama, NIK, alamat lengkap, kontak, dsb) ke dalam aplikasi ini — aplikasi hanya dirancang untuk menyimpan data agregat/angka progres per SLS.</li>
+            </ul>
+
+            <h4><i class="bi bi-4-circle-fill"></i> Layanan Pihak Ketiga (AI Provider)</h4>
+            <p>Fitur "Multi-AI Strategic Insight" bersifat opsional dan hanya aktif jika Anda mengisi API key milik Anda sendiri (OpenAI, Gemini, dan/atau Mistral). Penggunaan fitur ini tunduk pula pada ketentuan layanan dan kebijakan masing-masing penyedia AI tersebut, termasuk biaya penggunaan yang mungkin timbul dari akun API Anda. Saka Tracker tidak mengelola, menagih, atau bertanggung jawab atas biaya penggunaan API pihak ketiga.</p>
+
+            <h4><i class="bi bi-5-circle-fill"></i> Tanpa Jaminan (No Warranty)</h4>
+            <p>Aplikasi disediakan "SEBAGAIMANA ADANYA" (AS IS) tanpa jaminan dalam bentuk apa pun, baik tersurat maupun tersirat, termasuk namun tidak terbatas pada jaminan kelayakan untuk tujuan tertentu, keakuratan forecast, atau ketersediaan layanan AI pihak ketiga secara terus-menerus.</p>
+
+            <h4><i class="bi bi-6-circle-fill"></i> Batasan Tanggung Jawab</h4>
+            <p>Pengembang tidak bertanggung jawab atas kehilangan data akibat penghapusan cache browser, penggantian perangkat, atau kegagalan penyimpanan lokal. Gunakan fitur Backup &amp; Restore secara berkala untuk mencegah kehilangan data. Pengembang juga tidak bertanggung jawab atas keputusan lapangan yang diambil semata-mata berdasarkan hasil forecast atau insight AI tanpa verifikasi manusia.</p>
+
+            <h4><i class="bi bi-7-circle-fill"></i> Perubahan Layanan &amp; Ketentuan</h4>
+            <p>Ketentuan ini dapat diperbarui sewaktu-waktu seiring pembaruan versi aplikasi. Versi dan tanggal pembaruan terakhir selalu tercantum di bagian atas dokumen ini.</p>
+
+            <h4><i class="bi bi-8-circle-fill"></i> Hukum yang Berlaku</h4>
+            <p>Ketentuan ini tunduk pada hukum yang berlaku di Republik Indonesia.</p>
+
+            <h4><i class="bi bi-envelope-fill"></i> Kontak</h4>
+            <p>Pertanyaan seputar ketentuan layanan dapat disampaikan ke <strong>mlevian@protonmail.com</strong> atau WhatsApp developer.</p>
+        `;
     } else if (type === 'privacy') {
         title.innerHTML = '<i class="bi bi-lock-fill"></i> Privacy Policy';
-        body.innerText = 'PRIVACY POLICY - SAKA TRACKER\n\nLast Updated: July 8, 2026\n\n1. DATA COLLECTION\nSaka Tracker operates entirely on your local device. We DO NOT collect, store, or transmit your data.\n\n2. API KEYS\nAPI Keys are stored locally in your browser\'s LocalStorage.\n\n3. THIRD-PARTY SERVICES\nWhen using AI Insight, your prompt data is sent to OpenAI/Gemini/Mistral servers.\n\n4. DATA SECURITY\nData is stored locally. Use Backup/Restore feature to keep your data safe.';
+        body.innerHTML = `
+            <span class="legal-updated">Terakhir diperbarui: 8 Juli 2026 &middot; Versi 5.4.5</span>
+
+            <div class="legal-note"><i class="bi bi-hdd-fill"></i> Saka Tracker bersifat <strong>local-first</strong>: tidak ada server backend milik aplikasi ini yang menyimpan data Anda. Seluruh data hidup di browser perangkat Anda sendiri.</div>
+
+            <h4><i class="bi bi-1-circle-fill"></i> Data yang Diproses Aplikasi</h4>
+            <p>Aplikasi menyimpan data berikut secara lokal di perangkat Anda melalui <strong>localStorage</strong> browser:</p>
+            <ul>
+                <li>Angka progres per SLS: open, submit, reject, pending, approve, dan draft.</li>
+                <li>Riwayat snapshot harian (history) untuk keperluan forecast &amp; tren.</li>
+                <li>API key pihak ketiga (jika Anda mengisinya) untuk fitur AI Insight.</li>
+            </ul>
+            <p>Aplikasi <strong>tidak</strong> dirancang untuk menyimpan data pribadi responden sensus (nama, NIK, alamat, nomor kontak individu). Mohon hindari memasukkan data tersebut ke dalam field mana pun di aplikasi.</p>
+
+            <h4><i class="bi bi-2-circle-fill"></i> Penyimpanan Lokal</h4>
+            <p>Data tersimpan di localStorage browser pada perangkat yang Anda gunakan. Data ini <strong>tidak otomatis tersinkronisasi</strong> ke perangkat lain atau ke cloud manapun. Menghapus cache/data browser, mengganti perangkat, atau uninstall browser akan menghapus seluruh data secara permanen kecuali Anda melakukan backup terlebih dahulu.</p>
+
+            <h4><i class="bi bi-3-circle-fill"></i> Pengiriman Data ke Provider AI Pihak Ketiga</h4>
+            <p>Fitur "Multi-AI Strategic Insight" bersifat <strong>opsional</strong>. Fitur ini hanya aktif jika Anda mengisi API key Anda sendiri di halaman Pengaturan. Saat digunakan:</p>
+            <ul>
+                <li>Ringkasan angka agregat (persentase progres, ritme harian, kode SLS prioritas) dikirim langsung dari browser Anda ke server penyedia AI (OpenAI, Gemini, atau Mistral — sesuai urutan provider mana yang API key-nya terisi dan berhasil merespons).</li>
+                <li>Pengiriman terjadi langsung antara browser Anda dan server provider tersebut — <strong>tidak melalui server milik Saka Tracker</strong>, karena aplikasi ini tidak memiliki server backend.</li>
+                <li>Prompt yang dikirim hanya berisi data agregat/statistik, tidak dirancang untuk menyertakan data pribadi responden.</li>
+                <li>Data yang dikirim tunduk pada kebijakan privasi masing-masing provider (OpenAI, Google Gemini, atau Mistral AI).</li>
+            </ul>
+
+            <h4><i class="bi bi-4-circle-fill"></i> API Key</h4>
+            <p>API key yang Anda masukkan disimpan di localStorage browser Anda sendiri dan digunakan hanya untuk memanggil layanan AI terkait. Jaga kerahasiaan API key Anda — siapa pun yang mengakses perangkat/browser Anda berpotensi melihat key tersebut.</p>
+
+            <h4><i class="bi bi-5-circle-fill"></i> Cookies &amp; Pelacakan</h4>
+            <p>Saka Tracker tidak menggunakan cookies pelacakan, analytics pihak ketiga, atau iklan. Satu-satunya sumber daya eksternal yang dimuat adalah ikon Bootstrap Icons dari CDN.</p>
+
+            <h4><i class="bi bi-6-circle-fill"></i> Hak Anda atas Data</h4>
+            <ul>
+                <li><strong>Export</strong>: unduh seluruh data Anda kapan saja melalui fitur Backup (JSON) di halaman Pengaturan.</li>
+                <li><strong>Hapus</strong>: hapus history atau seluruh data kapan saja melalui fitur di halaman History/Pengaturan, atau dengan membersihkan localStorage browser.</li>
+                <li><strong>Portabilitas</strong>: file backup JSON dapat dipindahkan dan di-restore ke perangkat lain.</li>
+            </ul>
+
+            <h4><i class="bi bi-7-circle-fill"></i> Keamanan</h4>
+            <p>Karena data tersimpan lokal, keamanan data sangat bergantung pada keamanan perangkat Anda (kunci layar, akses fisik ke perangkat). Gunakan perangkat pribadi yang terkunci dan hindari mengisi API key di perangkat/browser bersama.</p>
+
+            <h4><i class="bi bi-8-circle-fill"></i> Perubahan Kebijakan</h4>
+            <p>Kebijakan ini dapat diperbarui seiring pembaruan versi aplikasi. Versi dan tanggal pembaruan terakhir selalu tercantum di bagian atas dokumen ini.</p>
+
+            <h4><i class="bi bi-envelope-fill"></i> Kontak</h4>
+            <p>Pertanyaan seputar privasi dapat disampaikan ke <strong>mlevian@protonmail.com</strong> atau WhatsApp developer.</p>
+        `;
     }
 }
 
