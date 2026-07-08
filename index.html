@@ -763,48 +763,172 @@ async function runAnalysis() {
     btn.innerHTML = '<i class="bi bi-cpu"></i> ANALISIS & SIMPAN SNAPSHOT';
 }
 
-function renderTerminAlert(prog) {
+ function renderTerminAlert(prog) {
     const card = document.getElementById('termin-alert-card');
     const statusDiv = document.getElementById('termin-status');
     const today = new Date();
     const targetDate = CONFIG.termin1TargetDate;
     const isPastDeadline = today > targetDate;
     const isTargetMet = prog.dashP >= 40;
-
+    
+    // Hitung metrik tambahan
+    const daysLeft = Math.ceil((targetDate - today) / (1000 * 60 * 60 * 24));
+    const targetProgress = 40;
+    const currentProgress = prog.dashP;
+    const gapToTarget = Math.max(0, targetProgress - currentProgress);
+    const progressPerDay = daysLeft > 0 ? gapToTarget / daysLeft : 0;
+    
     if (!isTargetMet) {
         card.style.display = 'block';
+        
+        let statusHTML = '';
+        
         if (isPastDeadline) {
-            statusDiv.innerHTML = `<div class="forecast-box forecast-crit"><i class="bi bi-exclamation-octagon-fill"></i> CRITICAL: Termin 1 BELUM tercapai (${prog.dashP.toFixed(2)}%) dan MELEWATI BATAS WAKTU (${targetDate.toLocaleDateString('id-ID')}). Segera percepat approval!</div>`;
+            // KRITIS: Melewati deadline
+            statusHTML = `
+                <div class="forecast-box forecast-crit" style="flex-direction:column; align-items:stretch; gap:12px;">
+                    <div style="display:flex; align-items:center; gap:10px; font-size:1.1rem;">
+                        <i class="bi bi-exclamation-octagon-fill" style="font-size:1.5rem; color:var(--accent-red);"></i>
+                        <strong style="color:var(--accent-red);">KRITIS! Termin 1 GAGAL</strong>
+                    </div>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; font-size:0.9rem;">
+                        <div><i class="bi bi-graph-up"></i> Progress saat ini:</div>
+                        <div style="font-weight:bold; color:var(--accent-red);">${currentProgress.toFixed(2)}%</div>
+                        <div><i class="bi bi-bullseye"></i> Target seharusnya:</div>
+                        <div style="font-weight:bold; color:var(--accent-red);">40%</div>
+                        <div><i class="bi bi-calendar-event"></i> Deadline:</div>
+                        <div style="font-weight:bold; color:var(--accent-red);">${targetDate.toLocaleDateString('id-ID', {day:'numeric', month:'long', year:'numeric'})}</div>
+                        <div><i class="bi bi-clock"></i> Keterlambatan:</div>
+                        <div style="font-weight:bold; color:var(--accent-red);">${Math.abs(daysLeft)} hari</div>
+                    </div>
+                    <div style="background:rgba(239,68,68,0.15); padding:10px; border-radius:8px; text-align:center; font-weight:bold; color:var(--accent-red);">
+                        <i class="bi bi-lightning-fill"></i> SEGERA PERCEPAT APPROVAL! Target tidak tercapai tepat waktu.
+                    </div>
+                </div>
+            `;
+        } else if (daysLeft <= 3 && currentProgress < 30) {
+            // KRITIS: Hanya 3 hari tersisa dan progress jauh
+            statusHTML = `
+                <div class="forecast-box forecast-crit" style="flex-direction:column; align-items:stretch; gap:12px;">
+                    <div style="display:flex; align-items:center; gap:10px; font-size:1.1rem;">
+                        <i class="bi bi-exclamation-octagon-fill" style="font-size:1.5rem; color:var(--accent-red);"></i>
+                        <strong style="color:var(--accent-red);">KRITIS! Hanya ${daysLeft} Hari Tersisa!</strong>
+                    </div>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; font-size:0.9rem;">
+                        <div><i class="bi bi-graph-up"></i> Progress:</div>
+                        <div style="font-weight:bold; color:var(--accent-orange);">${currentProgress.toFixed(2)}%</div>
+                        <div><i class="bi bi-bullseye"></i> Target:</div>
+                        <div style="font-weight:bold; color:var(--accent-orange);">40%</div>
+                        <div><i class="bi bi-calendar-event"></i> Tenggat:</div>
+                        <div style="font-weight:bold;">${targetDate.toLocaleDateString('id-ID', {day:'numeric', month:'long'})}</div>
+                        <div><i class="bi bi-clock"></i> Sisa Hari:</div>
+                        <div style="font-weight:bold; color:var(--accent-red);">${daysLeft} hari</div>
+                    </div>
+                    <div style="background:rgba(239,68,68,0.1); padding:10px; border-radius:8px; text-align:center; font-size:0.9rem;">
+                        <i class="bi bi-arrow-right-circle-fill" style="color:var(--accent-orange);"></i>
+                        Butuh <strong style="color:var(--accent-orange);">${progressPerDay.toFixed(1)}% per hari</strong> untuk mencapai target! 
+                        Fokus di 3 SLS prioritas dengan open tinggi.
+                    </div>
+                </div>
+            `;
+        } else if (daysLeft <= 7) {
+            // WARNING: 1 minggu tersisa
+            const statusText = currentProgress > 30 ? 'Perlu AKSI CEPAT' : 'Kondisi KRITIS!';
+            const borderColor = currentProgress > 30 ? 'var(--accent-orange)' : 'var(--accent-red)';
+            
+            statusHTML = `
+                <div class="forecast-box forecast-warn" style="flex-direction:column; align-items:stretch; gap:12px; border-left:4px solid ${borderColor};">
+                    <div style="display:flex; align-items:center; gap:10px; font-size:1.1rem;">
+                        <i class="bi bi-exclamation-triangle-fill" style="font-size:1.5rem; color:${borderColor};"></i>
+                        <strong style="color:${borderColor};">${daysLeft} Hari Menuju Termin 1 - ${statusText}</strong>
+                    </div>
+                    
+                    <!-- Progress Bar -->
+                    <div style="background:#1e293b; border-radius:8px; padding:12px;">
+                        <div style="display:flex; justify-content:space-between; font-size:0.8rem; margin-bottom:4px;">
+                            <span><i class="bi bi-graph-up"></i> Progress: ${currentProgress.toFixed(1)}%</span>
+                            <span><i class="bi bi-bullseye"></i> Target: 40%</span>
+                        </div>
+                        <div style="background:#334155; border-radius:4px; height:20px; overflow:hidden; position:relative;">
+                            <div style="background:${currentProgress > 35 ? 'var(--accent-green)' : currentProgress > 30 ? 'var(--accent-orange)' : 'var(--accent-red)'}; height:100%; width:${Math.min(100, currentProgress)}%; transition:width 0.5s ease;"></div>
+                            <div style="position:absolute; right:0; top:0; height:100%; width:${Math.max(0, 40 - currentProgress)}%; background:rgba(255,255,255,0.05); border-left:2px dashed var(--accent-orange);"></div>
+                            <div style="position:absolute; left:${Math.min(100, currentProgress)}%; top:50%; transform:translate(-50%, -50%); font-size:0.6rem; font-weight:bold; color:white; text-shadow:0 0 4px rgba(0,0,0,0.8);">
+                                ${currentProgress.toFixed(1)}%
+                            </div>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; font-size:0.7rem; color:var(--text-muted); margin-top:2px;">
+                            <span>Saat Ini</span>
+                            <span style="color:var(--accent-orange);"><i class="bi bi-arrow-up"></i> Gap ${gapToTarget.toFixed(1)}%</span>
+                            <span>Target</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Detail Metrics -->
+                    <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; font-size:0.85rem;">
+                        <div style="background:#0f172a; padding:8px; border-radius:6px; text-align:center;">
+                            <div style="color:var(--text-muted); font-size:0.7rem;"><i class="bi bi-calendar-range"></i> Sisa Hari</div>
+                            <div style="font-weight:bold; font-size:1.1rem; ${daysLeft <= 5 ? 'color:var(--accent-red)' : 'color:var(--accent-orange)'}">${daysLeft}</div>
+                        </div>
+                        <div style="background:#0f172a; padding:8px; border-radius:6px; text-align:center;">
+                            <div style="color:var(--text-muted); font-size:0.7rem;"><i class="bi bi-arrow-up-circle"></i> Gap ke Target</div>
+                            <div style="font-weight:bold; font-size:1.1rem; color:var(--accent-orange);">${gapToTarget.toFixed(1)}%</div>
+                        </div>
+                        <div style="background:#0f172a; padding:8px; border-radius:6px; text-align:center;">
+                            <div style="color:var(--text-muted); font-size:0.7rem;"><i class="bi bi-speedometer2"></i> Butuh per Hari</div>
+                            <div style="font-weight:bold; font-size:1.1rem; ${progressPerDay > 3 ? 'color:var(--accent-red)' : 'color:var(--accent-orange)'}">${progressPerDay.toFixed(1)}%</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Action Recommendation -->
+                    <div style="background:rgba(59,130,246,0.08); padding:10px; border-radius:8px; text-align:center; font-size:0.85rem; border-left:3px solid var(--accent-blue);">
+                        <i class="bi bi-lightbulb-fill" style="color:var(--accent-blue);"></i>
+                        <strong>Strategi:</strong> Percepat approval di 3 SLS prioritas (0018, 0019, 0020). 
+                        ${progressPerDay > 3 ? '<i class="bi bi-exclamation-triangle-fill" style="color:var(--accent-red);"></i> Perlu tambahan tenaga lapangan!' : 'Fokus pada SLS dengan open > 50 unit.'}
+                    </div>
+                </div>
+            `;
         } else {
-            const daysLeft = Math.ceil((targetDate - today) / (1000 * 60 * 60 * 24));
-            const persenTarget = ((prog.val / state.config.assessment) * 100);
-            const targetPerHari = daysLeft > 0 ? (40 - persenTarget) / daysLeft : 0;
-            
-            let warningLevel = 'forecast-warn';
-            let icon = '<i class="bi bi-exclamation-triangle-fill"></i>';
-            let additionalInfo = '';
-            
-            if (daysLeft <= 3 && persenTarget < 30) {
-                warningLevel = 'forecast-crit';
-                icon = '<i class="bi bi-exclamation-octagon-fill"></i>';
-                additionalInfo = ` <strong>⚠️ KRITIS!</strong> Hanya ${daysLeft} hari tersisa!`;
-            } else if (targetPerHari > 5) {
-                additionalInfo = ` Butuh percepatan ${targetPerHari.toFixed(1)}% per hari.`;
-            } else if (targetPerHari > 0) {
-                additionalInfo = ` Butuh ${targetPerHari.toFixed(1)}% per hari.`;
-            }
-            
-            statusDiv.innerHTML = `
-                <div class="forecast-box ${warningLevel}">
-                    ${icon} Termin 1 belum tercapai (${prog.dashP.toFixed(2)}%). 
-                    Target: 40% pada ${targetDate.toLocaleDateString('id-ID')}. 
-                    Sisa waktu: <strong>${daysLeft} hari</strong>.
-                    ${additionalInfo}
+            // Normal warning: masih ada waktu > 7 hari
+            statusHTML = `
+                <div class="forecast-box forecast-warn" style="flex-direction:column; align-items:stretch; gap:10px;">
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <i class="bi bi-info-circle-fill" style="color:var(--accent-orange); font-size:1.3rem;"></i>
+                        <span><i class="bi bi-calendar-event"></i> Termin 1: ${daysLeft} hari menuju deadline <strong>${targetDate.toLocaleDateString('id-ID', {day:'numeric', month:'long'})}</strong></span>
+                    </div>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; font-size:0.85rem; background:#0f172a; padding:10px; border-radius:8px;">
+                        <div><i class="bi bi-graph-up"></i> Progress: <strong style="color:var(--accent-blue);">${currentProgress.toFixed(2)}%</strong></div>
+                        <div><i class="bi bi-bullseye"></i> Target: <strong style="color:var(--accent-green);">40%</strong></div>
+                        <div><i class="bi bi-arrow-up-circle"></i> Gap: <strong style="color:var(--accent-orange);">${gapToTarget.toFixed(1)}%</strong></div>
+                        <div><i class="bi bi-speedometer2"></i> Butuh: <strong style="color:${progressPerDay > 2 ? 'var(--accent-orange)' : 'var(--accent-green)'};">${progressPerDay.toFixed(1)}% / hari</strong></div>
+                    </div>
+                    ${progressPerDay > 2 ? `<div style="font-size:0.8rem; color:var(--accent-orange); text-align:center;"><i class="bi bi-exclamation-triangle-fill"></i> Perlu percepatan! Target harian di atas 2%</div>` : ''}
                 </div>
             `;
         }
+        
+        statusDiv.innerHTML = statusHTML;
     } else {
-        card.style.display = 'none';
+        // TARGET TERCAPAI!
+        card.style.display = 'block';
+        statusHTML = `
+            <div class="forecast-box forecast-ok" style="flex-direction:column; align-items:stretch; gap:10px;">
+                <div style="display:flex; align-items:center; gap:10px; font-size:1.1rem;">
+                    <i class="bi bi-check-circle-fill" style="color:var(--accent-green); font-size:1.5rem;"></i>
+                    <strong style="color:var(--accent-green);">TERMIN 1 TERCAPAI!</strong>
+                </div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; font-size:0.9rem; background:#0f172a; padding:10px; border-radius:8px;">
+                    <div><i class="bi bi-graph-up"></i> Progress: <strong style="color:var(--accent-green);">${currentProgress.toFixed(2)}%</strong></div>
+                    <div><i class="bi bi-bullseye"></i> Target: <strong style="color:var(--accent-green);">40% <i class="bi bi-check-lg"></i></strong></div>
+                    <div><i class="bi bi-calendar-event"></i> Deadline: <strong>${targetDate.toLocaleDateString('id-ID', {day:'numeric', month:'long'})}</strong></div>
+                    <div><i class="bi bi-clock"></i> Selesai: <strong style="color:var(--accent-green);">${daysLeft < 0 ? Math.abs(daysLeft) + ' hari lebih cepat' : 'Tepat waktu'}</strong></div>
+                </div>
+                <div style="background:rgba(16,185,129,0.08); padding:8px; border-radius:8px; text-align:center; font-size:0.85rem; color:var(--text-muted);">
+                    <i class="bi bi-rocket-takeoff"></i> Pertahankan ritme untuk clearance 27 Agustus 2026!
+                </div>
+            </div>
+        `;
+        
+        statusDiv.innerHTML = statusHTML;
     }
 }
 
