@@ -1012,16 +1012,49 @@ function closeModal() {
     document.getElementById('legal-modal').style.display = 'none';
 }
 
+ 
+// ===============================
+// SMART INPUT LOGIC (CLAMP TO ZERO)
+// ===============================
+function toggleInputMode() {
+    const checkbox = document.getElementById('mode-akumulasi');
+    state.isAccumulationMode = checkbox.checked;
+    
+    const dateDisplay = document.getElementById('date-range-display');
+    const toggleLabel = document.querySelector('.toggle-label');
+    
+    if (state.isAccumulationMode) {
+        toggleLabel.innerHTML = '<i class="bi bi-calendar-range"></i> Mode Akumulasi (Rentang Tanggal)';
+        dateDisplay.style.display = "block";
+    } else {
+        toggleLabel.innerHTML = '<i class="bi bi-calendar-event"></i> Mode Input Harian';
+        dateDisplay.style.display = "none";
+    }
+    localStorage.setItem('saka_tracker_v5_4', JSON.stringify(state));
+}
+
 // ===============================
 // INITIALIZATION (SAFE INIT)
 // ===============================
 function initForm() {
     syncConfigTargets();
     
-    // Set toggle state from storage
+    // Set toggle state from storage - TANPA MEMANGGIL toggleInputMode()
     const checkbox = document.getElementById('mode-akumulasi');
-    if(checkbox) checkbox.checked = state.isAccumulationMode;
-    toggleInputMode(); // Apply visual state
+    if(checkbox) {
+        checkbox.checked = state.isAccumulationMode;
+        // Terapkan visual state secara langsung
+        const dateDisplay = document.getElementById('date-range-display');
+        const toggleLabel = document.querySelector('.toggle-label');
+        
+        if (state.isAccumulationMode) {
+            toggleLabel.innerHTML = '<i class="bi bi-calendar-range"></i> Mode Akumulasi (Rentang Tanggal)';
+            dateDisplay.style.display = "block";
+        } else {
+            toggleLabel.innerHTML = '<i class="bi bi-calendar-event"></i> Mode Input Harian';
+            dateDisplay.style.display = "none";
+        }
+    }
 
     const container = document.getElementById('sls-inputs-container');
     if(!container) return; // Safety check
@@ -1054,6 +1087,7 @@ window.addEventListener('DOMContentLoaded', () => {
         loadApiKeys();
     }, 100);
 });
+ 
 </script>
 </body>
 </html>
