@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Saka Tracker V5.4 - Professional</title>
-    <!-- Bootstrap Icons CDN -->
+    <title>Saka Tracker V5.4.1 - Stable</title>
+    <!-- Bootstrap Icons CDN with fallback handling -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <style>
         :root {
@@ -345,7 +345,7 @@
 
         <!-- APP INFO BOX -->
         <div class="app-info-box">
-            <div class="app-name">Saka Tracker v5.4.0 (Build 20260708)</div>
+            <div class="app-name">Saka Tracker v5.4.1 (Build 20260708)</div>
             <div style="margin-bottom: 10px; font-size: 0.8rem;">Aplikasi monitoring progres SLS berbasis Hybrid AI dengan tracking termin dan komparasi muatan kontrak.</div>
             <div style="font-weight: bold; color: var(--text-main); margin-bottom: 5px;">Developed by Saka_Omni</div>
             
@@ -388,7 +388,7 @@
 // ===============================
 // CONFIG & STATE MANAGEMENT
 // ===============================
-const APP_VERSION = "5.4.0";
+const APP_VERSION = "5.4.1";
 const BUILD_DATE = "20260708";
 const CONFIG = {
     startDate: new Date("2026-06-15"), 
@@ -1013,16 +1013,19 @@ function closeModal() {
 }
 
 // ===============================
-// INITIALIZATION
+// INITIALIZATION (SAFE INIT)
 // ===============================
 function initForm() {
     syncConfigTargets();
     
     // Set toggle state from storage
-    document.getElementById('mode-akumulasi').checked = state.isAccumulationMode;
+    const checkbox = document.getElementById('mode-akumulasi');
+    if(checkbox) checkbox.checked = state.isAccumulationMode;
     toggleInputMode(); // Apply visual state
 
     const container = document.getElementById('sls-inputs-container');
+    if(!container) return; // Safety check
+    
     container.innerHTML = '';
     state.sls.forEach((s,idx)=>{
         const row = document.createElement('div');
@@ -1039,12 +1042,18 @@ function initForm() {
         `;
         container.appendChild(row);
     });
-    document.getElementById('current-date').innerText = new Date().toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+    
+    const dateEl = document.getElementById('current-date');
+    if(dateEl) dateEl.innerText = new Date().toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
 }
 
-// Start App
-initForm();
-loadApiKeys();
+// Start App with Delay to ensure DOM and Icons are ready
+window.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+        initForm();
+        loadApiKeys();
+    }, 100);
+});
 </script>
 </body>
 </html>
