@@ -207,7 +207,7 @@ Proprietary — internal tool. Seluruh hak cipta pada developer. Tidak untuk did
 ## 📬 Kontak
 
 - **Email**: [mlevian@protonmail.com](mailto:mlevian@protonmail.com)
-- **WhatsApp**: [+62 851-1133-0391](https://wa.me/6285111330391)
+ 
 
 ---
 
