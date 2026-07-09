@@ -1,5 +1,5 @@
 // ===============================
-// SAKA TRACKER - Service Worker v5.5.0  
+// SAKA TRACKER - Service Worker v5.5.2  
 // ===============================
 // PENTING - SINKRONISASI VERSI (Semantic Versioning):
 // SW_VERSION di file ini HARUS selalu sama persis dengan APP_VERSION di
@@ -8,8 +8,8 @@
 // sehingga index.html dapat memverifikasi kecocokan versi secara otomatis
 // (lihat checkVersionSync() di index.html).
 
-const SW_VERSION = '5.5.1';
-const CACHE_NAME = 'saka-tracker-v5-5-1';
+const SW_VERSION = '5.5.2';
+const CACHE_NAME = 'saka-tracker-v5-5-2';
 const ASSETS = [
   '/sakahybrid/',
   '/sakahybrid/index.html',
@@ -29,8 +29,8 @@ self.addEventListener('install', event => {
         return cache.addAll(ASSETS);
       })
       .then(() => {
-        console.log('[SW] Installation complete!');
-        return self.skipWaiting();
+        console.log('[SW] Installation complete. Waiting for client approval before activation.');
+        return Promise.resolve();
       })
       .catch(err => {
         console.error('[SW] Installation failed:', err);

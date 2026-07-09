@@ -23,6 +23,7 @@
      banner "Versi baru tersedia" saat Service Worker baru selesai di-install. -->
     <script>
         window.__SAKA_UPDATE_SW_REG = null;
+        window.__SAKA_UPDATE_REQUESTED = false;
 
         function checkVersionSync(swVersion) {
             if (typeof APP_VERSION === 'undefined') return;
@@ -98,6 +99,7 @@
         }
 
         function beginUpdateFlow() {
+            window.__SAKA_UPDATE_REQUESTED = true;
             hideVersionMismatchModal();
             showUpdateProgressScreen();
 
@@ -142,6 +144,10 @@
             navigator.serviceWorker.addEventListener('controllerchange', function () {
                 if (refreshing) return;
                 refreshing = true;
+                if (!window.__SAKA_UPDATE_REQUESTED) {
+                    showUpdateBanner();
+                    return;
+                }
                 window.location.reload();
             });
 
