@@ -4,7 +4,7 @@
  
 **Monitoring progres lapangan SLS, real-time, offline-ready.**
 
-![Version](https://img.shields.io/badge/version-5.5.1-3b82f6?style=flat-square)
+![Version](https://img.shields.io/badge/version-5.5.2-3b82f6?style=flat-square)
 ![Status](https://img.shields.io/badge/status-stable-10b981?style=flat-square)
 ![PWA](https://img.shields.io/badge/PWA-installable-10b981?style=flat-square)
 ![Build Step](https://img.shields.io/badge/build_step-none-f59e0b?style=flat-square)
@@ -149,7 +149,8 @@ Seluruh indikator visual dalam aplikasi menggunakan [Bootstrap Icons](https://ic
 ## Riwayat Versi
 
 | Versi | Ringkasan |
-|---|---|
+| --- | --- |
+| 5.5.2 | Uji fitur update PWA dengan modal pembaruan, layar progres, dan tombol update yang menunggu persetujuan pengguna. |
 | 5.5.0 | Standardisasi seluruh ikon ke Bootstrap Icons (emoji dihapus total); sistem Semantic Versioning terpadu lintas berkas dengan sinkronisasi versi otomatis saat runtime antara halaman, Service Worker, dan manifest PWA. |
 | 5.4.5 | Penyempurnaan Terms of Service & Privacy Policy; penambahan Consent Gate dan PIN Lock opsional. |
 
@@ -176,6 +177,6 @@ Untuk pertanyaan teknis atau permintaan fitur, hubungi developer melalui kontak 
 
 <div align="center">
 
-Saka Tracker v5.5.0 &middot; Alat bantu internal monitoring SE2026
+Saka Tracker v5.5.2 &middot; Alat bantu internal monitoring SE2026
 
 </div>
