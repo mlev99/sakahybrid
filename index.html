@@ -5,6 +5,35 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Saka Tracker V5.4.5 - Stable</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- PWA Meta Tags -->
+<link rel="manifest" href="/sakahybrid/manifest.json">
+<meta name="theme-color" content="#0b1120">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Saka Tracker">
+<link rel="apple-touch-icon" href="/sakahybrid/launchericon-192x192.png">
+
+<!-- PWA Script - Register Service Worker -->
+<script>
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function() {
+        navigator.serviceWorker.register('/sakahybrid/sw.js')
+            .then(function(registration) {
+                console.log('✅ Service Worker registered successfully:', registration);
+            })
+            .catch(function(error) {
+                console.log('❌ Service Worker registration failed:', error);
+            });
+    });
+}
+
+// Check if app is installed (standalone mode)
+if (window.matchMedia('(display-mode: standalone)').matches) {
+    console.log('✅ Saka Tracker running in standalone mode (PWA)');
+    document.body.classList.add('pwa-mode');
+}
+</script>
+    
     <style>
         :root {
             --bg-color: #0b1120;
@@ -423,6 +452,37 @@
             .legend-box { grid-template-columns: 1fr; }
             .header-stats { grid-template-columns: repeat(2, 1fr); }
         }
+        /* PWA Mode - Tampilan saat diinstall */
+.pwa-mode .install-banner {
+    display: none !important;
+}
+
+/* Tombol install di browser (opsional) */
+.install-banner {
+    background: var(--card-bg);
+    border: 1px solid var(--accent-blue);
+    border-radius: 12px;
+    padding: 12px 16px;
+    margin-bottom: 12px;
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+.install-banner.show {
+    display: flex;
+}
+.install-banner .btn-install {
+    background: var(--accent-blue);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 0.8rem;
+    white-space: nowrap;
+}
     </style>
 </head>
 <body>
@@ -758,6 +818,18 @@
             <div id="recovery-msg" style="font-size:0.72rem; margin-top:4px;"></div>
         </div>
     </div>
+</div>
+
+    <!-- Install Banner (will show if PWA not installed) -->
+<div class="install-banner" id="install-banner">
+    <div style="display:flex; align-items:center; gap:10px;">
+        <i class="bi bi-cloud-download" style="font-size:1.5rem; color:var(--accent-blue);"></i>
+        <div>
+            <div style="font-weight:600; font-size:0.85rem;">Install Saka Tracker</div>
+            <div style="font-size:0.7rem; color:var(--text-muted);">Akses lebih cepat seperti aplikasi native</div>
+        </div>
+    </div>
+    <button class="btn-install" id="btn-install">Install</button>
 </div>
 
 <!-- BOTTOM NAVBAR -->
@@ -2056,7 +2128,40 @@ function updatePinSecurityUI() {
         disableBtn.style.display = 'none';
     }
 }
+// ===============================
+// PWA INSTALL PROMPT
+// ===============================
+let deferredPrompt;
 
+window.addEventListener('beforeinstallprompt', (e) => {
+    // Prevent Chrome 67 and earlier from automatically showing the prompt
+    e.preventDefault();
+    // Stash the event so it can be triggered later
+    deferredPrompt = e;
+    // Show install banner
+    const banner = document.getElementById('install-banner');
+    if (banner) banner.classList.add('show');
+});
+
+document.getElementById('btn-install')?.addEventListener('click', async () => {
+    if (!deferredPrompt) return;
+    // Show the install prompt
+    deferredPrompt.prompt();
+    // Wait for the user to respond to the prompt
+    const { outcome } = await deferredPrompt.userChoice;
+    console.log(`User response to install: ${outcome}`);
+    // Hide banner after install
+    if (outcome === 'accepted') {
+        document.getElementById('install-banner').classList.remove('show');
+    }
+    deferredPrompt = null;
+});
+
+// Hide banner when app is already installed
+window.addEventListener('appinstalled', () => {
+    document.getElementById('install-banner').classList.remove('show');
+    console.log('✅ Saka Tracker installed as PWA!');
+});
 // ===============================
 // INITIALIZATION
 // ===============================
