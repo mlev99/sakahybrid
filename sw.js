@@ -8,8 +8,8 @@
 // sehingga index.html dapat memverifikasi kecocokan versi secara otomatis
 // (lihat checkVersionSync() di index.html).
 
-const SW_VERSION = '5.5.0';
-const CACHE_NAME = 'saka-tracker-v5-5-0';
+const SW_VERSION = '5.5.1';
+const CACHE_NAME = 'saka-tracker-v5-5-1';
 const ASSETS = [
   '/sakahybrid/',
   '/sakahybrid/index.html',

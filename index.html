@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title id="app-title">Saka Tracker V5.5.0 - Stable</title>
+    <title id="app-title">Saka Tracker V5.5.1 - Stable</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <!-- PWA Meta Tags -->
     <link rel="manifest" href="/sakahybrid/manifest.json">
@@ -28,6 +28,7 @@
             if (typeof APP_VERSION === 'undefined') return;
             if (swVersion && swVersion !== APP_VERSION) {
                 console.warn('[VERSION] Ketidaksinkronan versi terdeteksi -> index.html: ' + APP_VERSION + ', sw.js: ' + swVersion);
+                showVersionMismatchModal(swVersion, 'Service Worker');
             }
         }
 
@@ -38,6 +39,7 @@
                     if (typeof APP_VERSION === 'undefined') return;
                     if (manifest.version && manifest.version !== APP_VERSION) {
                         console.warn('[VERSION] Ketidaksinkronan versi terdeteksi -> index.html: ' + APP_VERSION + ', manifest.json: ' + manifest.version);
+                        showVersionMismatchModal(manifest.version, 'PWA manifest');
                     }
                 })
                 .catch(function () { /* manifest tidak dapat diakses (mis. mode offline) */ });
@@ -46,6 +48,84 @@
         function showUpdateBanner() {
             const banner = document.getElementById('update-banner');
             if (banner) banner.classList.add('show');
+        }
+
+        function showVersionMismatchModal(targetVersion, source) {
+            if (!targetVersion || targetVersion === APP_VERSION) return;
+            const modal = document.getElementById('version-update-modal');
+            const body = document.getElementById('version-update-body');
+            const currentVersion = document.getElementById('version-current-version');
+            const targetVersionEl = document.getElementById('version-target-version');
+            if (!modal || !body || !currentVersion || !targetVersionEl) return;
+            currentVersion.textContent = APP_VERSION;
+            targetVersionEl.textContent = targetVersion;
+            body.innerHTML = `
+                <div style="margin-bottom:10px; color:var(--text-main); font-size:0.9rem;">
+                    <i class="bi bi-arrow-repeat"></i> Versi ${targetVersion} tersedia dari ${source}.
+                </div>
+                <div style="font-size:0.8rem; color:var(--text-muted); line-height:1.6;">
+                    Pembaruan membantu memastikan aplikasi tetap aman, stabil, dan memakai cache PWA terbaru.
+                </div>
+            `;
+            modal.style.display = 'flex';
+        }
+
+        function hideVersionMismatchModal() {
+            const modal = document.getElementById('version-update-modal');
+            if (modal) modal.style.display = 'none';
+        }
+
+        function showUpdateProgressScreen() {
+            const screen = document.getElementById('update-progress-screen');
+            const bar = document.getElementById('update-progress-bar');
+            const percent = document.getElementById('update-progress-percent');
+            const message = document.getElementById('update-progress-message');
+            if (!screen || !bar || !percent || !message) return;
+            bar.style.width = '0%';
+            percent.textContent = '0%';
+            message.textContent = 'Menyiapkan pembaruan...';
+            screen.style.display = 'flex';
+        }
+
+        function updateProgressScreen(progress, messageText) {
+            const bar = document.getElementById('update-progress-bar');
+            const percent = document.getElementById('update-progress-percent');
+            const message = document.getElementById('update-progress-message');
+            if (!bar || !percent || !message) return;
+            bar.style.width = Math.max(0, Math.min(100, progress)) + '%';
+            percent.textContent = Math.max(0, Math.min(100, progress)) + '%';
+            if (messageText) message.textContent = messageText;
+        }
+
+        function beginUpdateFlow() {
+            hideVersionMismatchModal();
+            showUpdateProgressScreen();
+
+            const steps = [
+                { progress: 18, text: 'Mengunduh pembaruan aplikasi...' },
+                { progress: 42, text: 'Memasang file cache PWA terbaru...' },
+                { progress: 76, text: 'Memulai ulang aplikasi...' },
+                { progress: 100, text: 'Selesai, sedang memuat ulang...' }
+            ];
+
+            let stepIndex = 0;
+            const timer = setInterval(function () {
+                if (stepIndex >= steps.length) {
+                    clearInterval(timer);
+                    return;
+                }
+                const step = steps[stepIndex];
+                updateProgressScreen(step.progress, step.text);
+                stepIndex += 1;
+            }, 650);
+
+            setTimeout(function () {
+                clearInterval(timer);
+                updateProgressScreen(100, 'Pembaruan siap diterapkan');
+                setTimeout(function () {
+                    applyUpdate();
+                }, 400);
+            }, 2600);
         }
 
         function applyUpdate() {
@@ -1103,6 +1183,68 @@
             width: 100%;
         }
 
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+        }
+
+        .modal-actions button {
+            flex: 1;
+        }
+
+        .version-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(59, 130, 246, 0.15);
+            color: var(--accent-blue);
+            border: 1px solid rgba(59, 130, 246, 0.35);
+            border-radius: 999px;
+            padding: 4px 10px;
+            font-size: 0.72rem;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+
+        .update-progress-card {
+            text-align: center;
+        }
+
+        .update-progress-card .bi {
+            font-size: 2rem;
+            color: var(--accent-blue);
+        }
+
+        .update-progress-card p {
+            color: var(--text-muted);
+            font-size: 0.82rem;
+            margin-top: 8px;
+        }
+
+        .update-progress-shell {
+            height: 10px;
+            border-radius: 999px;
+            background: rgba(148, 163, 184, 0.2);
+            overflow: hidden;
+            margin-top: 16px;
+        }
+
+        .update-progress-bar {
+            height: 100%;
+            width: 0%;
+            border-radius: 999px;
+            background: linear-gradient(90deg, var(--accent-blue), var(--accent-green));
+            transition: width 0.35s ease;
+        }
+
+        .update-progress-percent {
+            margin-top: 8px;
+            font-size: 0.8rem;
+            color: var(--text-main);
+            font-weight: 600;
+        }
+
         .full-gate {
             position: fixed;
             top: 0;
@@ -1463,7 +1605,7 @@
         <div class="header">
             <h1>
                 <i class="bi bi-graph-up-arrow"></i> SAKA TRACKER
-                <span class="version-badge" id="app-version-badge">v5.5.0</span>
+                <span class="version-badge" id="app-version-badge">v5.5.1</span>
             </h1>
             <p id="current-date">Memuat tanggal...</p>
 
@@ -1738,15 +1880,13 @@
             </div>
 
             <div class="app-info-box">
-                <div class="app-name" id="app-name-version">Saka Tracker v5.5.0 (Build 20260709)</div>
+                <div class="app-name" id="app-name-version">Saka Tracker v5.5.1 (Build 20260709)</div>
                 <div style="margin-bottom: 8px; font-size: 0.75rem;">Aplikasi monitoring progres SLS berbasis Hybrid AI
                     dengan tracking termin dan komparasi muatan kontrak.</div>
                 <div
                     style="margin-bottom: 8px; font-size: 0.68rem; color: var(--text-muted); background:#0b1120; border:1px solid var(--border); border-radius:8px; padding:6px 8px; text-align:left;">
                     <strong style="color:var(--text-main); font-size:0.7rem;"><i class="bi bi-clock-history"></i>
-                        v5.5.0</strong> — Standardisasi ikon Bootstrap Icons (menghapus seluruh emoji), penerapan
-                    Semantic Versioning terpadu, dan sinkronisasi versi otomatis antara halaman, Service Worker, dan
-                    manifest PWA.<br>
+                        v5.5.1</strong> — Perbaikan stabilitas startup, proteksi terhadap data rusak, dan alur update PWA yang lebih ramah pengguna.<br>
                     <strong style="color:var(--text-main); font-size:0.7rem;"><i class="bi bi-clock-history"></i>
                         v5.4.5</strong> — Penyempurnaan Terms of Service &amp; Privacy Policy, penambahan Consent Gate
                     dan PIN Lock opsional.
@@ -1762,10 +1902,57 @@
                 </div>
 
                 <div class="legal-links">
+                    <button class="legal-btn" onclick="openVersionModal()">Lihat Log Versi</button>
+                    <button class="legal-btn" onclick="clearPwaCache()">Bersihkan Cache</button>
+                </div>
+                <div class="legal-links" style="margin-top:8px;">
                     <button class="legal-btn" onclick="openModal('tos')">Terms of Service</button>
                     <button class="legal-btn" onclick="openModal('privacy')">Privacy Policy</button>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- MODAL VERSI / UPDATE -->
+    <div id="version-update-modal" class="modal-overlay" onclick="if(event.target === this) hideVersionMismatchModal()">
+        <div class="modal-content">
+            <div class="modal-title"><i class="bi bi-arrow-down-circle-fill"></i> Pembaruan Tersedia</div>
+            <div class="modal-body" id="version-update-body">
+                <div style="font-size:0.8rem; color:var(--text-muted); line-height:1.6;">Versi baru sedang siap dipasang untuk menjaga aplikasi tetap aman dan stabil.</div>
+            </div>
+            <div class="version-pill"><i class="bi bi-box-seam"></i> Saat ini: <span id="version-current-version">v5.5.1</span> &rarr; <span id="version-target-version">v5.5.1</span></div>
+            <div class="modal-actions">
+                <button class="btn-outline" onclick="hideVersionMismatchModal()">Nanti</button>
+                <button class="btn-primary" onclick="beginUpdateFlow()">Update Sekarang</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="update-progress-screen" class="full-gate">
+        <div class="gate-card update-progress-card">
+            <i class="bi bi-cloud-arrow-down-fill"></i>
+            <h2 style="margin-top:10px; font-size:1.05rem;">Memperbarui Saka Tracker</h2>
+            <p id="update-progress-message">Menyiapkan pembaruan...</p>
+            <div class="update-progress-shell">
+                <div class="update-progress-bar" id="update-progress-bar"></div>
+            </div>
+            <div class="update-progress-percent" id="update-progress-percent">0%</div>
+        </div>
+    </div>
+
+    <!-- MODAL HISTORY VERSI -->
+    <div id="version-log-modal" class="modal-overlay" onclick="if(event.target === this) closeVersionModal()">
+        <div class="modal-content">
+            <div class="modal-title"><i class="bi bi-clock-history"></i> Riwayat Versi</div>
+            <div class="modal-body">
+                <div class="version-pill"><i class="bi bi-box-seam"></i> Versi saat ini: v5.5.1</div>
+                <div style="margin-top:10px; font-size:0.8rem; line-height:1.7; color:var(--text-muted);">
+                    <strong style="color:var(--text-main);">v5.5.1</strong> — Perbaikan stabilitas startup, proteksi terhadap data rusak, dan alur update PWA yang lebih ramah pengguna.<br>
+                    <strong style="color:var(--text-main);">v5.5.0</strong> — Standardisasi ikon Bootstrap Icons, sinkronisasi versi otomatis, dan perbaikan UX dasar.<br>
+                    <strong style="color:var(--text-main);">v5.4.5</strong> — Penyempurnaan Terms of Service, Privacy Policy, Consent Gate, dan PIN Lock.
+                </div>
+            </div>
+            <button class="btn-primary modal-close" onclick="closeVersionModal()"><i class="bi bi-x-lg"></i> Tutup</button>
         </div>
     </div>
 
@@ -1785,7 +1972,7 @@
             </div>
             <h2 style="text-align:center; margin:8px 0 2px; font-size:1.1rem;">Sebelum Melanjutkan</h2>
             <p style="text-align:center; color:var(--text-muted); font-size:0.78rem; margin-bottom:12px;"
-                id="footer-tagline-version">Saka Tracker v5.5.0 — Alat bantu internal monitoring SE2026</p>
+                id="footer-tagline-version">Saka Tracker v5.5.1 — Alat bantu internal monitoring SE2026</p>
             <div class="gate-scroll">
                 <p>Dengan melanjutkan, Anda menyetujui hal-hal berikut:</p>
                 <ul>
@@ -1889,10 +2076,77 @@
         //   - README.md   -> badge/judul versi
         // Ketidaksesuaian antar file akan terdeteksi otomatis saat runtime dan
         // dicatat sebagai console.warn (lihat checkVersionSync & checkManifestVersionSync).
-        const APP_VERSION = "5.5.0";
+        const APP_VERSION = "5.5.1";
         const BUILD_DATE = "20260709";
         const LEGAL_VERSION = "5.4.5"; // versi dokumen ToS/Privacy - naik hanya saat isi legal berubah
         const STORAGE_KEY = "saka_tracker_v5_4"; // kunci localStorage historis, tidak diubah agar data pengguna lama tetap kompatibel
+
+        function safeParseJSON(value, fallback) {
+            if (value === null || value === undefined || value === '') return fallback;
+            try {
+                return JSON.parse(value);
+            } catch (err) {
+                console.warn('[STATE] Gagal membaca data tersimpan, memakai default.', err);
+                return fallback;
+            }
+        }
+
+        function readPersistedState() {
+            try {
+                return safeParseJSON(localStorage.getItem(STORAGE_KEY), null);
+            } catch (err) {
+                console.warn('[STATE] LocalStorage tidak bisa dibaca, memakai default.', err);
+                return null;
+            }
+        }
+
+        function createDefaultState() {
+            return {
+                config: { assessment: 675, muatan: 813 },
+                dashboard: { open: 0, draft: 27, submit: 0, reject: 0, pending: 0, approve: 0 },
+                sls: JSON.parse(JSON.stringify(DEFAULT_SLS_DATA)),
+                history: [],
+                apiKeys: { openai: '', gemini: '', mistral: '' },
+                isAccumulationMode: false,
+                consent: { accepted: false, version: null, date: null },
+                security: { pinEnabled: false, pinHash: null, recoveryHash: null, failedAttempts: 0, lockUntil: null }
+            };
+        }
+
+        function ensureStateShape(raw) {
+            const base = createDefaultState();
+            if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return base;
+
+            const safe = { ...base, ...raw };
+            safe.config = { ...base.config, ...(raw.config && typeof raw.config === 'object' ? raw.config : {}) };
+            safe.dashboard = { ...base.dashboard, ...(raw.dashboard && typeof raw.dashboard === 'object' ? raw.dashboard : {}) };
+            safe.apiKeys = { ...base.apiKeys, ...(raw.apiKeys && typeof raw.apiKeys === 'object' ? raw.apiKeys : {}) };
+            safe.consent = { ...base.consent, ...(raw.consent && typeof raw.consent === 'object' ? raw.consent : {}) };
+            safe.security = { ...base.security, ...(raw.security && typeof raw.security === 'object' ? raw.security : {}) };
+            safe.sls = Array.isArray(raw.sls) && raw.sls.length
+                ? raw.sls.map(item => ({
+                    kode: item && item.kode ? item.kode : '',
+                    nama: item && item.nama ? item.nama : '',
+                    open: parseInt(item && item.open) || 0,
+                    submit: parseInt(item && item.submit) || 0,
+                    reject: parseInt(item && item.reject) || 0,
+                    pending: parseInt(item && item.pending) || 0,
+                    approve: parseInt(item && item.approve) || 0,
+                    muatan: parseInt(item && item.muatan) || 0
+                }))
+                : JSON.parse(JSON.stringify(DEFAULT_SLS_DATA));
+            safe.history = Array.isArray(raw.history) ? raw.history.filter(item => item && typeof item === 'object') : [];
+            safe.isAccumulationMode = Boolean(raw.isAccumulationMode);
+            return safe;
+        }
+
+        function saveState() {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+            } catch (err) {
+                console.warn('[STATE] Tidak dapat menyimpan state:', err);
+            }
+        }
 
         document.addEventListener('DOMContentLoaded', function () {
             document.title = 'Saka Tracker V' + APP_VERSION + ' - Stable';
@@ -1928,16 +2182,7 @@
             { kode: "0020", nama: "RT 006 RW 04 DUSUN MASJID", open: 81, submit: 0, reject: 0, pending: 0, approve: 0, muatan: 91 }
         ];
 
-        let state = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {
-            config: { assessment: 675, muatan: 813 },
-            dashboard: { open: 0, draft: 27, submit: 0, reject: 0, pending: 0, approve: 0 },
-            sls: JSON.parse(JSON.stringify(DEFAULT_SLS_DATA)),
-            history: [],
-            apiKeys: { openai: '', gemini: '', mistral: '' },
-            isAccumulationMode: false,
-            consent: { accepted: false, version: null, date: null },
-            security: { pinEnabled: false, pinHash: null, recoveryHash: null, failedAttempts: 0, lockUntil: null }
-        };
+        let state = ensureStateShape(readPersistedState());
 
         // ===============================
         // HELPER FUNCTIONS
@@ -1955,6 +2200,10 @@
         // SYNC FUNCTIONS - ASSESSMENT DINAMIS
         // ===============================
         function syncConfigTargets() {
+            if (!state || !Array.isArray(state.sls)) {
+                state = ensureStateShape(state);
+            }
+
             let totalMuatan = 0;
             let totalAssessment = 0;
             let totalOpen = 0;
@@ -1982,6 +2231,10 @@
         }
 
         function syncDashboardFromSLS() {
+            if (!state || !Array.isArray(state.sls)) {
+                state = ensureStateShape(state);
+            }
+
             let totalSubmit = 0;
             let totalApprove = 0;
             let totalOpen = 0;
@@ -2010,19 +2263,24 @@
         // UPDATE HEADER STATS
         // ===============================
         function updateHeaderStats() {
-            document.getElementById('stat-open').textContent = state.dashboard.open;
-            document.getElementById('stat-submit').textContent = state.dashboard.submit;
-            document.getElementById('stat-approve').textContent = state.dashboard.approve;
-            document.getElementById('stat-muatan').textContent = state.config.muatan;
+            const openEl = document.getElementById('stat-open');
+            const submitEl = document.getElementById('stat-submit');
+            const approveEl = document.getElementById('stat-approve');
+            const muatanEl = document.getElementById('stat-muatan');
+            if (openEl) openEl.textContent = state.dashboard.open;
+            if (submitEl) submitEl.textContent = state.dashboard.submit;
+            if (approveEl) approveEl.textContent = state.dashboard.approve;
+            if (muatanEl) muatanEl.textContent = state.config.muatan;
         }
 
         // ===============================
         // ACCORDION TOGGLE
         // ===============================
         function toggleAccordion(el) {
+            if (!el) return;
             el.classList.toggle('open');
             const body = document.getElementById('accordion-body');
-            body.classList.toggle('open');
+            if (body) body.classList.toggle('open');
         }
 
         // ===============================
@@ -2030,20 +2288,24 @@
         // ===============================
         function toggleInputMode() {
             const checkbox = document.getElementById('mode-akumulasi');
-            state.isAccumulationMode = checkbox.checked;
+            if (checkbox) state.isAccumulationMode = checkbox.checked;
             const dateDisplay = document.getElementById('date-range-display');
             const toggleLabel = document.querySelector('.toggle-label');
-            if (state.isAccumulationMode) {
-                toggleLabel.innerHTML = '<i class="bi bi-calendar-range"></i> Mode Akumulasi (Rentang Tanggal)';
-                if (dateDisplay) dateDisplay.style.display = "block";
-            } else {
-                toggleLabel.innerHTML = '<i class="bi bi-calendar-event"></i> Mode Input Harian';
-                if (dateDisplay) dateDisplay.style.display = "none";
+            if (toggleLabel) {
+                if (state.isAccumulationMode) {
+                    toggleLabel.innerHTML = '<i class="bi bi-calendar-range"></i> Mode Akumulasi (Rentang Tanggal)';
+                    if (dateDisplay) dateDisplay.style.display = "block";
+                } else {
+                    toggleLabel.innerHTML = '<i class="bi bi-calendar-event"></i> Mode Input Harian';
+                    if (dateDisplay) dateDisplay.style.display = "none";
+                }
             }
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+            saveState();
         }
 
         function updateSLS(idx, field, val) {
+            if (!state || !Array.isArray(state.sls) || !state.sls[idx]) return;
+
             const num = parseInt(val);
 
             if (isNaN(num) || num < 0) {
@@ -2195,6 +2457,7 @@
         function renderTerminAlert(prog) {
             const card = document.getElementById('termin-alert-card');
             const statusDiv = document.getElementById('termin-status');
+            if (!card || !statusDiv) return;
             const today = new Date();
             const targetDate = CONFIG.termin1TargetDate;
             const isPastDeadline = today > targetDate;
@@ -2397,14 +2660,15 @@
 
         function renderForecast() {
             const prog = getProgress();
+            const statusDiv = document.getElementById('forecast-status');
+            const detailDiv = document.getElementById('forecast-details');
+            if (!statusDiv || !detailDiv) return;
             const sisaHari = getSisaHariKeClearance();
             const remaining = state.config.assessment - prog.val;
             const reqVel = Math.ceil(remaining / sisaHari);
             const currVel = getVelocity();
             const isOnTrack = currVel >= reqVel;
             const dateStr = clearanceDate.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
-            const statusDiv = document.getElementById('forecast-status');
-            const detailDiv = document.getElementById('forecast-details');
             let boxClass, icon, text;
             if (currVel === 0) {
                 boxClass = 'forecast-crit';
@@ -2430,24 +2694,29 @@
         }
 
         function renderTargetsAndComparison(prog) {
-            document.getElementById('comp-dash-persen').innerText = prog.dashP.toFixed(2) + '%';
-            document.getElementById('comp-muatan-persen').innerText = prog.muatanP.toFixed(2) + '%';
+            const dashEl = document.getElementById('comp-dash-persen');
+            const muatanEl = document.getElementById('comp-muatan-persen');
+            const velocityEl = document.getElementById('curr-velocity');
+            const reqVelocityEl = document.getElementById('req-velocity');
+            if (dashEl) dashEl.innerText = prog.dashP.toFixed(2) + '%';
+            if (muatanEl) muatanEl.innerText = prog.muatanP.toFixed(2) + '%';
             const sisaHari = getSisaHariKeClearance();
             const remaining = state.config.assessment - prog.val;
             const reqVel = Math.ceil(remaining / sisaHari);
             const currVel = getVelocity();
-            document.getElementById('curr-velocity').innerText = currVel + ' data/hari';
-            document.getElementById('req-velocity').innerText = reqVel + ' data/hari';
+            if (velocityEl) velocityEl.innerText = currVel + ' data/hari';
+            if (reqVelocityEl) reqVelocityEl.innerText = reqVel + ' data/hari';
         }
 
         function renderDifferenceAnalysis() {
             const baselineAssessment = 675, baselineMuatan = 813;
-            const currentAssessment = state.config.assessment, currentMuatan = state.config.muatan;
-            const diffAssessment = currentAssessment - baselineAssessment;
-            const diffMuatan = currentMuatan - baselineMuatan;
             const box = document.getElementById('diff-analysis-box');
             const diffAssEl = document.getElementById('diff-assessment');
             const diffMutEl = document.getElementById('diff-muatan');
+            if (!box || !diffAssEl || !diffMutEl) return;
+            const currentAssessment = state.config.assessment, currentMuatan = state.config.muatan;
+            const diffAssessment = currentAssessment - baselineAssessment;
+            const diffMuatan = currentMuatan - baselineMuatan;
             if (diffAssessment !== 0 || diffMuatan !== 0) {
                 box.style.display = 'block';
                 const formatDiff = (val) => {
@@ -2465,6 +2734,7 @@
         function renderPriorityAccordions() {
             const list = prioritasSLS();
             const container = document.getElementById('priority-list');
+            if (!container) return;
             container.innerHTML = '';
             list.forEach((s, i) => {
                 const item = document.createElement('div');
@@ -2496,12 +2766,17 @@
 
         function renderPerformance(prog, perf) {
             const gradeEl = document.getElementById('perf-grade');
+            const descEl = document.getElementById('perf-desc');
+            const deltaEl = document.getElementById('perf-delta');
+            const dashEl = document.getElementById('dash-persen');
+            const barEl = document.getElementById('dash-bar');
+            if (!gradeEl || !descEl || !deltaEl || !dashEl || !barEl) return;
             gradeEl.innerText = perf.g;
             gradeEl.style.color = perf.c;
-            document.getElementById('perf-desc').innerHTML = '<i class="bi ' + perf.icon + '"></i> ' + perf.d;
-            document.getElementById('perf-delta').innerHTML = '<i class="bi bi-bar-chart-fill"></i> ' + (perf.delta > 0 ? 'Di atas target' : 'Di bawah target') + ' ' + Math.abs(perf.delta) + '%';
-            document.getElementById('dash-persen').innerText = prog.dashP.toFixed(2) + '%';
-            document.getElementById('dash-bar').style.width = Math.min(100, prog.dashP) + '%';
+            descEl.innerHTML = '<i class="bi ' + perf.icon + '"></i> ' + perf.d;
+            deltaEl.innerHTML = '<i class="bi bi-bar-chart-fill"></i> ' + (perf.delta > 0 ? 'Di atas target' : 'Di bawah target') + ' ' + Math.abs(perf.delta) + '%';
+            dashEl.innerText = prog.dashP.toFixed(2) + '%';
+            barEl.style.width = Math.min(100, prog.dashP) + '%';
         }
 
         // ===============================
@@ -2554,6 +2829,7 @@
         function renderHistory() {
             const container = document.getElementById('history-list');
             const countEl = document.getElementById('history-count');
+            if (!container || !countEl) return;
 
             if (!state.history || state.history.length === 0) {
                 container.innerHTML = `<div class="empty-state">
@@ -2635,70 +2911,87 @@
         // ===============================
         async function runAnalysis() {
             const btn = document.getElementById('btn-analyze');
-            btn.disabled = true;
-            btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Sedang Menganalisis...';
-
-            syncDashboardFromSLS();
-            syncConfigTargets();
-            state.dashboard.draft = parseInt(document.getElementById('global-draft').value) || 0;
-
-            const prog = getProgress();
-            const perf = performanceGrade(prog.dashP);
-
-            const todayStr = new Date().toLocaleDateString('id-ID');
-
-            const existingToday = state.history.find(h => h.date === todayStr);
-            if (!existingToday) {
-                state.history.push({
-                    date: todayStr,
-                    progress: prog.val,
-                    dashP: prog.dashP,
-                    velocity: getVelocity(),
-                    grade: perf.g
-                });
-            } else {
-                existingToday.progress = prog.val;
-                existingToday.dashP = prog.dashP;
-                existingToday.velocity = getVelocity();
-                existingToday.grade = perf.g;
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Sedang Menganalisis...';
             }
 
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+            try {
+                syncDashboardFromSLS();
+                syncConfigTargets();
+                const draftEl = document.getElementById('global-draft');
+                state.dashboard.draft = parseInt(draftEl ? draftEl.value : 0) || 0;
 
-            renderTerminAlert(prog);
-            renderForecast();
-            renderTargetsAndComparison(prog);
-            renderDifferenceAnalysis();
-            renderPriorityAccordions();
-            renderPerformance(prog, perf);
-            updateHeaderStats();
+                const prog = getProgress();
+                const perf = performanceGrade(prog.dashP);
 
-            const orchestrator = new HybridAIOrchestrator(state.apiKeys);
-            const top3 = prioritasSLS().slice(0, 3);
-            const elapsedDays = state.history.length > 1 ? state.history.length - 1 : 23;
-            const modeText = state.isAccumulationMode ? '(Akumulasi ' + elapsedDays + ' hari)' : '(Harian)';
+                const todayStr = new Date().toLocaleDateString('id-ID');
 
-            const aiPrompt = 'Analisis progres Saka Tracker ' + modeText + ': ' +
-                'Progress Dashboard ' + prog.dashP.toFixed(2) + '% (' + prog.val + ' unit). ' +
-                'Ritme rata-rata 7 hari: ' + getVelocity() + ' data/hari. ' +
-                'Status Termin 1 (Target 40%): ' + (prog.dashP >= 40 ? 'Tercapai' : 'Belum Tercapai') + '. ' +
-                'Top 3 SLS prioritas: ' + top3.map(s => s.kode + ' (' + s.open + ' open)').join(', ') + '. ' +
-                'Berikan insight strategis singkat dengan format: gunakan #### untuk judul bagian, **tebal** untuk penekanan, dan - untuk poin-poin.';
+                const existingToday = state.history.find(h => h.date === todayStr);
+                if (!existingToday) {
+                    state.history.push({
+                        date: todayStr,
+                        progress: prog.val,
+                        dashP: prog.dashP,
+                        velocity: getVelocity(),
+                        grade: perf.g
+                    });
+                } else {
+                    existingToday.progress = prog.val;
+                    existingToday.dashP = prog.dashP;
+                    existingToday.velocity = getVelocity();
+                    existingToday.grade = perf.g;
+                }
 
-            const insight = await orchestrator.generateInsight(aiPrompt);
-            document.getElementById('ai-insights').innerHTML = cleanAIResponse(insight);
+                saveState();
 
-            const container = document.getElementById('analysis-container');
-            container.style.display = 'flex';
-            container.style.flexDirection = 'column';
-            container.style.gap = '12px';
-            setTimeout(() => container.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+                renderTerminAlert(prog);
+                renderForecast();
+                renderTargetsAndComparison(prog);
+                renderDifferenceAnalysis();
+                renderPriorityAccordions();
+                renderPerformance(prog, perf);
+                updateHeaderStats();
 
-            btn.disabled = false;
-            btn.innerHTML = '<i class="bi bi-cpu"></i> ANALISIS & SIMPAN SNAPSHOT';
+                const orchestrator = new HybridAIOrchestrator(state.apiKeys);
+                const top3 = prioritasSLS().slice(0, 3);
+                const elapsedDays = state.history.length > 1 ? state.history.length - 1 : 23;
+                const modeText = state.isAccumulationMode ? '(Akumulasi ' + elapsedDays + ' hari)' : '(Harian)';
 
-            if (document.getElementById('page-history').classList.contains('active')) {
-                renderHistory();
+                const aiPrompt = 'Analisis progres Saka Tracker ' + modeText + ': ' +
+                    'Progress Dashboard ' + prog.dashP.toFixed(2) + '% (' + prog.val + ' unit). ' +
+                    'Ritme rata-rata 7 hari: ' + getVelocity() + ' data/hari. ' +
+                    'Status Termin 1 (Target 40%): ' + (prog.dashP >= 40 ? 'Tercapai' : 'Belum Tercapai') + '. ' +
+                    'Top 3 SLS prioritas: ' + top3.map(s => s.kode + ' (' + s.open + ' open)').join(', ') + '. ' +
+                    'Berikan insight strategis singkat dengan format: gunakan #### untuk judul bagian, **tebal** untuk penekanan, dan - untuk poin-poin.';
+
+                const insight = await orchestrator.generateInsight(aiPrompt);
+                const aiInsightsEl = document.getElementById('ai-insights');
+                if (aiInsightsEl) aiInsightsEl.innerHTML = cleanAIResponse(insight);
+
+                const container = document.getElementById('analysis-container');
+                if (container) {
+                    container.style.display = 'flex';
+                    container.style.flexDirection = 'column';
+                    container.style.gap = '12px';
+                    setTimeout(() => container.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+                }
+
+                const historyPage = document.getElementById('page-history');
+                if (historyPage && historyPage.classList.contains('active')) {
+                    renderHistory();
+                }
+            } catch (error) {
+                console.error('[RUN] Analisis gagal:', error);
+                const aiInsightsEl = document.getElementById('ai-insights');
+                if (aiInsightsEl) {
+                    aiInsightsEl.innerHTML = '<div class="ai-section"><h4>Analisis tidak selesai</h4><p>Terjadi masalah teknis saat memproses data. Data Anda tetap aman di perangkat dan aplikasi tetap dapat digunakan.</p></div>';
+                }
+            } finally {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="bi bi-cpu"></i> ANALISIS & SIMPAN SNAPSHOT';
+                }
             }
         }
 
@@ -2728,6 +3021,7 @@
         // ===============================
         function renderDataSLSPage() {
             const list = document.getElementById('data-sls-list');
+            if (!list) return;
             list.innerHTML = '';
             state.sls.forEach((s, idx) => {
                 const row = document.createElement('div');
@@ -2773,7 +3067,12 @@
         // SETTINGS, BACKUP & RESTORE
         // ===============================
         function saveSettings() {
-            state.apiKeys.openai = document.getElementById('api-openai').value.trim();
+            const openaiEl = document.getElementById('api-openai');
+            const geminiEl = document.getElementById('api-gemini');
+            const mistralEl = document.getElementById('api-mistral');
+            if (openaiEl) state.apiKeys.openai = openaiEl.value.trim();
+            if (geminiEl) state.apiKeys.gemini = geminiEl.value.trim();
+            if (mistralEl) state.apiKeys.mistral = mistralEl.value.trim();
             state.apiKeys.gemini = document.getElementById('api-gemini').value.trim();
             state.apiKeys.mistral = document.getElementById('api-mistral').value.trim();
             localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
@@ -2782,19 +3081,23 @@
         }
 
         function loadApiKeys() {
-            document.getElementById('api-openai').value = state.apiKeys.openai || '';
-            document.getElementById('api-gemini').value = state.apiKeys.gemini || '';
-            document.getElementById('api-mistral').value = state.apiKeys.mistral || '';
+            const openaiEl = document.getElementById('api-openai');
+            const geminiEl = document.getElementById('api-gemini');
+            const mistralEl = document.getElementById('api-mistral');
+            if (openaiEl) openaiEl.value = state.apiKeys.openai || '';
+            if (geminiEl) geminiEl.value = state.apiKeys.gemini || '';
+            if (mistralEl) mistralEl.value = state.apiKeys.mistral || '';
             updateApiStatusUI();
         }
 
         function updateApiStatusUI() {
             ['openai', 'gemini', 'mistral'].forEach(key => {
+                const statusEl = document.getElementById('status-' + key);
+                if (!statusEl) return;
                 const hasKey = !!state.apiKeys[key];
-                const dot = document.getElementById('status-' + key).querySelector('.status-dot');
-                const text = document.getElementById('status-' + key);
-                dot.className = 'status-dot ' + (hasKey ? 'active' : '');
-                text.innerHTML = '<span class="status-dot ' + (hasKey ? 'active' : '') + '"></span> ' + (hasKey ? '<i class="bi bi-check-circle-fill"></i> Terkonfigurasi' : '<i class="bi bi-x-circle-fill"></i> Belum dikonfigurasi');
+                const dot = statusEl.querySelector('.status-dot');
+                if (dot) dot.className = 'status-dot ' + (hasKey ? 'active' : '');
+                statusEl.innerHTML = '<span class="status-dot ' + (hasKey ? 'active' : '') + '"></span> ' + (hasKey ? '<i class="bi bi-check-circle-fill"></i> Terkonfigurasi' : '<i class="bi bi-x-circle-fill"></i> Belum dikonfigurasi');
             });
         }
 
@@ -2919,6 +3222,33 @@
             document.getElementById('legal-modal').style.display = 'none';
         }
 
+        function openVersionModal() {
+            const modal = document.getElementById('version-log-modal');
+            if (modal) modal.style.display = 'flex';
+        }
+
+        function closeVersionModal() {
+            const modal = document.getElementById('version-log-modal');
+            if (modal) modal.style.display = 'none';
+        }
+
+        async function clearPwaCache() {
+            if (!confirm('Bersihkan cache PWA dan service worker? Data input, history, dan API key tetap aman di perangkat Anda.')) return;
+            try {
+                const cacheNames = await caches.keys();
+                await Promise.all(cacheNames.map(cacheName => caches.delete(cacheName)));
+                if ('serviceWorker' in navigator) {
+                    const registrations = await navigator.serviceWorker.getRegistrations();
+                    await Promise.all(registrations.map(reg => reg.unregister()));
+                }
+                alert('Cache berhasil dibersihkan. Aplikasi akan dimuat ulang.');
+                window.location.reload();
+            } catch (err) {
+                console.error('[CACHE] Gagal membersihkan cache:', err);
+                alert('Gagal membersihkan cache. Silakan coba lagi.');
+            }
+        }
+
         // ===============================
         // HYBRID AI ORCHESTRATOR
         // ===============================
@@ -3020,11 +3350,14 @@
 
         function checkConsentGate() {
             const gate = document.getElementById('consent-gate');
+            const checkbox = document.getElementById('consent-checkbox');
+            const agreeBtn = document.getElementById('btn-consent-agree');
+            if (!gate) return;
             const needsConsent = !state.consent || state.consent.version !== LEGAL_VERSION || !state.consent.accepted;
             if (needsConsent) {
                 gate.style.display = 'flex';
-                document.getElementById('consent-checkbox').checked = false;
-                document.getElementById('btn-consent-agree').disabled = true;
+                if (checkbox) checkbox.checked = false;
+                if (agreeBtn) agreeBtn.disabled = true;
             } else {
                 gate.style.display = 'none';
                 checkPinLock();
@@ -3034,7 +3367,8 @@
         function acceptConsent() {
             state.consent = { accepted: true, version: LEGAL_VERSION, date: new Date().toISOString() };
             saveState();
-            document.getElementById('consent-gate').style.display = 'none';
+            const gate = document.getElementById('consent-gate');
+            if (gate) gate.style.display = 'none';
             checkPinLock();
         }
 
@@ -3042,12 +3376,15 @@
 
         function checkPinLock() {
             const lock = document.getElementById('pin-lock-screen');
+            const recoveryFlow = document.getElementById('recovery-flow');
+            const pinError = document.getElementById('pin-error');
+            if (!lock) return;
             if (state.security && state.security.pinEnabled) {
                 lock.style.display = 'flex';
                 pinBuffer = '';
                 updatePinDots();
-                document.getElementById('recovery-flow').style.display = 'none';
-                document.getElementById('pin-error').innerText = '';
+                if (recoveryFlow) recoveryFlow.style.display = 'none';
+                if (pinError) pinError.innerText = '';
             } else {
                 lock.style.display = 'none';
             }
@@ -3055,7 +3392,8 @@
 
         function lockAppNow() {
             if (!state.security.pinEnabled) { alert('Aktifkan PIN terlebih dahulu.'); return; }
-            document.getElementById('pin-lock-screen').style.display = 'flex';
+            const lock = document.getElementById('pin-lock-screen');
+            if (lock) lock.style.display = 'flex';
             pinBuffer = '';
             updatePinDots();
         }
@@ -3108,7 +3446,8 @@
         }
 
         function showRecoveryFlow() {
-            document.getElementById('recovery-flow').style.display = 'block';
+            const recoveryFlow = document.getElementById('recovery-flow');
+            if (recoveryFlow) recoveryFlow.style.display = 'block';
         }
 
         async function verifyRecovery() {
@@ -3168,6 +3507,7 @@
             const statusDisplay = document.getElementById('pin-status-display');
             const lockBtn = document.getElementById('btn-lock-now');
             const disableBtn = document.getElementById('btn-disable-pin');
+            if (!statusDisplay || !lockBtn || !disableBtn) return;
             if (state.security.pinEnabled) {
                 statusDisplay.innerHTML = '<span class="status-dot active"></span> PIN Lock: Aktif';
                 lockBtn.style.display = 'flex';
@@ -3193,7 +3533,8 @@
             if (banner) banner.classList.add('show');
         });
 
-        document.getElementById('btn-install')?.addEventListener('click', async () => {
+        const installBtn = document.getElementById('btn-install');
+        installBtn?.addEventListener('click', async () => {
             if (!deferredPrompt) return;
             // Show the install prompt
             deferredPrompt.prompt();
@@ -3202,67 +3543,88 @@
             console.log(`User response to install: ${outcome}`);
             // Hide banner after install
             if (outcome === 'accepted') {
-                document.getElementById('install-banner').classList.remove('show');
+                const installBanner = document.getElementById('install-banner');
+                if (installBanner) installBanner.classList.remove('show');
             }
             deferredPrompt = null;
         });
 
         // Hide banner when app is already installed
         window.addEventListener('appinstalled', () => {
-            document.getElementById('install-banner').classList.remove('show');
+            const installBanner = document.getElementById('install-banner');
+            if (installBanner) installBanner.classList.remove('show');
             console.log('[PWA] Saka Tracker installed as PWA');
         });
         // ===============================
         // INITIALIZATION
         // ===============================
         function initForm() {
-            syncConfigTargets();
-            syncDashboardFromSLS();
-            updateHeaderStats();
+            try {
+                syncConfigTargets();
+                syncDashboardFromSLS();
+                updateHeaderStats();
 
-            const checkbox = document.getElementById('mode-akumulasi');
-            if (checkbox) {
-                checkbox.checked = state.isAccumulationMode;
-                const dateDisplay = document.getElementById('date-range-display');
-                const toggleLabel = document.querySelector('.toggle-label');
-                if (state.isAccumulationMode) {
-                    toggleLabel.innerHTML = '<i class="bi bi-calendar-range"></i> Mode Akumulasi (Rentang Tanggal)';
-                    if (dateDisplay) dateDisplay.style.display = "block";
-                } else {
-                    toggleLabel.innerHTML = '<i class="bi bi-calendar-event"></i> Mode Input Harian';
-                    if (dateDisplay) dateDisplay.style.display = "none";
+                const checkbox = document.getElementById('mode-akumulasi');
+                if (checkbox) {
+                    checkbox.checked = !!state.isAccumulationMode;
+                    const dateDisplay = document.getElementById('date-range-display');
+                    const toggleLabel = document.querySelector('.toggle-label');
+                    if (toggleLabel) {
+                        if (state.isAccumulationMode) {
+                            toggleLabel.innerHTML = '<i class="bi bi-calendar-range"></i> Mode Akumulasi (Rentang Tanggal)';
+                            if (dateDisplay) dateDisplay.style.display = "block";
+                        } else {
+                            toggleLabel.innerHTML = '<i class="bi bi-calendar-event"></i> Mode Input Harian';
+                            if (dateDisplay) dateDisplay.style.display = "none";
+                        }
+                    }
                 }
+
+                const container = document.getElementById('sls-inputs-container');
+                if (!container) return;
+                container.innerHTML = '';
+                state.sls.forEach((s, idx) => {
+                    const row = document.createElement('div');
+                    row.className = 'input-row';
+                    row.style.display = 'contents';
+                    row.innerHTML = `
+                <div class="sls-code">${s.kode}</div>
+                <input type="number" value="${s.open}" onchange="updateSLS(${idx},'open',this.value)">
+                <input type="number" value="${s.submit}" onchange="updateSLS(${idx},'submit',this.value)">
+                <input type="number" value="${s.reject}" onchange="updateSLS(${idx},'reject',this.value)">
+                <input type="number" value="${s.pending}" onchange="updateSLS(${idx},'pending',this.value)">
+                <input type="number" value="${s.approve}" onchange="updateSLS(${idx},'approve',this.value)">
+            `;
+                    container.appendChild(row);
+                });
+
+                const dateEl = document.getElementById('current-date');
+                if (dateEl) dateEl.innerText = new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+            } catch (error) {
+                console.error('[INIT] Gagal menginisialisasi form:', error);
             }
-
-            const container = document.getElementById('sls-inputs-container');
-            if (!container) return;
-            container.innerHTML = '';
-            state.sls.forEach((s, idx) => {
-                const row = document.createElement('div');
-                row.className = 'input-row';
-                row.style.display = 'contents';
-                row.innerHTML = `
-            <div class="sls-code">${s.kode}</div>
-            <input type="number" value="${s.open}" onchange="updateSLS(${idx},'open',this.value)">
-            <input type="number" value="${s.submit}" onchange="updateSLS(${idx},'submit',this.value)">
-            <input type="number" value="${s.reject}" onchange="updateSLS(${idx},'reject',this.value)">
-            <input type="number" value="${s.pending}" onchange="updateSLS(${idx},'pending',this.value)">
-            <input type="number" value="${s.approve}" onchange="updateSLS(${idx},'approve',this.value)">
-        `;
-                container.appendChild(row);
-            });
-
-            const dateEl = document.getElementById('current-date');
-            if (dateEl) dateEl.innerText = new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
         }
+
+        window.addEventListener('error', function (event) {
+            console.error('[APP] Error tidak tertangkap:', event.error || event.message);
+        });
+
+        window.addEventListener('unhandledrejection', function (event) {
+            console.error('[APP] Promise rejection tidak tertangkap:', event.reason);
+            event.preventDefault();
+        });
 
         window.addEventListener('DOMContentLoaded', function () {
             setTimeout(function () {
-                initForm();
-                loadApiKeys();
-                renderHistory();
-                updatePinSecurityUI();
-                checkConsentGate();
+                try {
+                    initForm();
+                    loadApiKeys();
+                    renderHistory();
+                    updatePinSecurityUI();
+                    checkConsentGate();
+                } catch (error) {
+                    console.error('[BOOT] Startup gagal:', error);
+                }
             }, 100);
         });
     </script>

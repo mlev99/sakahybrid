@@ -4,7 +4,7 @@
  
 **Monitoring progres lapangan SLS, real-time, offline-ready.**
 
-![Version](https://img.shields.io/badge/version-5.5.0-3b82f6?style=flat-square)
+![Version](https://img.shields.io/badge/version-5.5.1-3b82f6?style=flat-square)
 ![Status](https://img.shields.io/badge/status-stable-10b981?style=flat-square)
 ![PWA](https://img.shields.io/badge/PWA-installable-10b981?style=flat-square)
 ![Build Step](https://img.shields.io/badge/build_step-none-f59e0b?style=flat-square)
