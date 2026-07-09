@@ -41,60 +41,129 @@
             gap: 16px; 
         }
         
-        .header { text-align: center; padding: 10px 0 12px; border-bottom: 1px solid var(--border); margin-bottom: 4px; }
-        .header h1 { font-size: 1.4rem; font-weight: 700; letter-spacing: -0.5px; display: flex; align-items: center; justify-content: center; gap: 10px;}
-        .header .version-badge { font-size: 0.65rem; background: var(--accent-blue); color: white; padding: 2px 10px; border-radius: 20px; font-weight: 600; }
+        .header { 
+            text-align: center; 
+            padding: 10px 0 12px; 
+            border-bottom: 1px solid var(--border); 
+            margin-bottom: 4px; 
+        }
+        .header h1 { 
+            font-size: 1.4rem; 
+            font-weight: 700; 
+            letter-spacing: -0.5px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .header .version-badge { 
+            font-size: 0.65rem; 
+            background: var(--accent-blue); 
+            color: white; 
+            padding: 2px 10px; 
+            border-radius: 20px; 
+            font-weight: 600; 
+        }
         .header p { color: var(--text-muted); font-size: 0.85rem; margin-top: 4px; }
+
+        /* HEADER STATS - DATA AGREGAT */
+        .header-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+            gap: 8px;
+            margin-top: 10px;
+            padding: 10px 12px;
+            background: #0f172a;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+        .header-stat {
+            text-align: center;
+        }
+        .header-stat-label {
+            font-size: 0.6rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .header-stat-value {
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+        .header-stat-value.blue { color: var(--accent-blue); }
+        .header-stat-value.orange { color: var(--accent-orange); }
+        .header-stat-value.green { color: var(--accent-green); }
+        .header-stat-value.purple { color: #a78bfa; }
 
         .form-section { 
             background: var(--card-bg); 
             border-radius: 16px; 
-            padding: 20px; 
+            padding: 16px 18px; 
             border: 1px solid var(--border);
             margin-bottom: 4px;
         }
         
+        /* ACCORDION TOGGLE */
+        .accordion-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            padding: 6px 0;
+            user-select: none;
+        }
+        .accordion-toggle:hover { opacity: 0.8; }
+        .accordion-toggle .bi { transition: transform 0.3s ease; font-size: 1.2rem; }
+        .accordion-toggle.open .bi { transform: rotate(180deg); }
+        .accordion-body {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease;
+        }
+        .accordion-body.open { max-height: 2000px; }
+
         .input-mode-toggle {
             display: flex; align-items: center; justify-content: space-between;
-            background: #0f172a; padding: 12px 15px; border-radius: 12px;
-            border: 1px solid var(--border); margin-bottom: 15px;
+            background: #0f172a; padding: 10px 14px; border-radius: 12px;
+            border: 1px solid var(--border); margin-bottom: 12px;
         }
-        .toggle-label { font-size: 0.85rem; font-weight: 600; display: flex; align-items: center; gap: 8px;}
-        .date-range-info { font-size: 0.75rem; color: var(--accent-blue); margin-top: 4px; display: none;}
+        .toggle-label { font-size: 0.8rem; font-weight: 600; display: flex; align-items: center; gap: 8px;}
+        .date-range-info { font-size: 0.7rem; color: var(--accent-blue); margin-top: 2px; display: none;}
         
-        .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
+        .switch { position: relative; display: inline-block; width: 40px; height: 22px; }
         .switch input { opacity: 0; width: 0; height: 0; }
         .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #334155; transition: .4s; border-radius: 24px; }
-        .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+        .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
         input:checked + .slider { background-color: var(--accent-blue); }
-        input:checked + .slider:before { transform: translateX(20px); }
+        input:checked + .slider:before { transform: translateX(18px); }
 
-        .input-grid { display: grid; grid-template-columns: 50px repeat(5, 1fr); gap: 6px; align-items: center; font-size: 0.75rem; margin-bottom: 10px; }
-        .input-header { color: var(--text-muted); font-weight: 600; text-align: center; padding-bottom: 8px; border-bottom: 1px solid var(--border); font-size: 0.7rem; }
-        .sls-code { font-weight: bold; color: var(--accent-blue); text-align: left; padding-left: 2px; font-size: 0.8rem; }
+        .input-grid { display: grid; grid-template-columns: 50px repeat(5, 1fr); gap: 4px; align-items: center; font-size: 0.7rem; margin-bottom: 8px; }
+        .input-header { color: var(--text-muted); font-weight: 600; text-align: center; padding-bottom: 6px; border-bottom: 1px solid var(--border); font-size: 0.65rem; }
+        .sls-code { font-weight: bold; color: var(--accent-blue); text-align: left; padding-left: 2px; font-size: 0.75rem; }
         
         input[type="number"], input[type="password"], input[type="text"] {
             background: #0f172a; border: 1px solid var(--border); color: white;
-            padding: 12px; border-radius: 10px; width: 100%; text-align: center; 
-            font-size: 0.9rem; transition: all 0.2s; -moz-appearance: textfield;
+            padding: 10px 6px; border-radius: 8px; width: 100%; text-align: center; 
+            font-size: 0.85rem; transition: all 0.2s; -moz-appearance: textfield;
         }
         input[type="number"]::-webkit-outer-spin-button, input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
         input:focus { outline: none; border-color: var(--accent-blue); background: #172033; }
 
-        .draft-row { display: flex; justify-content: space-between; align-items: center; padding: 15px 5px; border-top: 1px solid var(--border); margin-top: 10px; }
-        .draft-label { font-weight: bold; font-size: 0.9rem; display: flex; align-items: center; gap: 8px;}
-        .draft-input-wrap { width: 100px; }
+        .draft-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 5px; border-top: 1px solid var(--border); margin-top: 8px; }
+        .draft-label { font-weight: bold; font-size: 0.85rem; display: flex; align-items: center; gap: 8px;}
+        .draft-input-wrap { width: 90px; }
 
         .btn-primary {
             background: linear-gradient(135deg, var(--accent-blue), #2563eb); 
-            color: white; border: none; padding: 16px; border-radius: 12px; 
-            font-weight: 700; cursor: pointer; width: 100%; font-size: 1rem;
-            transition: all 0.3s ease; margin-top: 15px; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.2);
+            color: white; border: none; padding: 14px; border-radius: 12px; 
+            font-weight: 700; cursor: pointer; width: 100%; font-size: 0.95rem;
+            transition: all 0.3s ease; margin-top: 12px; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.2);
             display: flex; align-items: center; justify-content: center; gap: 8px;
         }
         .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
-        .btn-success { background: var(--accent-green); color: white; border: none; padding: 14px; border-radius: 12px; width: 100%; font-weight: 600; margin-top: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;}
-        .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text-muted); padding: 14px; border-radius: 12px; width: 100%; margin-top: 10px; font-size: 0.9rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;}
+        .btn-success { background: var(--accent-green); color: white; border: none; padding: 12px; border-radius: 12px; width: 100%; font-weight: 600; margin-top: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.9rem;}
+        .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text-muted); padding: 12px; border-radius: 12px; width: 100%; margin-top: 10px; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;}
         .btn-outline:hover { background: var(--border); }
         .btn-danger { background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); color: var(--accent-red); padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 0.8rem; transition: all 0.2s; display: flex; align-items: center; gap: 6px; }
         .btn-danger:hover { background: rgba(239, 68, 68, 0.25); }
@@ -111,12 +180,12 @@
         .result-card { 
             background: var(--card-bg); 
             border-radius: 16px; 
-            padding: 18px 20px; 
+            padding: 16px 18px; 
             border: 1px solid var(--border);
             margin: 0;
             width: 100%;
         }
-        .result-title { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.8px; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;}
+        .result-title { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.8px; font-weight: 700; margin-bottom: 10px; display: flex; align-items: center; gap: 8px;}
 
         .history-card {
             background: var(--card-bg);
@@ -149,111 +218,125 @@
         .history-stat-label { font-size: 0.65rem; color: var(--text-muted); }
         .history-stat-value { font-weight: bold; font-size: 0.95rem; margin-top: 2px; }
 
-        .forecast-box { padding: 14px 16px; border-radius: 10px; font-size: 0.9rem; font-weight: 500; margin-bottom: 8px; display: flex; align-items: center; gap: 10px; }
+        .forecast-box { padding: 12px 14px; border-radius: 10px; font-size: 0.85rem; font-weight: 500; margin-bottom: 6px; display: flex; align-items: center; gap: 10px; }
         .forecast-ok { background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); color: var(--accent-green); }
         .forecast-warn { background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); color: var(--accent-orange); }
         .forecast-crit { background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: var(--accent-red); }
 
-        .metrics-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .metrics-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .metric-item { display: flex; flex-direction: column; gap: 2px; }
-        .metric-label { font-size: 0.75rem; color: var(--text-muted); }
-        .metric-value { font-size: 1.05rem; font-weight: 700; }
+        .metric-label { font-size: 0.7rem; color: var(--text-muted); }
+        .metric-value { font-size: 1rem; font-weight: 700; }
 
         .diff-analysis-box {
             background: rgba(59, 130, 246, 0.05); border: 1px dashed var(--accent-blue);
-            border-radius: 12px; padding: 14px; margin-top: 12px; display: none;
+            border-radius: 12px; padding: 12px; margin-top: 10px; display: none;
         }
-        .diff-title { font-size: 0.75rem; color: var(--accent-blue); font-weight: bold; margin-bottom: 6px; display: flex; align-items: center; gap: 6px;}
-        .diff-row { display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 3px; color: var(--text-muted);}
+        .diff-title { font-size: 0.7rem; color: var(--accent-blue); font-weight: bold; margin-bottom: 4px; display: flex; align-items: center; gap: 6px;}
+        .diff-row { display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 2px; color: var(--text-muted);}
         .diff-val { color: var(--text-main); font-weight: 600; }
 
-        .priority-list { display: flex; flex-direction: column; gap: 8px; }
+        .priority-list { display: flex; flex-direction: column; gap: 6px; }
         .priority-item { background: #0f172a; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
-        .priority-header { padding: 12px 14px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
-        .p-rank { width: 24px; height: 24px; background: var(--border); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: bold; margin-right: 10px; }
+        .priority-header { padding: 10px 12px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+        .p-rank { width: 22px; height: 22px; background: var(--border); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: bold; margin-right: 8px; }
         .p-info { flex: 1; }
-        .p-code { font-weight: bold; font-size: 0.9rem; }
-        .p-score { font-size: 0.7rem; color: var(--text-muted); margin-top: 1px; }
-        .p-action { font-size: 0.65rem; padding: 3px 10px; border-radius: 20px; font-weight: 600; }
+        .p-code { font-weight: bold; font-size: 0.85rem; }
+        .p-score { font-size: 0.65rem; color: var(--text-muted); margin-top: 1px; }
+        .p-action { font-size: 0.6rem; padding: 2px 10px; border-radius: 20px; font-weight: 600; }
         .action-lanjut { background: rgba(59, 130, 246, 0.15); color: var(--accent-blue); }
         .action-mulai { background: rgba(245, 158, 11, 0.15); color: var(--accent-orange); }
         .action-done { background: rgba(16, 185, 129, 0.15); color: var(--accent-green); }
         .action-urgent { background: rgba(239, 68, 68, 0.15); color: var(--accent-red); }
         .priority-detail { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; background: #162032; border-top: 1px solid var(--border); }
         .priority-detail.open { max-height: 500px; }
-        .detail-content { padding: 12px 14px; font-size: 0.85rem; color: var(--text-muted); line-height: 1.6; }
+        .detail-content { padding: 10px 12px; font-size: 0.8rem; color: var(--text-muted); line-height: 1.6; }
         .toggle-icon { transition: transform 0.3s; font-size: 0.8rem; color: var(--text-muted); }
         .priority-item.expanded .toggle-icon { transform: rotate(180deg); }
 
-        .perf-display { text-align: center; padding: 8px 0; }
-        .grade-big { font-size: 3rem; font-weight: 800; line-height: 1; margin-bottom: 4px; }
+        .perf-display { text-align: center; padding: 6px 0; }
+        .grade-big { font-size: 2.8rem; font-weight: 800; line-height: 1; margin-bottom: 2px; }
         .progress-track { height: 6px; background: #334155; border-radius: 4px; overflow: hidden; margin-top: 8px; }
         .progress-fill { height: 100%; transition: width 1s ease; }
 
-        .ai-text { font-size: 0.9rem; color: var(--text-main); line-height: 1.7; }
-        .ai-text p { margin-bottom: 10px; }
+        .ai-text { font-size: 0.88rem; color: var(--text-main); line-height: 1.7; }
+        .ai-text p { margin-bottom: 8px; }
+        .ai-text strong { color: var(--text-main); }
+        .ai-text ul, .ai-text ol { margin: 4px 0 8px 20px; }
+        .ai-text li { margin-bottom: 4px; }
+        .ai-text h4 { font-size: 0.85rem; color: var(--accent-blue); margin: 12px 0 4px; }
+        .ai-text h5 { font-size: 0.8rem; color: var(--accent-orange); margin: 8px 0 4px; }
         .ai-highlight { background: rgba(59, 130, 246, 0.15); color: #60a5fa; padding: 2px 6px; border-radius: 4px; font-weight: 600; }
         .ai-warn { background: rgba(239, 68, 68, 0.15); color: #f87171; padding: 2px 6px; border-radius: 4px; font-weight: 600; }
         .ai-success { background: rgba(16, 185, 129, 0.15); color: #34d399; padding: 2px 6px; border-radius: 4px; font-weight: 600; }
+        .ai-text .ai-section { 
+            background: #0f172a; 
+            border-radius: 8px; 
+            padding: 10px 12px; 
+            margin: 8px 0;
+            border-left: 3px solid var(--accent-blue);
+        }
+        .ai-text .ai-section.risk { border-left-color: var(--accent-red); }
+        .ai-text .ai-section.success { border-left-color: var(--accent-green); }
 
-        .setting-group { margin-bottom: 20px; }
-        .setting-group label { display: block; color: var(--text-muted); margin-bottom: 8px; font-size: 0.9rem; }
-        .api-status { font-size: 0.8rem; margin-top: 6px; display: flex; align-items: center; gap: 6px; }
+        .setting-group { margin-bottom: 18px; }
+        .setting-group label { display: block; color: var(--text-muted); margin-bottom: 6px; font-size: 0.85rem; }
+        .api-status { font-size: 0.75rem; margin-top: 4px; display: flex; align-items: center; gap: 6px; }
         .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border); }
         .status-dot.active { background: var(--accent-green); box-shadow: 0 0 8px var(--accent-green); }
 
         .app-info-box { 
             background: #0f172a; border: 1px solid var(--border); border-radius: 12px; 
-            padding: 20px; margin-top: 30px; text-align: center; 
+            padding: 18px; margin-top: 24px; text-align: center; 
         }
-        .app-name { font-size: 1.1rem; font-weight: bold; color: var(--text-main); margin-bottom: 5px; }
-        .dev-contact { margin: 15px 0; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
-        .contact-btn { background: var(--card-bg); border: 1px solid var(--border); color: var(--text-main); padding: 8px 16px; border-radius: 20px; text-decoration: none; font-size: 0.8rem; display: flex; align-items: center; gap: 6px; transition: all 0.2s;}
+        .app-name { font-size: 1rem; font-weight: bold; color: var(--text-main); margin-bottom: 4px; }
+        .dev-contact { margin: 12px 0; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+        .contact-btn { background: var(--card-bg); border: 1px solid var(--border); color: var(--text-main); padding: 6px 14px; border-radius: 20px; text-decoration: none; font-size: 0.75rem; display: flex; align-items: center; gap: 6px; transition: all 0.2s;}
         .contact-btn:hover { border-color: var(--accent-blue); color: var(--accent-blue); }
-        .legal-links { margin-top: 15px; display: flex; justify-content: center; gap: 15px; }
-        .legal-btn { background: none; border: none; color: var(--text-muted); font-size: 0.75rem; cursor: pointer; text-decoration: underline; padding: 5px;}
+        .legal-links { margin-top: 12px; display: flex; justify-content: center; gap: 15px; }
+        .legal-btn { background: none; border: none; color: var(--text-muted); font-size: 0.7rem; cursor: pointer; text-decoration: underline; padding: 4px;}
 
         .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); z-index: 99999; display: none; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(5px);}
-        .modal-content { background: var(--card-bg); border-radius: 16px; padding: 25px; max-width: 500px; width: 100%; max-height: 80vh; overflow-y: auto; border: 1px solid var(--border); }
-        .modal-title { font-size: 1.2rem; font-weight: bold; margin-bottom: 15px; color: var(--text-main); display: flex; align-items: center; gap: 8px;}
-        .modal-body { font-size: 0.9rem; color: var(--text-muted); line-height: 1.6; }
-        .modal-body .legal-updated { font-size: 0.75rem; color: var(--text-muted); opacity: 0.8; margin-bottom: 16px; display:block; }
-        .modal-body h4 { color: var(--text-main); font-size: 0.9rem; margin: 16px 0 6px; display: flex; align-items: center; gap: 6px; }
+        .modal-content { background: var(--card-bg); border-radius: 16px; padding: 22px; max-width: 500px; width: 100%; max-height: 80vh; overflow-y: auto; border: 1px solid var(--border); }
+        .modal-title { font-size: 1.1rem; font-weight: bold; margin-bottom: 12px; color: var(--text-main); display: flex; align-items: center; gap: 8px;}
+        .modal-body { font-size: 0.85rem; color: var(--text-muted); line-height: 1.6; }
+        .modal-body .legal-updated { font-size: 0.7rem; color: var(--text-muted); opacity: 0.8; margin-bottom: 12px; display:block; }
+        .modal-body h4 { color: var(--text-main); font-size: 0.85rem; margin: 12px 0 4px; display: flex; align-items: center; gap: 6px; }
         .modal-body h4:first-of-type { margin-top: 0; }
-        .modal-body p { margin-bottom: 8px; }
-        .modal-body ul { margin: 4px 0 8px 18px; padding: 0; }
-        .modal-body li { margin-bottom: 4px; }
+        .modal-body p { margin-bottom: 6px; }
+        .modal-body ul { margin: 4px 0 6px 18px; padding: 0; }
+        .modal-body li { margin-bottom: 3px; }
         .modal-body strong { color: var(--text-main); }
-        .modal-body .legal-note { background: rgba(59,130,246,0.08); border-left: 3px solid var(--accent-blue); border-radius: 8px; padding: 10px 12px; margin: 10px 0; font-size: 0.85rem; }
-        .modal-close { margin-top: 20px; width: 100%; }
+        .modal-body .legal-note { background: rgba(59,130,246,0.08); border-left: 3px solid var(--accent-blue); border-radius: 8px; padding: 8px 12px; margin: 8px 0; font-size: 0.8rem; }
+        .modal-close { margin-top: 16px; width: 100%; }
 
         .full-gate {
             position: fixed; top:0; left:0; right:0; bottom:0; z-index: 999999;
             background: var(--bg-color); display: none; align-items: center; justify-content: center;
-            padding: 24px 16px; overflow-y: auto;
+            padding: 20px 16px; overflow-y: auto;
         }
         .gate-card {
             background: var(--card-bg); border: 1px solid var(--border); border-radius: 18px;
-            padding: 26px 22px; max-width: 440px; width: 100%; max-height: 92vh; overflow-y: auto;
+            padding: 24px 20px; max-width: 440px; width: 100%; max-height: 92vh; overflow-y: auto;
         }
         .gate-scroll {
-            max-height: 38vh; overflow-y: auto; font-size: 0.83rem; color: var(--text-muted);
-            background: #0f172a; border: 1px solid var(--border); border-radius: 10px; padding: 14px; margin-bottom: 4px;
+            max-height: 34vh; overflow-y: auto; font-size: 0.8rem; color: var(--text-muted);
+            background: #0f172a; border: 1px solid var(--border); border-radius: 10px; padding: 12px; margin-bottom: 4px;
         }
-        .gate-scroll ul { margin: 8px 0 4px 18px; }
-        .gate-scroll li { margin-bottom: 8px; }
+        .gate-scroll ul { margin: 6px 0 4px 18px; }
+        .gate-scroll li { margin-bottom: 6px; }
         .gate-scroll strong { color: var(--text-main); }
-        .consent-check-row { display: flex; gap: 10px; align-items: flex-start; font-size: 0.82rem; color: var(--text-muted); margin: 16px 0; }
+        .consent-check-row { display: flex; gap: 10px; align-items: flex-start; font-size: 0.78rem; color: var(--text-muted); margin: 12px 0; }
         .consent-check-row input { width: 18px; height: 18px; margin-top: 2px; accent-color: var(--accent-blue); }
 
-        .pin-dots { display: flex; justify-content: center; gap: 14px; margin: 18px 0 8px; }
-        .pin-dots span { width: 14px; height: 14px; border-radius: 50%; background: #334155; border: 1px solid var(--border); transition: all .15s ease; display: inline-block; }
+        .pin-dots { display: flex; justify-content: center; gap: 12px; margin: 14px 0 6px; }
+        .pin-dots span { width: 12px; height: 12px; border-radius: 50%; background: #334155; border: 1px solid var(--border); transition: all .15s ease; display: inline-block; }
         .pin-dots span.filled { background: var(--accent-blue); box-shadow: 0 0 8px rgba(59,130,246,0.6); }
-        .pin-keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; max-width: 260px; margin: 4px auto 0; }
-        .pin-key { background: #0f172a; border: 1px solid var(--border); color: var(--text-main); font-size: 1.3rem; font-weight: 600; padding: 16px 0; border-radius: 14px; cursor: pointer; }
+        .pin-keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; max-width: 240px; margin: 4px auto 0; }
+        .pin-key { background: #0f172a; border: 1px solid var(--border); color: var(--text-main); font-size: 1.2rem; font-weight: 600; padding: 14px 0; border-radius: 14px; cursor: pointer; }
         .pin-key:active { background: var(--border); }
         .pin-key.empty { background: transparent; border: none; cursor: default; }
-        #pin-error { color: var(--accent-red); font-size: 0.8rem; min-height: 18px; text-align: center; margin-bottom: 4px; }
+        #pin-error { color: var(--accent-red); font-size: 0.75rem; min-height: 16px; text-align: center; margin-bottom: 4px; }
 
         .bottom-nav {
             position: fixed;
@@ -280,12 +363,12 @@
             gap: 2px;
             color: var(--text-muted);
             text-decoration: none;
-            font-size: 0.6rem;
-            padding: 6px 16px;
+            font-size: 0.55rem;
+            padding: 6px 14px;
             cursor: pointer;
             transition: all 0.3s ease;
             border-radius: 12px;
-            min-width: 60px;
+            min-width: 55px;
             background: transparent;
             border: none;
             font-family: 'Inter', system-ui, sans-serif;
@@ -293,10 +376,10 @@
         .nav-item:hover { background: rgba(59, 130, 246, 0.1); }
         .nav-item.active { color: var(--accent-blue); background: rgba(59, 130, 246, 0.08); }
         .nav-item.active .nav-icon { color: var(--accent-blue); transform: scale(1.1); }
-        .nav-icon { font-size: 1.4rem; margin-bottom: 1px; transition: transform 0.3s ease; }
+        .nav-icon { font-size: 1.3rem; margin-bottom: 1px; transition: transform 0.3s ease; }
         .nav-item span { font-weight: 500; letter-spacing: 0.3px; }
 
-        .footer-status { font-size: 0.65rem; color: var(--text-muted); text-align: center; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border); opacity: 0.7; }
+        .footer-status { font-size: 0.6rem; color: var(--text-muted); text-align: center; margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--border); opacity: 0.7; }
         .provider-active { color: var(--accent-green); font-weight: 600; }
 
         .page { display: none; }
@@ -304,21 +387,21 @@
 
         .empty-state {
             text-align: center;
-            padding: 30px 20px;
+            padding: 24px 16px;
             color: var(--text-muted);
         }
-        .empty-state i { font-size: 3rem; margin-bottom: 12px; opacity: 0.3; }
+        .empty-state i { font-size: 2.5rem; margin-bottom: 10px; opacity: 0.3; }
 
         .legend-box {
             background: #0f172a;
             border-radius: 8px;
-            padding: 10px 12px;
-            margin-top: 10px;
-            font-size: 0.7rem;
+            padding: 8px 12px;
+            margin-top: 8px;
+            font-size: 0.65rem;
             color: var(--text-muted);
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
-            gap: 6px;
+            gap: 4px;
         }
         .legend-item { display: flex; align-items: center; gap: 6px; }
         .legend-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
@@ -327,17 +410,18 @@
         .legend-dot.approve { background: var(--accent-green); }
 
         @media (max-width: 480px) {
-            .container { padding: 8px 10px 16px; }
-            .form-section { padding: 12px 14px; }
-            .input-grid { gap: 3px; font-size: 0.6rem; }
-            .input-grid input { padding: 8px 3px; font-size: 0.75rem; }
+            .container { padding: 6px 8px 14px; }
+            .form-section { padding: 10px 12px; }
+            .input-grid { gap: 2px; font-size: 0.55rem; }
+            .input-grid input { padding: 6px 2px; font-size: 0.7rem; }
             .metrics-grid { grid-template-columns: 1fr; }
-            .nav-item { padding: 4px 10px; min-width: 50px; }
-            .nav-icon { font-size: 1.2rem; }
-            .result-card { padding: 14px 16px; }
-            .header h1 { font-size: 1rem; }
+            .nav-item { padding: 4px 8px; min-width: 45px; }
+            .nav-icon { font-size: 1.1rem; }
+            .result-card { padding: 12px 14px; }
+            .header h1 { font-size: 0.95rem; }
             .history-stats { grid-template-columns: 1fr 1fr; }
             .legend-box { grid-template-columns: 1fr; }
+            .header-stats { grid-template-columns: repeat(2, 1fr); }
         }
     </style>
 </head>
@@ -351,36 +435,62 @@
             <span class="version-badge">v5.4.5</span>
         </h1>
         <p id="current-date">Memuat tanggal...</p>
+        
+        <!-- HEADER STATS - DATA AGREGAT -->
+        <div class="header-stats" id="header-stats">
+            <div class="header-stat">
+                <div class="header-stat-label"><i class="bi bi-folder-open"></i> Open</div>
+                <div class="header-stat-value blue" id="stat-open">0</div>
+            </div>
+            <div class="header-stat">
+                <div class="header-stat-label"><i class="bi bi-file-earmark-check"></i> Submit</div>
+                <div class="header-stat-value orange" id="stat-submit">0</div>
+            </div>
+            <div class="header-stat">
+                <div class="header-stat-label"><i class="bi bi-check-circle"></i> Approve</div>
+                <div class="header-stat-value green" id="stat-approve">0</div>
+            </div>
+            <div class="header-stat">
+                <div class="header-stat-label"><i class="bi bi-database"></i> Muatan</div>
+                <div class="header-stat-value purple" id="stat-muatan">0</div>
+            </div>
+        </div>
     </div>
 
     <div class="form-section">
-        <div class="input-mode-toggle">
-            <div>
-                <div class="toggle-label"><i class="bi bi-calendar-event"></i> Mode Input Harian</div>
-                <div class="date-range-info" id="date-range-display">Data per 15 Juni s.d 7 Juli 2026</div>
+        <!-- ACCORDION TOGGLE -->
+        <div class="accordion-toggle open" onclick="toggleAccordion(this)">
+            <span style="font-weight:600; font-size:0.9rem;"><i class="bi bi-pencil-square"></i> Input Data SLS</span>
+            <i class="bi bi-chevron-down"></i>
+        </div>
+        <div class="accordion-body open" id="accordion-body">
+            <div class="input-mode-toggle">
+                <div>
+                    <div class="toggle-label"><i class="bi bi-calendar-event"></i> Mode Input Harian</div>
+                    <div class="date-range-info" id="date-range-display">Data per 15 Juni s.d 7 Juli 2026</div>
+                </div>
+                <label class="switch">
+                    <input type="checkbox" id="mode-akumulasi" onchange="toggleInputMode()">
+                    <span class="slider"></span>
+                </label>
             </div>
-            <label class="switch">
-                <input type="checkbox" id="mode-akumulasi" onchange="toggleInputMode()">
-                <span class="slider"></span>
-            </label>
-        </div>
 
-        <!-- LEGEND -->
-        <div class="legend-box">
-            <div class="legend-item"><span class="legend-dot open"></span> Open = Belum dikerjakan</div>
-            <div class="legend-item"><span class="legend-dot submit"></span> Submit = Sudah dikerjakan</div>
-            <div class="legend-item"><span class="legend-dot approve"></span> Approve = Sudah divalidasi PML</div>
-        </div>
+            <div class="legend-box">
+                <div class="legend-item"><span class="legend-dot open"></span> Open = Belum dikerjakan</div>
+                <div class="legend-item"><span class="legend-dot submit"></span> Submit = Sudah dikerjakan</div>
+                <div class="legend-item"><span class="legend-dot approve"></span> Approve = Sudah divalidasi PML</div>
+            </div>
 
-        <div class="input-grid">
-            <div class="input-header">Kode</div><div class="input-header">Open</div><div class="input-header">Sub</div>
-            <div class="input-header">Rej</div><div class="input-header">Pend</div><div class="input-header">App</div>
-            <div id="sls-inputs-container" style="display:contents"></div>
-        </div>
+            <div class="input-grid">
+                <div class="input-header">Kode</div><div class="input-header">Open</div><div class="input-header">Sub</div>
+                <div class="input-header">Rej</div><div class="input-header">Pend</div><div class="input-header">App</div>
+                <div id="sls-inputs-container" style="display:contents"></div>
+            </div>
 
-        <div class="draft-row">
-            <span class="draft-label"><i class="bi bi-file-earmark-text"></i> DRAFT TOTAL</span>
-            <div class="draft-input-wrap"><input type="number" id="global-draft" value="27"></div>
+            <div class="draft-row">
+                <span class="draft-label"><i class="bi bi-file-earmark-text"></i> DRAFT TOTAL</span>
+                <div class="draft-input-wrap"><input type="number" id="global-draft" value="27"></div>
+            </div>
         </div>
 
         <button class="btn-primary" id="btn-analyze" onclick="runAnalysis()"><i class="bi bi-cpu"></i> ANALISIS & SIMPAN SNAPSHOT</button>
@@ -395,7 +505,7 @@
         <div class="result-card">
             <div class="result-title"><i class="bi bi-lightning-charge-fill"></i> FORECAST ENGINE (CLEARANCE)</div>
             <div id="forecast-status"></div>
-            <div id="forecast-details" style="font-size:0.8rem; color:var(--text-muted); margin-top:6px;"></div>
+            <div id="forecast-details" style="font-size:0.75rem; color:var(--text-muted); margin-top:4px;"></div>
         </div>
 
         <div class="result-card">
@@ -409,7 +519,7 @@
                     <span class="metric-label">% Muatan Kontrak</span>
                     <span class="metric-value" id="comp-muatan-persen" style="color:var(--accent-green)">-</span>
                 </div>
-                <div class="metric-item" style="grid-column: 1/-1; border-top:1px solid var(--border); padding-top:10px; margin-top:4px;">
+                <div class="metric-item" style="grid-column: 1/-1; border-top:1px solid var(--border); padding-top:8px; margin-top:4px;">
                     <span class="metric-label">Ritme Saat Ini (7 Hari Terakhir)</span>
                     <span class="metric-value" id="curr-velocity">-</span>
                 </div>
@@ -441,12 +551,12 @@
             <div class="result-title"><i class="bi bi-speedometer2"></i> PERFORMANCE & TREND</div>
             <div class="perf-display">
                 <div class="grade-big" id="perf-grade">-</div>
-                <div class="grade-desc" id="perf-desc" style="color:var(--text-muted); font-size:0.85rem; margin-bottom:10px;">-</div>
-                <div style="font-size:0.75rem; color:var(--text-muted);" id="perf-delta">-</div>
+                <div class="grade-desc" id="perf-desc" style="color:var(--text-muted); font-size:0.8rem; margin-bottom:8px;">-</div>
+                <div style="font-size:0.7rem; color:var(--text-muted);" id="perf-delta">-</div>
             </div>
-            <div style="display:flex; justify-content:space-between; font-size:0.8rem; margin-top:8px;">
+            <div style="display:flex; justify-content:space-between; font-size:0.75rem; margin-top:6px;">
                 <span>Progress Dashboard</span>
-                <span class="metric-value" id="dash-persen" style="font-size:0.95rem;">-</span>
+                <span class="metric-value" id="dash-persen" style="font-size:0.9rem;">-</span>
             </div>
             <div class="progress-track"><div class="progress-fill" id="dash-bar" style="background:var(--accent-green); width:0%"></div></div>
         </div>
@@ -454,7 +564,7 @@
         <div class="result-card">
             <div class="result-title"><i class="bi bi-brain"></i> MULTI-AI STRATEGIC INSIGHT</div>
             <div id="ai-insights" class="ai-text">
-                <div style="color:var(--text-muted); font-style:italic; padding:8px 0;">Menunggu analisis AI...</div>
+                <div style="color:var(--text-muted); font-style:italic; padding:6px 0;">Menunggu analisis AI...</div>
             </div>
             <div class="footer-status" id="ai-provider-status">
                 Multi-AI Orchestrator | Provider: <span class="provider-active">Standby</span>
@@ -471,13 +581,13 @@
     </div>
 
     <div class="form-section">
-        <div style="display: grid; grid-template-columns: 60px 1fr 1fr 40px; gap: 10px; margin-bottom: 15px; font-size: 0.8rem; color: var(--text-muted); text-align: center;">
+        <div style="display: grid; grid-template-columns: 60px 1fr 1fr 40px; gap: 8px; margin-bottom: 12px; font-size: 0.75rem; color: var(--text-muted); text-align: center;">
             <div>Kode</div><div>Open FASIH</div><div>Muatan</div><div></div>
         </div>
         <div id="data-sls-list"></div>
         
-        <button class="btn-outline" onclick="addNewSLSRow()" style="margin-top: 15px;"><i class="bi bi-plus-lg"></i> Tambah Baris SLS Baru</button>
-        <button class="btn-success" onclick="saveDataSLS()" style="margin-top: 10px;"><i class="bi bi-save"></i> Simpan Perubahan Data Master</button>
+        <button class="btn-outline" onclick="addNewSLSRow()" style="margin-top: 12px;"><i class="bi bi-plus-lg"></i> Tambah Baris SLS Baru</button>
+        <button class="btn-success" onclick="saveDataSLS()" style="margin-top: 8px;"><i class="bi bi-save"></i> Simpan Perubahan Data Master</button>
     </div>
 </div>
 
@@ -488,9 +598,9 @@
         <p>Riwayat snapshot progres per hari</p>
     </div>
 
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-        <span style="color:var(--text-muted); font-size:0.85rem;">Total <span id="history-count">0</span> snapshot</span>
-        <button class="btn-danger" onclick="clearAllHistory()" style="font-size:0.75rem; padding:6px 14px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+        <span style="color:var(--text-muted); font-size:0.8rem;">Total <span id="history-count">0</span> snapshot</span>
+        <button class="btn-danger" onclick="clearAllHistory()" style="font-size:0.7rem; padding:6px 12px;">
             <i class="bi bi-trash3"></i> Hapus Semua
         </button>
     </div>
@@ -528,19 +638,19 @@
         
         <button class="btn-success" onclick="saveSettings()"><i class="bi bi-save"></i> Simpan Konfigurasi API</button>
         <button class="btn-outline" onclick="testAllApis()"><i class="bi bi-wifi"></i> Uji Koneksi Semua Provider</button>
-        <div id="test-results" style="margin-top:15px; font-size:0.85rem; color:var(--text-muted)"></div>
+        <div id="test-results" style="margin-top:12px; font-size:0.8rem; color:var(--text-muted)"></div>
 
-        <div style="margin-top: 30px; border-top: 1px solid var(--border); padding-top: 20px;">
+        <div style="margin-top: 24px; border-top: 1px solid var(--border); padding-top: 16px;">
             <div class="result-title"><i class="bi bi-cloud-arrow-up-down"></i> BACKUP & RESTORE DATA</div>
-            <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 15px;">Unduh semua data SLS, history, dan API keys ke file JSON.</p>
+            <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 12px;">Unduh semua data SLS, history, dan API keys ke file JSON.</p>
             <button class="btn-outline" onclick="backupData()"><i class="bi bi-download"></i> Export Backup (JSON)</button>
             <button class="btn-outline" onclick="document.getElementById('restore-file').click()"><i class="bi bi-upload"></i> Import Restore (JSON)</button>
             <input type="file" id="restore-file" accept=".json" style="display: none;" onchange="restoreData(this)">
         </div>
 
-        <div style="margin-top: 30px; border-top: 1px solid var(--border); padding-top: 20px;">
+        <div style="margin-top: 24px; border-top: 1px solid var(--border); padding-top: 16px;">
             <div class="result-title"><i class="bi bi-shield-lock"></i> KEAMANAN APLIKASI</div>
-            <div class="api-status" id="pin-status-display" style="margin-bottom:14px;"><span class="status-dot"></span> PIN Lock: Nonaktif</div>
+            <div class="api-status" id="pin-status-display" style="margin-bottom:12px;"><span class="status-dot"></span> PIN Lock: Nonaktif</div>
 
             <div class="setting-group">
                 <label>PIN Baru (tepat 4 digit angka)</label>
@@ -556,20 +666,20 @@
             </div>
             <button class="btn-success" onclick="setupPin()"><i class="bi bi-lock-fill"></i> Aktifkan / Perbarui PIN</button>
             <button class="btn-outline" id="btn-lock-now" onclick="lockAppNow()" style="display:none;"><i class="bi bi-lock"></i> Kunci Aplikasi Sekarang</button>
-            <button class="btn-danger" id="btn-disable-pin" onclick="disablePin()" style="display:none; width:100%; justify-content:center; margin-top:10px;"><i class="bi bi-unlock"></i> Nonaktifkan PIN Lock</button>
+            <button class="btn-danger" id="btn-disable-pin" onclick="disablePin()" style="display:none; width:100%; justify-content:center; margin-top:8px;"><i class="bi bi-unlock"></i> Nonaktifkan PIN Lock</button>
 
-            <div style="font-size:0.72rem; color:var(--text-muted); margin-top:12px; line-height:1.5; background:#0b1120; border:1px solid var(--border); border-radius:8px; padding:10px 12px;">
-                <i class="bi bi-info-circle"></i> PIN ini adalah kunci akses cepat di perangkat (disimpan sebagai hash SHA-256, bukan teks asli), bukan enkripsi data. Ini lapisan kenyamanan untuk mencegah akses casual, bukan pengaman kriptografis penuh — siapa pun dengan akses teknis ke browser tetap berpotensi membaca data mentah di localStorage.
+            <div style="font-size:0.7rem; color:var(--text-muted); margin-top:10px; line-height:1.5; background:#0b1120; border:1px solid var(--border); border-radius:8px; padding:8px 10px;">
+                <i class="bi bi-info-circle"></i> PIN ini adalah kunci akses cepat di perangkat (disimpan sebagai hash SHA-256, bukan teks asli).
             </div>
         </div>
 
         <div class="app-info-box">
             <div class="app-name">Saka Tracker v5.4.5 (Build 20260708)</div>
-            <div style="margin-bottom: 10px; font-size: 0.8rem;">Aplikasi monitoring progres SLS berbasis Hybrid AI dengan tracking termin dan komparasi muatan kontrak.</div>
-            <div style="margin-bottom: 10px; font-size: 0.72rem; color: var(--text-muted); background:#0b1120; border:1px solid var(--border); border-radius:8px; padding:8px 10px; text-align:left;">
-                <strong style="color:var(--text-main); font-size:0.75rem;"><i class="bi bi-clock-history"></i> v5.4.5</strong> — Penyempurnaan Terms of Service &amp; Privacy Policy, penambahan Consent Gate (wajib menyetujui sebelum masuk aplikasi) dan PIN Lock opsional (kunci akses 4 digit + jawaban pemulihan) di halaman Pengaturan.
+            <div style="margin-bottom: 8px; font-size: 0.75rem;">Aplikasi monitoring progres SLS berbasis Hybrid AI dengan tracking termin dan komparasi muatan kontrak.</div>
+            <div style="margin-bottom: 8px; font-size: 0.68rem; color: var(--text-muted); background:#0b1120; border:1px solid var(--border); border-radius:8px; padding:6px 8px; text-align:left;">
+                <strong style="color:var(--text-main); font-size:0.7rem;"><i class="bi bi-clock-history"></i> v5.4.5</strong> — Penyempurnaan Terms of Service &amp; Privacy Policy, penambahan Consent Gate dan PIN Lock opsional.
             </div>
-            <div style="font-weight: bold; color: var(--text-main); margin-bottom: 5px;">Developed by Saka_Omni</div>
+            <div style="font-weight: bold; color: var(--text-main); margin-bottom: 4px;">Developed by Saka_Omni</div>
             
             <div class="dev-contact">
                 <a href="mailto:mlevian@protonmail.com" class="contact-btn"><i class="bi bi-envelope"></i> Email Developer</a>
@@ -593,20 +703,20 @@
     </div>
 </div>
 
-<!-- CONSENT GATE (blocks app until TOS/Privacy accepted for current legal version) -->
+<!-- CONSENT GATE -->
 <div id="consent-gate" class="full-gate">
     <div class="gate-card">
-        <div style="font-size:2.2rem; text-align:center; color:var(--accent-blue);"><i class="bi bi-shield-check"></i></div>
-        <h2 style="text-align:center; margin:10px 0 2px; font-size:1.2rem;">Sebelum Melanjutkan</h2>
-        <p style="text-align:center; color:var(--text-muted); font-size:0.82rem; margin-bottom:14px;">Saka Tracker v5.4.5 — Alat bantu internal monitoring SE2026</p>
+        <div style="font-size:2rem; text-align:center; color:var(--accent-blue);"><i class="bi bi-shield-check"></i></div>
+        <h2 style="text-align:center; margin:8px 0 2px; font-size:1.1rem;">Sebelum Melanjutkan</h2>
+        <p style="text-align:center; color:var(--text-muted); font-size:0.78rem; margin-bottom:12px;">Saka Tracker v5.4.5 — Alat bantu internal monitoring SE2026</p>
         <div class="gate-scroll">
             <p>Dengan melanjutkan, Anda menyetujui hal-hal berikut:</p>
             <ul>
-                <li>Aplikasi ini adalah <strong>alat bantu internal</strong>, bukan aplikasi resmi Badan Pusat Statistik (BPS).</li>
-                <li>Seluruh data tersimpan <strong>lokal di perangkat Anda</strong> (localStorage) — tidak ada server backend milik aplikasi ini.</li>
-                <li><strong>Jangan</strong> memasukkan data pribadi responden sensus (nama, NIK, alamat, kontak individu) ke aplikasi ini — hanya angka agregat progres per SLS.</li>
-                <li>Fitur AI Insight (opsional) mengirim ringkasan angka agregat <strong>langsung dari browser Anda</strong> ke provider AI yang API key-nya Anda isi sendiri.</li>
-                <li>Aplikasi disediakan apa adanya (as-is) tanpa jaminan; Anda bertanggung jawab menjaga keamanan perangkat dan API key.</li>
+                <li>Aplikasi ini adalah <strong>alat bantu internal</strong>, bukan aplikasi resmi BPS.</li>
+                <li>Seluruh data tersimpan <strong>lokal di perangkat Anda</strong> (localStorage).</li>
+                <li><strong>Jangan</strong> memasukkan data pribadi responden sensus ke aplikasi ini.</li>
+                <li>Fitur AI Insight (opsional) mengirim ringkasan angka agregat ke provider AI.</li>
+                <li>Aplikasi disediakan apa adanya (as-is) tanpa jaminan.</li>
             </ul>
             <p>Baca selengkapnya: <button class="legal-btn" onclick="openModal('tos')" style="padding:2px 4px;">Terms of Service</button> &middot; <button class="legal-btn" onclick="openModal('privacy')" style="padding:2px 4px;">Privacy Policy</button></p>
         </div>
@@ -621,9 +731,9 @@
 <!-- PIN LOCK SCREEN -->
 <div id="pin-lock-screen" class="full-gate">
     <div class="gate-card" style="text-align:center;">
-        <i class="bi bi-lock-fill" style="font-size:2.2rem; color:var(--accent-blue);"></i>
-        <h2 style="margin:10px 0 2px; font-size:1.2rem;">Terkunci</h2>
-        <p style="color:var(--text-muted); font-size:0.82rem;">Masukkan PIN untuk membuka Saka Tracker</p>
+        <i class="bi bi-lock-fill" style="font-size:2rem; color:var(--accent-blue);"></i>
+        <h2 style="margin:8px 0 2px; font-size:1.1rem;">Terkunci</h2>
+        <p style="color:var(--text-muted); font-size:0.78rem;">Masukkan PIN untuk membuka Saka Tracker</p>
         <div class="pin-dots" id="pin-dots"><span></span><span></span><span></span><span></span></div>
         <div id="pin-error"></div>
         <div class="pin-keypad">
@@ -640,12 +750,12 @@
             <button class="pin-key" onclick="pinPress('0')">0</button>
             <button class="pin-key" onclick="pinBackspace()"><i class="bi bi-backspace"></i></button>
         </div>
-        <button class="legal-btn" style="margin-top:16px;" onclick="showRecoveryFlow()">Lupa PIN?</button>
-        <div id="recovery-flow" style="display:none; margin-top:12px; text-align:left;">
-            <label style="font-size:0.78rem; color:var(--text-muted);">Jawaban pemulihan Anda</label>
-            <input type="text" id="recovery-answer-input" placeholder="Jawaban pemulihan..." style="margin-top:6px;">
-            <button class="btn-success" style="margin-top:8px;" onclick="verifyRecovery()"><i class="bi bi-key"></i> Verifikasi</button>
-            <div id="recovery-msg" style="font-size:0.76rem; margin-top:6px;"></div>
+        <button class="legal-btn" style="margin-top:14px;" onclick="showRecoveryFlow()">Lupa PIN?</button>
+        <div id="recovery-flow" style="display:none; margin-top:10px; text-align:left;">
+            <label style="font-size:0.75rem; color:var(--text-muted);">Jawaban pemulihan Anda</label>
+            <input type="text" id="recovery-answer-input" placeholder="Jawaban pemulihan..." style="margin-top:4px; width:100%; background:#0f172a; border:1px solid var(--border); color:white; padding:8px 12px; border-radius:8px;">
+            <button class="btn-success" style="margin-top:6px;" onclick="verifyRecovery()"><i class="bi bi-key"></i> Verifikasi</button>
+            <div id="recovery-msg" style="font-size:0.72rem; margin-top:4px;"></div>
         </div>
     </div>
 </div>
@@ -676,7 +786,7 @@
 // ===============================
 const APP_VERSION = "5.4.5";
 const BUILD_DATE = "20260708";
-const LEGAL_VERSION = "5.4.5"; // bump this whenever TOS/Privacy content changes materially, to re-trigger consent gate
+const LEGAL_VERSION = "5.4.5";
 
 // ===============================
 // CONFIG & STATE MANAGEMENT
@@ -708,12 +818,10 @@ let state = JSON.parse(localStorage.getItem('saka_tracker_v5_4')) || {
     sls: JSON.parse(JSON.stringify(DEFAULT_SLS_DATA)),
     history: [],
     apiKeys: { openai: '', gemini: '', mistral: '' },
-    isAccumulationMode: false
+    isAccumulationMode: false,
+    consent: { accepted: false, version: null, date: null },
+    security: { pinEnabled: false, pinHash: null, recoveryHash: null, failedAttempts: 0, lockUntil: null }
 };
-
-// Migration guard: users with state saved before v5.4.5 won't have these fields yet.
-if(!state.consent) state.consent = { accepted: false, version: null, date: null };
-if(!state.security) state.security = { pinEnabled: false, pinHash: null, recoveryHash: null, failedAttempts: 0, lockUntil: null };
 
 // ===============================
 // HELPER FUNCTIONS
@@ -747,7 +855,6 @@ function syncConfigTargets() {
         totalSubmit += submit;
         totalApprove += approve;
         totalMuatan += muatan;
-        // Assessment = OPEN + SUBMIT + APPROVE (termasuk temuan baru)
         totalAssessment += open + submit + approve;
     });
     
@@ -780,6 +887,26 @@ function syncDashboardFromSLS() {
     state.dashboard.pending = totalPending;
     
     syncConfigTargets();
+    updateHeaderStats();
+}
+
+// ===============================
+// UPDATE HEADER STATS
+// ===============================
+function updateHeaderStats() {
+    document.getElementById('stat-open').textContent = state.dashboard.open;
+    document.getElementById('stat-submit').textContent = state.dashboard.submit;
+    document.getElementById('stat-approve').textContent = state.dashboard.approve;
+    document.getElementById('stat-muatan').textContent = state.config.muatan;
+}
+
+// ===============================
+// ACCORDION TOGGLE
+// ===============================
+function toggleAccordion(el) {
+    el.classList.toggle('open');
+    const body = document.getElementById('accordion-body');
+    body.classList.toggle('open');
 }
 
 // ===============================
@@ -812,7 +939,6 @@ function updateSLS(idx, field, val) {
     const oldVal = state.sls[idx][field];
     const diff = num - oldVal;
 
-    // VALIDASI: Submit tidak boleh melebihi (Open + Submit sebelumnya)
     if (field === 'submit') {
         const maxSubmit = state.sls[idx].open + oldVal;
         if (num > maxSubmit) {
@@ -820,7 +946,6 @@ function updateSLS(idx, field, val) {
             if(event && event.target) event.target.value = oldVal;
             return;
         }
-        // Open berkurang sebesar selisih submit
         state.sls[idx].open -= diff;
         if (state.sls[idx].open < 0) {
             state.sls[idx].open = 0;
@@ -828,20 +953,16 @@ function updateSLS(idx, field, val) {
     }
     
     // APPROVE TIDAK DIVALIDASI - bisa lebih besar dari Submit atau Open
-    // karena bisa ada temuan asesmen baru di lapangan
     if (field === 'approve') {
         // Approve tidak perlu validasi apapun
         // Open TIDAK berkurang otomatis dari approve
-        // karena approve bisa berasal dari temuan baru
-        // User bisa update Open secara manual jika diperlukan
     }
 
     state.sls[idx][field] = num;
     
-    // RE-SYNC assessment setelah perubahan
     syncConfigTargets();
+    updateHeaderStats();
     
-    // Update tampilan Open jika berubah
     if (field === 'submit' && diff !== 0) {
         const openInput = document.querySelectorAll('#sls-inputs-container input')[idx * 5]; 
         if(openInput) {
@@ -849,7 +970,6 @@ function updateSLS(idx, field, val) {
         }
     }
     
-    // Simpan ke localStorage
     localStorage.setItem('saka_tracker_v5_4', JSON.stringify(state));
 }
 
@@ -889,8 +1009,6 @@ function prioritasSLS() {
         const total = item.open + prog;
         const persen = total === 0 ? 0 : (prog / total) * 100;
         
-        // Skor berdasarkan Open (semakin tinggi, semakin urgent)
-        // dan Approve (semakin tinggi, semakin banyak valid)
         const openScore = Math.min(item.open * 0.8, 40);
         const approveScore = item.approve * 0.3;
         const submitScore = item.submit * 0.1;
@@ -950,7 +1068,7 @@ function generateSLSDetail(slsItem, rank) {
 }
 
 // ===============================
-// RENDER TERMIN ALERT
+// RENDER FUNCTIONS
 // ===============================
 function renderTerminAlert(prog) {
     const card = document.getElementById('termin-alert-card');
@@ -986,12 +1104,12 @@ function renderTerminAlert(prog) {
     if (!isTargetMet) {
         let statusHTML = '';
         if (isPastDeadline) {
-            statusHTML = `<div class="forecast-box forecast-crit" style="flex-direction:column; align-items:stretch; gap:12px;">
-                <div style="display:flex; align-items:center; gap:10px; font-size:1.1rem;">
-                    <i class="bi bi-exclamation-octagon-fill" style="font-size:1.5rem; color:var(--accent-red);"></i>
+            statusHTML = `<div class="forecast-box forecast-crit" style="flex-direction:column; align-items:stretch; gap:10px;">
+                <div style="display:flex; align-items:center; gap:10px; font-size:1rem;">
+                    <i class="bi bi-exclamation-octagon-fill" style="font-size:1.3rem; color:var(--accent-red);"></i>
                     <strong style="color:var(--accent-red);">KRITIS! Termin 1 GAGAL</strong>
                 </div>
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; font-size:0.9rem; background:#0f172a; padding:10px; border-radius:8px;">
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; font-size:0.85rem; background:#0f172a; padding:8px; border-radius:8px;">
                     <div><i class="bi bi-graph-up"></i> Progress:</div>
                     <div style="font-weight:bold; color:var(--accent-red);">${currentProgress.toFixed(2)}% (${currentData} data)</div>
                     <div><i class="bi bi-bullseye"></i> Target 40%:</div>
@@ -1001,17 +1119,17 @@ function renderTerminAlert(prog) {
                     <div><i class="bi bi-clock"></i> Keterlambatan:</div>
                     <div style="font-weight:bold; color:var(--accent-red);">${Math.abs(daysLeft)} hari</div>
                 </div>
-                <div style="background:rgba(239,68,68,0.15); padding:10px; border-radius:8px; text-align:center; font-weight:bold; color:var(--accent-red);">
+                <div style="background:rgba(239,68,68,0.15); padding:8px; border-radius:8px; text-align:center; font-weight:bold; color:var(--accent-red); font-size:0.85rem;">
                     <i class="bi bi-lightning-fill"></i> SEGERA PERCEPAT APPROVAL! Target tidak tercapai tepat waktu.
                 </div>
             </div>`;
         } else if (daysLeft <= 3 && currentProgress < 30) {
-            statusHTML = `<div class="forecast-box forecast-crit" style="flex-direction:column; align-items:stretch; gap:12px;">
-                <div style="display:flex; align-items:center; gap:10px; font-size:1.1rem;">
-                    <i class="bi bi-exclamation-octagon-fill" style="font-size:1.5rem; color:var(--accent-red);"></i>
+            statusHTML = `<div class="forecast-box forecast-crit" style="flex-direction:column; align-items:stretch; gap:10px;">
+                <div style="display:flex; align-items:center; gap:10px; font-size:1rem;">
+                    <i class="bi bi-exclamation-octagon-fill" style="font-size:1.3rem; color:var(--accent-red);"></i>
                     <strong style="color:var(--accent-red);">KRITIS! Hanya ${daysLeft} Hari Tersisa!</strong>
                 </div>
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; font-size:0.9rem; background:#0f172a; padding:10px; border-radius:8px;">
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; font-size:0.85rem; background:#0f172a; padding:8px; border-radius:8px;">
                     <div><i class="bi bi-graph-up"></i> Progress:</div>
                     <div style="font-weight:bold; color:var(--accent-orange);">${currentProgress.toFixed(2)}% (${currentData} data)</div>
                     <div><i class="bi bi-bullseye"></i> Target 40%:</div>
@@ -1021,105 +1139,105 @@ function renderTerminAlert(prog) {
                     <div><i class="bi bi-calendar-event"></i> Sisa Hari:</div>
                     <div style="font-weight:bold; color:var(--accent-red);">${daysLeft} hari</div>
                 </div>
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; background:#0f172a; padding:10px; border-radius:8px;">
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; background:#0f172a; padding:8px; border-radius:8px;">
                     <div style="text-align:center;">
-                        <div style="color:var(--text-muted); font-size:0.7rem;"><i class="bi bi-speedometer2"></i> Butuh/hari (40%)</div>
-                        <div style="font-weight:bold; font-size:1.2rem; color:var(--accent-red);">${dataPerDayTo40} data</div>
-                        <div style="font-size:0.7rem; color:var(--text-muted);">(${progressPerDay.toFixed(1)}%)</div>
+                        <div style="color:var(--text-muted); font-size:0.65rem;"><i class="bi bi-speedometer2"></i> Butuh/hari (40%)</div>
+                        <div style="font-weight:bold; font-size:1.1rem; color:var(--accent-red);">${dataPerDayTo40} data</div>
+                        <div style="font-size:0.65rem; color:var(--text-muted);">(${progressPerDay.toFixed(1)}%)</div>
                     </div>
                     <div style="text-align:center;">
-                        <div style="color:var(--text-muted); font-size:0.7rem;"><i class="bi bi-graph-up-arrow"></i> Ritme Saat Ini</div>
-                        <div style="font-weight:bold; font-size:1.2rem; color:${currVel >= dataPerDayTo40 ? 'var(--accent-green)' : 'var(--accent-red)'};">${currVel} data/hari</div>
-                        <div style="font-size:0.7rem; color:${currVel >= dataPerDayTo40 ? 'var(--accent-green)' : 'var(--accent-red)'};">${currVel >= dataPerDayTo40 ? '✅ Cukup' : '❌ Kurang ' + (dataPerDayTo40 - currVel) + ' data/hari'}</div>
+                        <div style="color:var(--text-muted); font-size:0.65rem;"><i class="bi bi-graph-up-arrow"></i> Ritme Saat Ini</div>
+                        <div style="font-weight:bold; font-size:1.1rem; color:${currVel >= dataPerDayTo40 ? 'var(--accent-green)' : 'var(--accent-red)'};">${currVel} data/hari</div>
+                        <div style="font-size:0.65rem; color:${currVel >= dataPerDayTo40 ? 'var(--accent-green)' : 'var(--accent-red)'};">${currVel >= dataPerDayTo40 ? '✅ Cukup' : '❌ Kurang ' + (dataPerDayTo40 - currVel) + ' data/hari'}</div>
                     </div>
                 </div>
-                <div style="background:rgba(59,130,246,0.08); padding:10px; border-radius:8px; border-left:3px solid var(--accent-blue);">
-                    <div style="font-weight:bold; margin-bottom:4px;"><i class="bi bi-flag-fill"></i> Target Final 100%</div>
-                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:4px; font-size:0.85rem;">
+                <div style="background:rgba(59,130,246,0.08); padding:8px; border-radius:8px; border-left:3px solid var(--accent-blue);">
+                    <div style="font-weight:bold; margin-bottom:4px; font-size:0.8rem;"><i class="bi bi-flag-fill"></i> Target Final 100%</div>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:4px; font-size:0.8rem;">
                         <div><i class="bi bi-arrow-up-circle"></i> Gap: <strong style="color:var(--accent-blue);">${gapDataTo100} data (${gapToFinal.toFixed(1)}%)</strong></div>
                         <div><i class="bi bi-speedometer2"></i> Butuh/hari: <strong style="color:${dataPerDayTo100 > 15 ? 'var(--accent-red)' : 'var(--accent-orange)'};">${dataPerDayTo100} data</strong></div>
                         <div style="grid-column:1/-1;"><i class="bi bi-clock"></i> Estimasi selesai: <strong style="color:${estimatedDaysTo100 <= sisaHariKeClearance ? 'var(--accent-green)' : 'var(--accent-red)'};">${estimatedDaysTo100 === Infinity ? '∞' : estimatedDaysTo100 + ' hari'}</strong></div>
                     </div>
                 </div>
-                <div style="background:rgba(239,68,68,0.1); padding:10px; border-radius:8px; text-align:center; font-size:0.9rem;">
+                <div style="background:rgba(239,68,68,0.1); padding:8px; border-radius:8px; text-align:center; font-size:0.85rem;">
                     <i class="bi bi-lightning-fill" style="color:var(--accent-orange);"></i> Butuh <strong style="color:var(--accent-red);">${dataPerDayTo40} data/hari</strong> untuk mencapai 40%! Fokus di 3 SLS prioritas dengan open tinggi.
                 </div>
             </div>`;
         } else if (daysLeft <= 7) {
             const statusText = currentProgress > 30 ? 'Perlu AKSI CEPAT' : 'Kondisi KRITIS!';
             const borderColor = currentProgress > 30 ? 'var(--accent-orange)' : 'var(--accent-red)';
-            statusHTML = `<div class="forecast-box forecast-warn" style="flex-direction:column; align-items:stretch; gap:12px; border-left:4px solid ${borderColor};">
-                <div style="display:flex; align-items:center; gap:10px; font-size:1.1rem;">
-                    <i class="bi bi-exclamation-triangle-fill" style="font-size:1.5rem; color:${borderColor};"></i>
+            statusHTML = `<div class="forecast-box forecast-warn" style="flex-direction:column; align-items:stretch; gap:10px; border-left:4px solid ${borderColor};">
+                <div style="display:flex; align-items:center; gap:10px; font-size:1rem;">
+                    <i class="bi bi-exclamation-triangle-fill" style="font-size:1.3rem; color:${borderColor};"></i>
                     <strong style="color:${borderColor};">${daysLeft} Hari Menuju Termin 1 - ${statusText}</strong>
                 </div>
-                <div style="background:#1e293b; border-radius:8px; padding:12px;">
-                    <div style="display:flex; justify-content:space-between; font-size:0.8rem; margin-bottom:4px;">
+                <div style="background:#1e293b; border-radius:8px; padding:10px;">
+                    <div style="display:flex; justify-content:space-between; font-size:0.75rem; margin-bottom:4px;">
                         <span><i class="bi bi-graph-up"></i> Progress: ${currentProgress.toFixed(1)}% (${currentData} data)</span>
                         <span><i class="bi bi-bullseye"></i> Target 40%: ${target40Data} data</span>
                     </div>
-                    <div style="background:#334155; border-radius:4px; height:24px; overflow:hidden; position:relative;">
+                    <div style="background:#334155; border-radius:4px; height:22px; overflow:hidden; position:relative;">
                         <div style="background:${currentProgress > 35 ? 'var(--accent-green)' : currentProgress > 30 ? 'var(--accent-orange)' : 'var(--accent-red)'}; height:100%; width:${Math.min(100, currentProgress)}%; transition:width 0.5s ease;"></div>
                         <div style="position:absolute; right:0; top:0; height:100%; width:${Math.max(0, 40 - currentProgress)}%; background:rgba(255,255,255,0.05); border-left:2px dashed var(--accent-orange);"></div>
-                        <div style="position:absolute; left:40%; top:50%; transform:translate(-50%, -50%); font-size:0.6rem; font-weight:bold; color:white; text-shadow:0 0 4px rgba(0,0,0,0.8);">🎯 40%</div>
-                        <div style="position:absolute; left:${Math.min(100, currentProgress)}%; top:50%; transform:translate(-50%, -50%); font-size:0.6rem; font-weight:bold; color:white; text-shadow:0 0 4px rgba(0,0,0,0.8);">${currentProgress.toFixed(0)}%</div>
+                        <div style="position:absolute; left:40%; top:50%; transform:translate(-50%, -50%); font-size:0.55rem; font-weight:bold; color:white; text-shadow:0 0 4px rgba(0,0,0,0.8);">🎯 40%</div>
+                        <div style="position:absolute; left:${Math.min(100, currentProgress)}%; top:50%; transform:translate(-50%, -50%); font-size:0.55rem; font-weight:bold; color:white; text-shadow:0 0 4px rgba(0,0,0,0.8);">${currentProgress.toFixed(0)}%</div>
                     </div>
-                    <div style="display:flex; justify-content:space-between; font-size:0.7rem; color:var(--text-muted); margin-top:2px;">
+                    <div style="display:flex; justify-content:space-between; font-size:0.65rem; color:var(--text-muted); margin-top:2px;">
                         <span>Saat Ini (${currentData} data)</span>
                         <span style="color:var(--accent-orange);"><i class="bi bi-arrow-up"></i> Gap ${gapDataTo40} data (${gapToTarget.toFixed(1)}%)</span>
                         <span>Target 40%</span>
                     </div>
                 </div>
-                <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; font-size:0.85rem;">
-                    <div style="background:#0f172a; padding:8px; border-radius:6px; text-align:center;">
-                        <div style="color:var(--text-muted); font-size:0.7rem;"><i class="bi bi-calendar-range"></i> Sisa Hari</div>
-                        <div style="font-weight:bold; font-size:1.1rem; ${daysLeft <= 5 ? 'color:var(--accent-red)' : 'color:var(--accent-orange)'}">${daysLeft}</div>
+                <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px; font-size:0.8rem;">
+                    <div style="background:#0f172a; padding:6px; border-radius:6px; text-align:center;">
+                        <div style="color:var(--text-muted); font-size:0.65rem;"><i class="bi bi-calendar-range"></i> Sisa Hari</div>
+                        <div style="font-weight:bold; font-size:1rem; ${daysLeft <= 5 ? 'color:var(--accent-red)' : 'color:var(--accent-orange)'}">${daysLeft}</div>
                     </div>
-                    <div style="background:#0f172a; padding:8px; border-radius:6px; text-align:center;">
-                        <div style="color:var(--text-muted); font-size:0.7rem;"><i class="bi bi-arrow-up-circle"></i> Gap ke 40%</div>
-                        <div style="font-weight:bold; font-size:1.1rem; color:var(--accent-orange);">${gapDataTo40} data</div>
-                        <div style="font-size:0.7rem; color:var(--text-muted);">(${gapToTarget.toFixed(1)}%)</div>
+                    <div style="background:#0f172a; padding:6px; border-radius:6px; text-align:center;">
+                        <div style="color:var(--text-muted); font-size:0.65rem;"><i class="bi bi-arrow-up-circle"></i> Gap ke 40%</div>
+                        <div style="font-weight:bold; font-size:1rem; color:var(--accent-orange);">${gapDataTo40} data</div>
+                        <div style="font-size:0.65rem; color:var(--text-muted);">(${gapToTarget.toFixed(1)}%)</div>
                     </div>
-                    <div style="background:#0f172a; padding:8px; border-radius:6px; text-align:center;">
-                        <div style="color:var(--text-muted); font-size:0.7rem;"><i class="bi bi-speedometer2"></i> Butuh/hari</div>
-                        <div style="font-weight:bold; font-size:1.1rem; ${dataPerDayTo40 > 5 ? 'color:var(--accent-red)' : 'color:var(--accent-orange)'}">${dataPerDayTo40} data</div>
-                        <div style="font-size:0.7rem; color:var(--text-muted);">(${progressPerDay.toFixed(1)}%)</div>
+                    <div style="background:#0f172a; padding:6px; border-radius:6px; text-align:center;">
+                        <div style="color:var(--text-muted); font-size:0.65rem;"><i class="bi bi-speedometer2"></i> Butuh/hari</div>
+                        <div style="font-weight:bold; font-size:1rem; ${dataPerDayTo40 > 5 ? 'color:var(--accent-red)' : 'color:var(--accent-orange)'}">${dataPerDayTo40} data</div>
+                        <div style="font-size:0.65rem; color:var(--text-muted);">(${progressPerDay.toFixed(1)}%)</div>
                     </div>
                 </div>
-                <div style="background:rgba(59,130,246,0.06); padding:10px; border-radius:8px; border-left:3px solid var(--accent-blue);">
-                    <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px; font-size:0.8rem;">
+                <div style="background:rgba(59,130,246,0.06); padding:8px; border-radius:8px; border-left:3px solid var(--accent-blue);">
+                    <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:4px; font-size:0.75rem;">
                         <div><div style="color:var(--text-muted);"><i class="bi bi-flag-fill"></i> Target 100%</div><div style="font-weight:bold;">${target100Data} data</div></div>
                         <div><div style="color:var(--text-muted);"><i class="bi bi-arrow-up-circle"></i> Gap</div><div style="font-weight:bold; color:var(--accent-blue);">${gapDataTo100} data</div></div>
                         <div><div style="color:var(--text-muted);"><i class="bi bi-speedometer2"></i> Butuh/hari</div><div style="font-weight:bold; color:${dataPerDayTo100 > 15 ? 'var(--accent-red)' : 'var(--accent-orange)'};">${dataPerDayTo100} data</div></div>
                     </div>
-                    <div style="display:flex; justify-content:space-between; font-size:0.8rem; margin-top:4px; padding-top:4px; border-top:1px solid var(--border);">
+                    <div style="display:flex; justify-content:space-between; font-size:0.75rem; margin-top:4px; padding-top:4px; border-top:1px solid var(--border);">
                         <span><i class="bi bi-clock"></i> Estimasi Selesai (ritme ${currVel}/hari)</span>
                         <span style="font-weight:bold; color:${estimatedDaysTo100 <= sisaHariKeClearance ? 'var(--accent-green)' : 'var(--accent-red)'};">${estimatedDaysTo100 === Infinity ? '∞ (belum ada ritme)' : estimatedDaysTo100 + ' hari'}</span>
                     </div>
                 </div>
-                <div style="background:rgba(59,130,246,0.08); padding:10px; border-radius:8px; text-align:center; font-size:0.85rem; border-left:3px solid var(--accent-blue);">
+                <div style="background:rgba(59,130,246,0.08); padding:8px; border-radius:8px; text-align:center; font-size:0.8rem; border-left:3px solid var(--accent-blue);">
                     <i class="bi bi-lightbulb-fill" style="color:var(--accent-blue);"></i> <strong>Strategi:</strong> Percepat approval di 3 SLS prioritas (0018, 0019, 0020). ${dataPerDayTo40 > 5 ? '<i class="bi bi-exclamation-triangle-fill" style="color:var(--accent-red);"></i> Perlu tambahan tenaga lapangan!' : 'Fokus pada SLS dengan open > 50 unit.'} ${dataPerDayTo40 > currVel ? ' Butuh tambahan <strong>' + (dataPerDayTo40 - currVel) + ' data/hari</strong> dari ritme saat ini.' : ''}
                 </div>
             </div>`;
         } else {
-            statusHTML = `<div class="forecast-box forecast-warn" style="flex-direction:column; align-items:stretch; gap:10px;">
-                <div style="display:flex; align-items:center; gap:10px;">
-                    <i class="bi bi-info-circle-fill" style="color:var(--accent-orange); font-size:1.3rem;"></i>
-                    <span><i class="bi bi-calendar-event"></i> Termin 1: ${daysLeft} hari menuju deadline <strong>${targetDate.toLocaleDateString('id-ID', {day:'numeric', month:'long'})}</strong></span>
+            statusHTML = `<div class="forecast-box forecast-warn" style="flex-direction:column; align-items:stretch; gap:8px;">
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <i class="bi bi-info-circle-fill" style="color:var(--accent-orange); font-size:1.2rem;"></i>
+                    <span style="font-size:0.85rem;"><i class="bi bi-calendar-event"></i> Termin 1: ${daysLeft} hari menuju deadline <strong>${targetDate.toLocaleDateString('id-ID', {day:'numeric', month:'long'})}</strong></span>
                 </div>
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; font-size:0.85rem; background:#0f172a; padding:10px; border-radius:8px;">
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:4px; font-size:0.8rem; background:#0f172a; padding:8px; border-radius:8px;">
                     <div><i class="bi bi-graph-up"></i> Progress: <strong style="color:var(--accent-blue);">${currentProgress.toFixed(2)}% (${currentData} data)</strong></div>
                     <div><i class="bi bi-bullseye"></i> Target 40%: <strong style="color:var(--accent-green);">${target40Data} data</strong></div>
                     <div><i class="bi bi-arrow-up-circle"></i> Gap ke 40%: <strong style="color:var(--accent-orange);">${gapDataTo40} data (${gapToTarget.toFixed(1)}%)</strong></div>
                     <div><i class="bi bi-speedometer2"></i> Butuh/hari: <strong style="color:${dataPerDayTo40 > 3 ? 'var(--accent-orange)' : 'var(--accent-green)'};">${dataPerDayTo40} data (${progressPerDay.toFixed(1)}%)</strong></div>
                 </div>
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; font-size:0.8rem; background:#0f172a; padding:8px; border-radius:8px;">
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:4px; font-size:0.75rem; background:#0f172a; padding:6px; border-radius:8px;">
                     <div><i class="bi bi-flag-fill"></i> Target 100%: <strong>${target100Data} data</strong></div>
                     <div><i class="bi bi-arrow-up-circle"></i> Gap ke 100%: <strong style="color:var(--accent-blue);">${gapDataTo100} data (${gapToFinal.toFixed(1)}%)</strong></div>
                     <div><i class="bi bi-speedometer2"></i> Butuh/hari (100%): <strong style="color:${dataPerDayTo100 > 15 ? 'var(--accent-red)' : 'var(--accent-orange)'};">${dataPerDayTo100} data</strong></div>
                     <div><i class="bi bi-clock"></i> Estimasi selesai: <strong style="color:${estimatedDaysTo100 <= sisaHariKeClearance ? 'var(--accent-green)' : 'var(--accent-red)'};">${estimatedDaysTo100 === Infinity ? '∞' : estimatedDaysTo100 + ' hari'}</strong></div>
                 </div>
-                ${dataPerDayTo40 > 2 ? '<div style="font-size:0.8rem; color:var(--accent-orange); text-align:center;"><i class="bi bi-exclamation-triangle-fill"></i> Perlu percepatan! Target harian di atas 2% (' + dataPerDayTo40 + ' data/hari)</div>' : ''}
+                ${dataPerDayTo40 > 2 ? '<div style="font-size:0.75rem; color:var(--accent-orange); text-align:center;"><i class="bi bi-exclamation-triangle-fill"></i> Perlu percepatan! Target harian di atas 2% (' + dataPerDayTo40 + ' data/hari)</div>' : ''}
             </div>`;
         }
         statusDiv.innerHTML = statusHTML;
@@ -1127,27 +1245,27 @@ function renderTerminAlert(prog) {
         const gapToFinalData = target100Data - currentData;
         const daysToClearance = getSisaHariKeClearance();
         const dataPerDayToFinal = daysToClearance > 0 ? Math.ceil(gapToFinalData / daysToClearance) : 0;
-        statusDiv.innerHTML = `<div class="forecast-box forecast-ok" style="flex-direction:column; align-items:stretch; gap:10px;">
-            <div style="display:flex; align-items:center; gap:10px; font-size:1.1rem;">
-                <i class="bi bi-check-circle-fill" style="color:var(--accent-green); font-size:1.5rem;"></i>
+        statusDiv.innerHTML = `<div class="forecast-box forecast-ok" style="flex-direction:column; align-items:stretch; gap:8px;">
+            <div style="display:flex; align-items:center; gap:10px; font-size:1rem;">
+                <i class="bi bi-check-circle-fill" style="color:var(--accent-green); font-size:1.3rem;"></i>
                 <strong style="color:var(--accent-green);">TERMIN 1 TERCAPAI! (40%)</strong>
             </div>
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; font-size:0.9rem; background:#0f172a; padding:10px; border-radius:8px;">
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:4px; font-size:0.85rem; background:#0f172a; padding:8px; border-radius:8px;">
                 <div><i class="bi bi-graph-up"></i> Progress: <strong style="color:var(--accent-green);">${currentProgress.toFixed(2)}% (${currentData} data)</strong></div>
                 <div><i class="bi bi-bullseye"></i> Target 40%: <strong style="color:var(--accent-green);">${target40Data} data ✅</strong></div>
                 <div><i class="bi bi-calendar-event"></i> Deadline: <strong>${targetDate.toLocaleDateString('id-ID', {day:'numeric', month:'long'})}</strong></div>
                 <div><i class="bi bi-clock"></i> Selesai: <strong style="color:var(--accent-green);">${daysLeft < 0 ? Math.abs(daysLeft) + ' hari lebih cepat' : 'Tepat waktu'}</strong></div>
             </div>
-            <div style="background:rgba(16,185,129,0.08); padding:10px; border-radius:8px; border-left:3px solid var(--accent-green);">
-                <div style="font-weight:bold; margin-bottom:6px;"><i class="bi bi-flag-fill"></i> Target Final 100%</div>
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; font-size:0.85rem;">
+            <div style="background:rgba(16,185,129,0.08); padding:8px; border-radius:8px; border-left:3px solid var(--accent-green);">
+                <div style="font-weight:bold; margin-bottom:4px; font-size:0.8rem;"><i class="bi bi-flag-fill"></i> Target Final 100%</div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:4px; font-size:0.8rem;">
                     <div><i class="bi bi-arrow-up-circle"></i> Gap ke 100%: <strong style="color:var(--accent-blue);">${gapToFinalData} data (${gapToFinal.toFixed(1)}%)</strong></div>
                     <div><i class="bi bi-speedometer2"></i> Butuh/hari (100%): <strong style="color:${dataPerDayToFinal > 15 ? 'var(--accent-red)' : 'var(--accent-orange)'};">${dataPerDayToFinal} data</strong></div>
                     <div><i class="bi bi-graph-up"></i> Ritme Saat Ini: <strong style="color:${currVel >= dataPerDayToFinal ? 'var(--accent-green)' : 'var(--accent-orange)'};">${currVel} data/hari</strong></div>
                     <div><i class="bi bi-clock"></i> Estimasi Selesai: <strong style="color:${estimatedDaysTo100 <= daysToClearance ? 'var(--accent-green)' : 'var(--accent-red)'};">${estimatedDaysTo100 === Infinity ? '∞' : estimatedDaysTo100 + ' hari'}</strong></div>
                 </div>
             </div>
-            <div style="background:rgba(16,185,129,0.08); padding:8px; border-radius:8px; text-align:center; font-size:0.85rem; color:var(--text-muted);">
+            <div style="background:rgba(16,185,129,0.08); padding:6px; border-radius:8px; text-align:center; font-size:0.8rem; color:var(--text-muted);">
                 <i class="bi bi-rocket-takeoff"></i> Pertahankan ritme untuk clearance 27 Agustus 2026!
                 ${currVel < dataPerDayToFinal ? ' Perlu tambahan <strong>' + (dataPerDayToFinal - currVel) + ' data/hari</strong> untuk mencapai 100% tepat waktu.' : ''}
             </div>
@@ -1155,9 +1273,6 @@ function renderTerminAlert(prog) {
     }
 }
 
-// ===============================
-// RENDER FUNCTIONS LAINNYA
-// ===============================
 function renderForecast() {
     const prog = getProgress();
     const sisaHari = getSisaHariKeClearance();
@@ -1240,7 +1355,7 @@ function renderPriorityAccordions() {
                     <div class="p-score">Score: ${s.score.toFixed(0)} | Prog: ${s.persen.toFixed(0)}%</div>
                 </div>
             </div>
-            <div style="display:flex; align-items:center; gap:10px;">
+            <div style="display:flex; align-items:center; gap:8px;">
                 <span class="p-action ${s.actionClass}">${s.action}</span>
                 <i class="bi bi-chevron-down toggle-icon"></i>
             </div>
@@ -1265,6 +1380,50 @@ function renderPerformance(prog, perf) {
     document.getElementById('perf-delta').innerHTML = '📊 ' + (perf.delta > 0 ? 'Di atas target' : 'Di bawah target') + ' ' + Math.abs(perf.delta) + '%';
     document.getElementById('dash-persen').innerText = prog.dashP.toFixed(2)+'%';
     document.getElementById('dash-bar').style.width = Math.min(100,prog.dashP)+'%';
+}
+
+// ===============================
+// AI INSIGHT - CLEAN MARKDOWN
+// ===============================
+function cleanAIResponse(text) {
+    if (!text) return '<p style="color:var(--text-muted); font-style:italic;">Tidak ada insight yang dihasilkan.</p>';
+    
+    // Replace markdown headers
+    let cleaned = text
+        .replace(/^####\s+(.*)$/gm, '<h4>$1</h4>')
+        .replace(/^###\s+(.*)$/gm, '<h4>$1</h4>')
+        .replace(/^##\s+(.*)$/gm, '<h4>$1</h4>')
+        .replace(/^#\s+(.*)$/gm, '<h4>$1</h4>')
+        // Bold
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        // Italic
+        .replace(/\*(.*?)\*/g, '<em>$1</em>')
+        // Lists
+        .replace(/^-\s+(.*)$/gm, '<li>$1</li>')
+        .replace(/^\d+\.\s+(.*)$/gm, '<li>$1</li>')
+        // Wrap lists
+        .replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>')
+        // Line breaks
+        .replace(/\n/g, '<br>');
+    
+    // Wrap sections
+    cleaned = cleaned.replace(/<h4>([^<]+)<\/h4>/g, (match, title) => {
+        const isRisk = title.toLowerCase().includes('risiko') || title.toLowerCase().includes('risk');
+        const isSuccess = title.toLowerCase().includes('rekomendasi') || title.toLowerCase().includes('strategi');
+        const cls = isRisk ? 'risk' : isSuccess ? 'success' : '';
+        return `<div class="ai-section ${cls}"><h4>${title}</h4>`;
+    });
+    
+    // Close ai-section divs
+    cleaned = cleaned.replace(/<\/h4>/g, '</h4></div>');
+    
+    // Fix double divs
+    cleaned = cleaned.replace(/<\/div><div class="ai-section/g, '</div><div class="ai-section');
+    
+    // Clean up extra tags
+    cleaned = cleaned.replace(/<\/h4><\/div><\/h4>/g, '</h4></div>');
+    
+    return cleaned;
 }
 
 // ===============================
@@ -1301,11 +1460,11 @@ function renderHistory() {
                 <div class="history-date">
                     <i class="bi bi-calendar3"></i>
                     ${item.date}
-                    <span style="font-size:0.7rem; color:var(--text-muted); font-weight:normal; margin-left:8px;">
+                    <span style="font-size:0.65rem; color:var(--text-muted); font-weight:normal; margin-left:6px;">
                         #${state.history.length - originalIndex}
                     </span>
                 </div>
-                <button class="btn-danger" onclick="deleteHistory(${originalIndex})" style="padding:4px 10px; font-size:0.7rem;">
+                <button class="btn-danger" onclick="deleteHistory(${originalIndex})" style="padding:4px 8px; font-size:0.65rem;">
                     <i class="bi bi-trash3"></i>
                 </button>
             </div>
@@ -1390,6 +1549,7 @@ async function runAnalysis() {
     renderDifferenceAnalysis();
     renderPriorityAccordions();
     renderPerformance(prog, perf);
+    updateHeaderStats();
 
     const orchestrator = new HybridAIOrchestrator(state.apiKeys);
     const top3 = prioritasSLS().slice(0,3);
@@ -1401,10 +1561,10 @@ async function runAnalysis() {
         'Ritme rata-rata 7 hari: ' + getVelocity() + ' data/hari. ' +
         'Status Termin 1 (Target 40%): ' + (prog.dashP >= 40 ? 'Tercapai' : 'Belum Tercapai') + '. ' +
         'Top 3 SLS prioritas: ' + top3.map(s=>s.kode + ' (' + s.open + ' open)').join(', ') + '. ' +
-        'Berikan insight strategis singkat.';
+        'Berikan insight strategis singkat dengan format: gunakan #### untuk judul bagian, **tebal** untuk penekanan, dan - untuk poin-poin.';
     
     const insight = await orchestrator.generateInsight(aiPrompt);
-    document.getElementById('ai-insights').innerHTML = insight;
+    document.getElementById('ai-insights').innerHTML = cleanAIResponse(insight);
 
     const container = document.getElementById('analysis-container');
     container.style.display = 'flex';
@@ -1450,12 +1610,12 @@ function renderDataSLSPage() {
     state.sls.forEach((s, idx) => {
         const row = document.createElement('div');
         row.className = 'data-sls-row';
-        row.style.cssText = "display: grid; grid-template-columns: 60px 1fr 1fr 40px; gap: 10px; align-items: center; margin-bottom: 10px; padding: 10px; background: #0f172a; border-radius: 10px; border: 1px solid var(--border);";
+        row.style.cssText = "display: grid; grid-template-columns: 60px 1fr 1fr 40px; gap: 8px; align-items: center; margin-bottom: 8px; padding: 8px 10px; background: #0f172a; border-radius: 10px; border: 1px solid var(--border);";
         row.innerHTML = `
-            <input type="text" value="${s.kode}" onchange="updateDataSLS(${idx}, 'kode', this.value)" style="text-align:center; font-weight:bold; color:var(--accent-blue)">
-            <input type="number" value="${s.open}" onchange="updateDataSLS(${idx}, 'open', this.value)" placeholder="Open FASIH">
-            <input type="number" value="${s.muatan || 0}" onchange="updateDataSLS(${idx}, 'muatan', this.value)" placeholder="Jml Muatan">
-            <button class="btn-delete" onclick="deleteDataSLS(${idx})" style="background: rgba(239, 68, 68, 0.1); color: var(--accent-red); border: none; width: 30px; height: 30px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center;"><i class="bi bi-x-lg"></i></button>
+            <input type="text" value="${s.kode}" onchange="updateDataSLS(${idx}, 'kode', this.value)" style="text-align:center; font-weight:bold; color:var(--accent-blue); background:transparent; border:none; font-size:0.85rem;">
+            <input type="number" value="${s.open}" onchange="updateDataSLS(${idx}, 'open', this.value)" placeholder="Open FASIH" style="background:#0f172a; border:1px solid var(--border); color:white; padding:8px; border-radius:8px; width:100%; text-align:center; font-size:0.85rem;">
+            <input type="number" value="${s.muatan || 0}" onchange="updateDataSLS(${idx}, 'muatan', this.value)" placeholder="Jml Muatan" style="background:#0f172a; border:1px solid var(--border); color:white; padding:8px; border-radius:8px; width:100%; text-align:center; font-size:0.85rem;">
+            <button class="btn-delete" onclick="deleteDataSLS(${idx})" style="background: rgba(239, 68, 68, 0.1); color: var(--accent-red); border: none; width: 28px; height: 28px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center;"><i class="bi bi-x-lg"></i></button>
         `;
         list.appendChild(row);
     });
@@ -1484,6 +1644,7 @@ function saveDataSLS() {
     localStorage.setItem('saka_tracker_v5_4', JSON.stringify(state));
     alert('✅ Data Master SLS berhasil disimpan!');
     initForm();
+    updateHeaderStats();
 }
 
 // ===============================
@@ -1582,90 +1743,52 @@ function openModal(type) {
         title.innerHTML = '<i class="bi bi-shield-check"></i> Terms of Service';
         body.innerHTML = `
             <span class="legal-updated">Terakhir diperbarui: 8 Juli 2026 &middot; Versi 5.4.5</span>
-
-            <div class="legal-note"><i class="bi bi-info-circle-fill"></i> Saka Tracker adalah <strong>alat bantu internal</strong> untuk monitoring progres lapangan Sensus Ekonomi 2026 (SE2026). Aplikasi ini <strong>bukan produk resmi Badan Pusat Statistik (BPS)</strong> dan tidak berafiliasi dengan BPS.</div>
-
+            <div class="legal-note"><i class="bi bi-info-circle-fill"></i> Saka Tracker adalah <strong>alat bantu internal</strong> untuk monitoring progres lapangan Sensus Ekonomi 2026 (SE2026). Aplikasi ini <strong>bukan produk resmi BPS</strong>.</div>
             <h4><i class="bi bi-1-circle-fill"></i> Penerimaan Ketentuan</h4>
-            <p>Dengan mengakses dan menggunakan Saka Tracker, Anda menyatakan telah membaca, memahami, dan menyetujui seluruh ketentuan dalam dokumen ini. Jika Anda tidak menyetujui ketentuan ini, mohon untuk tidak menggunakan aplikasi.</p>
-
+            <p>Dengan mengakses dan menggunakan Saka Tracker, Anda menyatakan telah membaca, memahami, dan menyetujui seluruh ketentuan dalam dokumen ini.</p>
             <h4><i class="bi bi-2-circle-fill"></i> Deskripsi Layanan</h4>
-            <p>Saka Tracker menyediakan fitur pencatatan progres SLS (open/submit/reject/pending/approve), perhitungan target &amp; forecast, prioritisasi kerja, serta ringkasan analisis berbasis AI. Seluruh perhitungan bersifat estimasi untuk membantu pengambilan keputusan lapangan, dan <strong>bukan merupakan sumber data resmi</strong> untuk pelaporan ke BPS.</p>
-
+            <p>Saka Tracker menyediakan fitur pencatatan progres SLS, perhitungan target & forecast, prioritisasi kerja, serta ringkasan analisis berbasis AI.</p>
             <h4><i class="bi bi-3-circle-fill"></i> Tanggung Jawab Pengguna</h4>
             <ul>
-                <li>Anda bertanggung jawab penuh atas keakuratan data yang diinput ke dalam aplikasi.</li>
-                <li>Anda bertanggung jawab menjaga kerahasiaan API key pihak ketiga (OpenAI, Gemini, Mistral) yang Anda masukkan sendiri ke aplikasi.</li>
-                <li>Anda bertanggung jawab menjaga keamanan perangkat yang digunakan, karena seluruh data tersimpan secara lokal di perangkat tersebut.</li>
-                <li><strong>Dilarang</strong> memasukkan data pribadi responden sensus (nama, NIK, alamat lengkap, kontak, dsb) ke dalam aplikasi ini — aplikasi hanya dirancang untuk menyimpan data agregat/angka progres per SLS.</li>
+                <li>Anda bertanggung jawab penuh atas keakuratan data yang diinput.</li>
+                <li>Jaga kerahasiaan API key pihak ketiga yang Anda masukkan.</li>
+                <li><strong>Dilarang</strong> memasukkan data pribadi responden sensus ke aplikasi ini.</li>
             </ul>
-
             <h4><i class="bi bi-4-circle-fill"></i> Layanan Pihak Ketiga (AI Provider)</h4>
-            <p>Fitur "Multi-AI Strategic Insight" bersifat opsional dan hanya aktif jika Anda mengisi API key milik Anda sendiri (OpenAI, Gemini, dan/atau Mistral). Penggunaan fitur ini tunduk pula pada ketentuan layanan dan kebijakan masing-masing penyedia AI tersebut, termasuk biaya penggunaan yang mungkin timbul dari akun API Anda. Saka Tracker tidak mengelola, menagih, atau bertanggung jawab atas biaya penggunaan API pihak ketiga.</p>
-
+            <p>Fitur AI Insight bersifat opsional dan hanya aktif jika Anda mengisi API key sendiri. Penggunaan tunduk pada ketentuan masing-masing provider.</p>
             <h4><i class="bi bi-5-circle-fill"></i> Tanpa Jaminan (No Warranty)</h4>
-            <p>Aplikasi disediakan "SEBAGAIMANA ADANYA" (AS IS) tanpa jaminan dalam bentuk apa pun, baik tersurat maupun tersirat, termasuk namun tidak terbatas pada jaminan kelayakan untuk tujuan tertentu, keakuratan forecast, atau ketersediaan layanan AI pihak ketiga secara terus-menerus.</p>
-
+            <p>Aplikasi disediakan "SEBAGAIMANA ADANYA" (AS IS) tanpa jaminan dalam bentuk apa pun.</p>
             <h4><i class="bi bi-6-circle-fill"></i> Batasan Tanggung Jawab</h4>
-            <p>Pengembang tidak bertanggung jawab atas kehilangan data akibat penghapusan cache browser, penggantian perangkat, atau kegagalan penyimpanan lokal. Gunakan fitur Backup &amp; Restore secara berkala untuk mencegah kehilangan data. Pengembang juga tidak bertanggung jawab atas keputusan lapangan yang diambil semata-mata berdasarkan hasil forecast atau insight AI tanpa verifikasi manusia.</p>
-
-            <h4><i class="bi bi-7-circle-fill"></i> Perubahan Layanan &amp; Ketentuan</h4>
-            <p>Ketentuan ini dapat diperbarui sewaktu-waktu seiring pembaruan versi aplikasi. Versi dan tanggal pembaruan terakhir selalu tercantum di bagian atas dokumen ini.</p>
-
-            <h4><i class="bi bi-8-circle-fill"></i> Hukum yang Berlaku</h4>
-            <p>Ketentuan ini tunduk pada hukum yang berlaku di Republik Indonesia.</p>
-
+            <p>Pengembang tidak bertanggung jawab atas kehilangan data akibat penghapusan cache browser atau penggantian perangkat.</p>
             <h4><i class="bi bi-envelope-fill"></i> Kontak</h4>
-            <p>Pertanyaan seputar ketentuan layanan dapat disampaikan ke <strong>mlevian@protonmail.com</strong> atau WhatsApp developer.</p>
+            <p>Pertanyaan dapat disampaikan ke <strong>mlevian@protonmail.com</strong> atau WhatsApp developer.</p>
         `;
     } else if (type === 'privacy') {
         title.innerHTML = '<i class="bi bi-lock-fill"></i> Privacy Policy';
         body.innerHTML = `
             <span class="legal-updated">Terakhir diperbarui: 8 Juli 2026 &middot; Versi 5.4.5</span>
-
-            <div class="legal-note"><i class="bi bi-hdd-fill"></i> Saka Tracker bersifat <strong>local-first</strong>: tidak ada server backend milik aplikasi ini yang menyimpan data Anda. Seluruh data hidup di browser perangkat Anda sendiri.</div>
-
-            <h4><i class="bi bi-1-circle-fill"></i> Data yang Diproses Aplikasi</h4>
-            <p>Aplikasi menyimpan data berikut secara lokal di perangkat Anda melalui <strong>localStorage</strong> browser:</p>
+            <div class="legal-note"><i class="bi bi-hdd-fill"></i> Saka Tracker bersifat <strong>local-first</strong>: tidak ada server backend yang menyimpan data Anda.</div>
+            <h4><i class="bi bi-1-circle-fill"></i> Data yang Diproses</h4>
+            <p>Aplikasi menyimpan data berikut secara lokal di localStorage:</p>
             <ul>
                 <li>Angka progres per SLS: open, submit, reject, pending, approve, dan draft.</li>
-                <li>Riwayat snapshot harian (history) untuk keperluan forecast &amp; tren.</li>
-                <li>API key pihak ketiga (jika Anda mengisinya) untuk fitur AI Insight.</li>
+                <li>Riwayat snapshot harian (history).</li>
+                <li>API key pihak ketiga (jika Anda mengisinya).</li>
             </ul>
-            <p>Aplikasi <strong>tidak</strong> dirancang untuk menyimpan data pribadi responden sensus (nama, NIK, alamat, nomor kontak individu). Mohon hindari memasukkan data tersebut ke dalam field mana pun di aplikasi.</p>
-
             <h4><i class="bi bi-2-circle-fill"></i> Penyimpanan Lokal</h4>
-            <p>Data tersimpan di localStorage browser pada perangkat yang Anda gunakan. Data ini <strong>tidak otomatis tersinkronisasi</strong> ke perangkat lain atau ke cloud manapun. Menghapus cache/data browser, mengganti perangkat, atau uninstall browser akan menghapus seluruh data secara permanen kecuali Anda melakukan backup terlebih dahulu.</p>
-
-            <h4><i class="bi bi-3-circle-fill"></i> Pengiriman Data ke Provider AI Pihak Ketiga</h4>
-            <p>Fitur "Multi-AI Strategic Insight" bersifat <strong>opsional</strong>. Fitur ini hanya aktif jika Anda mengisi API key Anda sendiri di halaman Pengaturan. Saat digunakan:</p>
-            <ul>
-                <li>Ringkasan angka agregat (persentase progres, ritme harian, kode SLS prioritas) dikirim langsung dari browser Anda ke server penyedia AI (OpenAI, Gemini, atau Mistral — sesuai urutan provider mana yang API key-nya terisi dan berhasil merespons).</li>
-                <li>Pengiriman terjadi langsung antara browser Anda dan server provider tersebut — <strong>tidak melalui server milik Saka Tracker</strong>, karena aplikasi ini tidak memiliki server backend.</li>
-                <li>Prompt yang dikirim hanya berisi data agregat/statistik, tidak dirancang untuk menyertakan data pribadi responden.</li>
-                <li>Data yang dikirim tunduk pada kebijakan privasi masing-masing provider (OpenAI, Google Gemini, atau Mistral AI).</li>
-            </ul>
-
+            <p>Data tersimpan di localStorage browser. Tidak otomatis tersinkronisasi ke perangkat lain.</p>
+            <h4><i class="bi bi-3-circle-fill"></i> Pengiriman Data ke Provider AI</h4>
+            <p>Fitur AI Insight bersifat opsional. Saat digunakan, ringkasan angka agregat dikirim langsung ke provider AI.</p>
             <h4><i class="bi bi-4-circle-fill"></i> API Key</h4>
-            <p>API key yang Anda masukkan disimpan di localStorage browser Anda sendiri dan digunakan hanya untuk memanggil layanan AI terkait. Jaga kerahasiaan API key Anda — siapa pun yang mengakses perangkat/browser Anda berpotensi melihat key tersebut.</p>
-
-            <h4><i class="bi bi-5-circle-fill"></i> Cookies &amp; Pelacakan</h4>
-            <p>Saka Tracker tidak menggunakan cookies pelacakan, analytics pihak ketiga, atau iklan. Satu-satunya sumber daya eksternal yang dimuat adalah ikon Bootstrap Icons dari CDN.</p>
-
-            <h4><i class="bi bi-6-circle-fill"></i> Hak Anda atas Data</h4>
+            <p>API key disimpan di localStorage dan digunakan hanya untuk memanggil layanan AI terkait.</p>
+            <h4><i class="bi bi-5-circle-fill"></i> Hak Anda atas Data</h4>
             <ul>
-                <li><strong>Export</strong>: unduh seluruh data Anda kapan saja melalui fitur Backup (JSON) di halaman Pengaturan.</li>
-                <li><strong>Hapus</strong>: hapus history atau seluruh data kapan saja melalui fitur di halaman History/Pengaturan, atau dengan membersihkan localStorage browser.</li>
-                <li><strong>Portabilitas</strong>: file backup JSON dapat dipindahkan dan di-restore ke perangkat lain.</li>
+                <li><strong>Export</strong>: unduh seluruh data melalui Backup.</li>
+                <li><strong>Hapus</strong>: hapus history atau seluruh data.</li>
+                <li><strong>Portabilitas</strong>: file backup JSON dapat dipindahkan ke perangkat lain.</li>
             </ul>
-
-            <h4><i class="bi bi-7-circle-fill"></i> Keamanan</h4>
-            <p>Karena data tersimpan lokal, keamanan data sangat bergantung pada keamanan perangkat Anda (kunci layar, akses fisik ke perangkat). Gunakan perangkat pribadi yang terkunci dan hindari mengisi API key di perangkat/browser bersama. Aplikasi menyediakan fitur opsional <strong>PIN Lock</strong> (4 digit, disimpan sebagai hash SHA-256) sebagai lapisan kenyamanan tambahan di halaman Pengaturan — ini bukan enkripsi data dan tidak menggantikan kebutuhan mengamankan perangkat itu sendiri.</p>
-
-            <h4><i class="bi bi-8-circle-fill"></i> Perubahan Kebijakan</h4>
-            <p>Kebijakan ini dapat diperbarui seiring pembaruan versi aplikasi. Versi dan tanggal pembaruan terakhir selalu tercantum di bagian atas dokumen ini.</p>
-
             <h4><i class="bi bi-envelope-fill"></i> Kontak</h4>
-            <p>Pertanyaan seputar privasi dapat disampaikan ke <strong>mlevian@protonmail.com</strong> atau WhatsApp developer.</p>
+            <p>Pertanyaan dapat disampaikan ke <strong>mlevian@protonmail.com</strong> atau WhatsApp developer.</p>
         `;
     }
 }
@@ -1733,10 +1856,8 @@ class HybridAIOrchestrator {
 
     cleanMarkdown(text) {
         if(!text) return '';
-        let cleaned = text.replace(/\*\*(.*?)\*\*/g, '<span class="ai-highlight">$1</span>');
-        cleaned = cleaned.replace(/\*(.*?)\*/g, '<em>$1</em>');
-        cleaned = cleaned.split('\n\n').map(p => '<p>' + p.trim() + '</p>').join('');
-        return cleaned.replace(/\n/g, '<br>');
+        // Let the cleanAIResponse function handle formatting
+        return text;
     }
 
     deterministicFallback() {
@@ -1751,7 +1872,7 @@ class HybridAIOrchestrator {
         if (currVel === 0) {
             return '<p>' + statusTag + ': Belum ada data progres yang tercatat.</p><p>📌 Mulai input data harian untuk mendapatkan analisis yang akurat.</p><p>Target clearance: <strong>' + clearanceDate.toLocaleDateString('id-ID') + '</strong></p>';
         }
-        return '<p>' + statusTag + ': Ritme saat ini <strong>' + currVel + ' data/hari</strong> ' + (isOnTrack ? 'memenuhi' : 'belum memenuhi') + ' target clearance.</p><p>Sisa data: <strong>' + remaining + '</strong>. Kebutuhan harian: <strong>' + reqVel + ' data</strong>.</p><p>Fokus prioritas: <span class="ai-highlight">' + top3 + '</span>.</p>' + (!isOnTrack ? '<p>💡 Strategi: Percepat approval di SLS prioritas dan evaluasi bottleneck harian.</p>' : '');
+        return '<h4>Status Saat Ini</h4><p>' + statusTag + ': Ritme saat ini <strong>' + currVel + ' data/hari</strong> ' + (isOnTrack ? 'memenuhi' : 'belum memenuhi') + ' target clearance.</p><p>Sisa data: <strong>' + remaining + '</strong>. Kebutuhan harian: <strong>' + reqVel + ' data</strong>.</p><h4>Prioritas</h4><p>Fokus prioritas: <span class="ai-highlight">' + top3 + '</span>.</p>' + (!isOnTrack ? '<h4>Rekomendasi</h4><p>💡 Percepat approval di SLS prioritas dan evaluasi bottleneck harian.</p>' : '');
     }
 
     updateStatus(name, status) {
@@ -1775,7 +1896,6 @@ async function sha256Hex(text) {
     return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
-// --- Consent gate ---
 function checkConsentGate() {
     const gate = document.getElementById('consent-gate');
     const needsConsent = !state.consent || state.consent.version !== LEGAL_VERSION || !state.consent.accepted;
@@ -1796,7 +1916,6 @@ function acceptConsent() {
     checkPinLock();
 }
 
-// --- PIN lock ---
 let pinBuffer = '';
 
 function checkPinLock() {
@@ -1876,7 +1995,7 @@ async function verifyRecovery() {
     if (!ans) { msg.style.color = 'var(--accent-red)'; msg.innerText = 'Isi jawaban pemulihan terlebih dahulu.'; return; }
     if (!state.security.recoveryHash) {
         msg.style.color = 'var(--accent-red)';
-        msg.innerText = 'Belum ada jawaban pemulihan tersimpan. Reset hanya bisa lewat hapus data browser (data akan hilang).';
+        msg.innerText = 'Belum ada jawaban pemulihan tersimpan. Reset hanya bisa lewat hapus data browser.';
         return;
     }
     const hash = await sha256Hex(ans);
@@ -1896,14 +2015,13 @@ async function verifyRecovery() {
     }
 }
 
-// --- Settings: PIN management ---
 async function setupPin() {
     const pin = document.getElementById('pin-new').value.trim();
     const confirmPin = document.getElementById('pin-confirm').value.trim();
     const recovery = document.getElementById('pin-recovery').value.trim();
     if (!/^\d{4}$/.test(pin)) { alert('⚠️ PIN harus tepat 4 digit angka.'); return; }
     if (pin !== confirmPin) { alert('⚠️ Konfirmasi PIN tidak cocok.'); return; }
-    if (!recovery || recovery.length < 3) { alert('⚠️ Isi jawaban pemulihan minimal 3 karakter (untuk jaga-jaga jika lupa PIN).'); return; }
+    if (!recovery || recovery.length < 3) { alert('⚠️ Isi jawaban pemulihan minimal 3 karakter.'); return; }
     state.security.pinHash = await sha256Hex(pin);
     state.security.recoveryHash = await sha256Hex(recovery.toLowerCase());
     state.security.pinEnabled = true;
@@ -1918,7 +2036,7 @@ async function setupPin() {
 }
 
 function disablePin() {
-    if (!confirm('Nonaktifkan PIN Lock? Aplikasi tidak akan meminta PIN lagi saat dibuka.')) return;
+    if (!confirm('Nonaktifkan PIN Lock?')) return;
     state.security = { pinEnabled: false, pinHash: null, recoveryHash: null, failedAttempts: 0, lockUntil: null };
     saveState();
     updatePinSecurityUI();
@@ -1945,6 +2063,7 @@ function updatePinSecurityUI() {
 function initForm() {
     syncConfigTargets();
     syncDashboardFromSLS();
+    updateHeaderStats();
     
     const checkbox = document.getElementById('mode-akumulasi');
     if(checkbox) {
