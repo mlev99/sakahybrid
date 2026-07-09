@@ -1,8 +1,15 @@
 // ===============================
-// SAKA TRACKER - Service Worker v5.4.5
+// SAKA TRACKER - Service Worker v5.5.0  
 // ===============================
+// PENTING - SINKRONISASI VERSI (Semantic Versioning):
+// SW_VERSION di file ini HARUS selalu sama persis dengan APP_VERSION di
+// index.html dan "version" di manifest.json. Saat SW ini aktif, versinya
+// dikirim ke semua client terbuka lewat postMessage({type:'SW_ACTIVATED'})
+// sehingga index.html dapat memverifikasi kecocokan versi secara otomatis
+// (lihat checkVersionSync() di index.html).
 
-const CACHE_NAME = 'saka-tracker-v5-4-5';
+const SW_VERSION = '5.5.0';
+const CACHE_NAME = 'saka-tracker-v5-5-0';
 const ASSETS = [
   '/sakahybrid/',
   '/sakahybrid/index.html',
@@ -35,7 +42,7 @@ self.addEventListener('install', event => {
 // ACTIVATE - Clean old caches
 // ===============================
 self.addEventListener('activate', event => {
-  console.log('[SW] Activating...');
+  console.log('[SW] Activating v' + SW_VERSION + '...');
   event.waitUntil(
     caches.keys().then(cacheNames => {
       return Promise.all(
@@ -47,10 +54,14 @@ self.addEventListener('activate', event => {
         })
       );
     })
-    .then(() => {
-      console.log('[SW] Activation complete!');
-      return self.clients.claim();
-    })
+      .then(() => self.clients.claim())
+      .then(() => self.clients.matchAll())
+      .then(clients => {
+        clients.forEach(client => {
+          client.postMessage({ type: 'SW_ACTIVATED', version: SW_VERSION });
+        });
+        console.log('[SW] Activation complete, version broadcast to', clients.length, 'client(s)');
+      })
   );
 });
 
@@ -66,15 +77,15 @@ self.addEventListener('fetch', event => {
   const url = new URL(event.request.url);
 
   // Skip tracking/analytics requests
-  if (url.hostname.includes('google-analytics') || 
-      url.hostname.includes('googletagmanager')) {
+  if (url.hostname.includes('google-analytics') ||
+    url.hostname.includes('googletagmanager')) {
     return event.respondWith(fetch(event.request));
   }
 
   // Skip API requests (AI providers)
   if (url.hostname.includes('api.openai.com') ||
-      url.hostname.includes('generativelanguage.googleapis.com') ||
-      url.hostname.includes('api.mistral.ai')) {
+    url.hostname.includes('generativelanguage.googleapis.com') ||
+    url.hostname.includes('api.mistral.ai')) {
     return event.respondWith(fetch(event.request));
   }
 
@@ -121,6 +132,7 @@ self.addEventListener('fetch', event => {
                   <head>
                     <title>Saka Tracker - Offline</title>
                     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
                     <style>
                       body { 
                         background: #0b1120; 
@@ -153,16 +165,19 @@ self.addEventListener('fetch', event => {
                         font-weight: 600;
                         cursor: pointer;
                         font-size: 0.9rem;
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 8px;
                       }
                       .btn:hover { background: #2563eb; }
                     </style>
                   </head>
                   <body>
                     <div class="offline-box">
-                      <div class="offline-icon">📡</div>
+                      <div class="offline-icon"><i class="bi bi-wifi-off"></i></div>
                       <h1>Luring / Offline</h1>
                       <p>Koneksi internet tidak tersedia.<br>Silakan coba lagi nanti.</p>
-                      <button class="btn" onclick="location.reload()">🔄 Coba Lagi</button>
+                      <button class="btn" onclick="location.reload()"><i class="bi bi-arrow-repeat"></i> Coba Lagi</button>
                     </div>
                   </body>
                 </html>`,
@@ -184,4 +199,4 @@ self.addEventListener('message', event => {
   }
 });
 
-console.log('[SW] Saka Tracker Service Worker loaded!');
+console.log('[SW] Saka Tracker Service Worker v' + SW_VERSION + ' loaded');

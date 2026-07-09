@@ -1,9 +1,9 @@
 # SAKA TRACKER — Technical Specification (SKILL.md)
-
+  
 **App:** Saka Tracker — SE2026 SLS Progress Monitoring
-**Version documented:** v5.4.5 (Build 20260708)
-**Type:** Single-file client-side web app (HTML+CSS+JS, no backend, no build step)
-**Storage:** Browser `localStorage`, key `saka_tracker_v5_4`
+**Version documented:** v5.5.0 (Build 20260709)
+**Type:** Single-file client-side web app (HTML+CSS+JS, no backend, no build step) with a companion `manifest.json` + `sw.js` for PWA install/offline support
+**Storage:** Browser `localStorage`, key `saka_tracker_v5_4` (referenced via the `STORAGE_KEY` constant since v5.5.0; the literal key itself is unchanged for backward compatibility)
 **Author role documented for:** Saka_Omni (internal field-ops tooling)
 **Scope:** Internal monitoring tool for Sensus Ekonomi 2026 (SE2026) field progress — **not** an official BPS product.
 
@@ -165,15 +165,15 @@ muatanFactor = muatan ? muatan/100 : 1
 score = (openScore + approveScore + submitScore) * muatanFactor
 ```
 
-Sorted descending by `score`. Action label thresholds:
+Sorted descending by `score`. Action label thresholds (as of v5.5.0 each also carries an `actionIcon` Bootstrap Icons class, rendered as `<i class="bi ${actionIcon}">` next to the label — no emoji):
 
-| Condition | Action | Class |
-|---|---|---|
-| `persen >= 100` | Selesai ✅ | `action-done` |
-| `open > 50 && persen < 30` | URGENT! 🚨 | `action-urgent` |
-| `open > 30 && persen < 50` | Prioritas Tinggi | `action-urgent` |
-| `persen > 0` (else) | Lanjutkan | `action-lanjut` |
-| `persen == 0` | Mulai | `action-mulai` |
+| Condition | Action | Icon (`bi-*`) | Class |
+|---|---|---|---|
+| `persen >= 100` | Selesai | `check-circle-fill` | `action-done` |
+| `open > 50 && persen < 30` | URGENT! | `exclamation-triangle-fill` | `action-urgent` |
+| `open > 30 && persen < 50` | Prioritas Tinggi | `flag-fill` | `action-urgent` |
+| `persen > 0` (else) | Lanjutkan | `arrow-right-circle-fill` | `action-lanjut` |
+| `persen == 0` | Mulai | `play-circle-fill` | `action-mulai` |
 
 ### 5.6 Performance grade (`performanceGrade`)
 
@@ -184,16 +184,16 @@ expectedProgress = elapsedDays / totalDays * 100
 delta = dashP - expectedProgress
 ```
 
-Grade thresholds (both an absolute `dashP` floor AND a `delta` floor must be met):
+Grade thresholds (both an absolute `dashP` floor AND a `delta` floor must be met). As of v5.5.0 each grade also carries an `icon` Bootstrap Icons class rendered next to the label in `#perf-desc` — no emoji:
 
-| Grade | dashP ≥ | delta ≥ | Label |
-|---|---|---|---|
-| A+ | 80 | +10 | Excellent 🏆 |
-| A | 70 | +5 | Luar Biasa ⭐ |
-| B | 60 | 0 | Baik & On Track ✅ |
-| C | 50 | −5 | Sedang, Perlu Percepatan ⚠️ |
-| D | 40 | −10 | Di Bawah Target 📉 |
-| E | else | else | Kritis! 🚨 |
+| Grade | dashP ≥ | delta ≥ | Label | Icon (`bi-*`) |
+|---|---|---|---|---|
+| A+ | 80 | +10 | Excellent | `trophy-fill` |
+| A | 70 | +5 | Luar Biasa | `star-fill` |
+| B | 60 | 0 | Baik & On Track | `check-circle-fill` |
+| C | 50 | −5 | Sedang, Perlu Percepatan | `exclamation-triangle-fill` |
+| D | 40 | −10 | Di Bawah Target | `graph-down` |
+| E | else | else | Kritis! Butuh Aksi Cepat | `exclamation-octagon-fill` |
 
 ### 5.7 Termin 1 tracking (`renderTerminAlert`)
 
@@ -225,7 +225,7 @@ Keys live in `state.apiKeys` (plaintext in localStorage — see §11 limitations
 
 ### 6.4 Status indicator
 
-`updateStatus(name, status)` writes into `#ai-provider-status` in the footer of the AI Insight card with 🟢/🔄/🔴 glyphs — this is the only live "which provider answered" indicator in the UI.
+`updateStatus(name, status)` writes into `#ai-provider-status` in the footer of the AI Insight card with a small colored `<i class="bi bi-circle-fill">` (green = idle/active) or `<i class="bi bi-arrow-repeat">` (calling) indicator — as of v5.5.0 these are Bootstrap Icons, not emoji glyphs — this is the only live "which provider answered" indicator in the UI.
 
 ---
 
@@ -312,28 +312,51 @@ Note the app's data layer and DOM are **already initialized underneath** both ov
 3. **Snapshot dates are locale strings**, not ISO — fragile for cross-timezone or cross-device history merges (§4.3).
 4. **No merge on restore** — restoring a backup always fully overwrites current state (§9).
 5. **Termin logic is hardcoded to a single milestone** (`termin1TargetDate`), with 5 near-duplicated render branches (§5.7) — needs refactoring before adding Termin 2+.
-6. **No offline/installable shell** — no manifest.json or service worker yet; the app works offline today only because it's a single static file already loaded, but it isn't installable as a PWA (see §13).
-7. **`alert()`/`confirm()`** used throughout for all user feedback and destructive-action confirmations — inconsistent with the rest of the dark, custom-styled UI.
+6. **PWA shell exists but is manually versioned.** `manifest.json` and `sw.js` ship alongside `index.html` (see §12) and give install-to-home-screen + offline caching. There is still no build step, so the three files' version strings must be kept in sync by hand; a runtime check (§12) flags drift via `console.warn` but cannot fix it automatically.
+7. **`alert()`/`confirm()`** used throughout for all user feedback and destructive-action confirmations — inconsistent with the rest of the dark, custom-styled UI. (Note: as of v5.5.0 these are plain text only — no emoji/icons — since native `alert()`/`confirm()` dialogs cannot render HTML or icon fonts; all in-page UI, by contrast, uses Bootstrap Icons exclusively, see §12.)
 
 ---
 
 ## 12. Versioning Convention
 
-- `APP_VERSION` / `BUILD_DATE`: bump on any shipped change; reflected in page `<title>`, header badge, and the Settings app-info box.
-- `LEGAL_VERSION`: **independent** of `APP_VERSION** — only bump when ToS/Privacy Policy text changes in a way that should re-surface the Consent Gate to existing users. It's fine for `APP_VERSION` to advance without `LEGAL_VERSION` changing.
-- Changelog entries live as a small inline note block inside the Settings `.app-info-box` (not a separate changelog page yet — see §13).
+**Semantic Versioning (semver.org)** is used across the whole app: `MAJOR.MINOR.PATCH`.
+- `MAJOR`: breaking changes (e.g. `state` schema change requiring a migration).
+- `MINOR`: new features, backward-compatible (e.g. this v5.5.0 release: icon standardization + version-sync system).
+- `PATCH`: bug fixes only, no behavior/feature change.
+
+**Files that must carry the identical version number on every release:**
+
+| File | Where the version lives |
+|---|---|
+| `index.html` | `APP_VERSION` constant (single source of truth for this file — `<title>`, header badge, and Settings app-info box are all set from it at `DOMContentLoaded`, not hardcoded in markup) |
+| `sw.js` | `SW_VERSION` constant and `CACHE_NAME` suffix |
+| `manifest.json` | top-level `"version"` field (custom field, ignored by browsers but used for sync-checking) and the `"description"` string |
+| `SKILL.md` | `Version documented` in the header block |
+| `README.md` | version badge/heading |
+
+**Runtime cross-file communication (how the "apps" verify each other):**
+- On `activate`, `sw.js` posts `{type:'SW_ACTIVATED', version: SW_VERSION}` to every open client. `index.html` compares this against its own `APP_VERSION` in `checkVersionSync()` and logs a `console.warn` on mismatch.
+- On load, `index.html` fetches `manifest.json` and compares its `"version"` field against `APP_VERSION` in `checkManifestVersionSync()`, again warning on mismatch.
+- When a new Service Worker finishes installing while an old one still controls the page, `index.html` shows a dismissible "Versi baru tersedia" banner (`#update-banner`) with a reload action that posts `{type:'SKIP_WAITING'}` to the waiting worker, then reloads once the new worker takes control (`controllerchange`).
+- None of this requires a build step — it's plain `postMessage`/`fetch` coordination between three independently-editable static files, so a human still has to bump all three numbers together; the runtime checks exist to catch it when that's forgotten, not to make bumping automatic.
+
+`LEGAL_VERSION`: **independent** of `APP_VERSION` — only bump when ToS/Privacy Policy text changes in a way that should re-surface the Consent Gate to existing users. It's fine for `APP_VERSION` to advance without `LEGAL_VERSION` changing (this happened in v5.5.0).
+
+**Iconography standard:** No emoji/emoticon characters anywhere in the codebase, including console logs and offline fallback markup. All in-page visual indicators use Bootstrap Icons (`<i class="bi bi-...">`) exclusively. The one exception is native `alert()`/`confirm()` dialogs, which cannot render HTML — those use plain, unadorned text.
+
+Changelog entries live as a small inline note block inside the Settings `.app-info-box` (not a separate changelog page yet — see §13).
 
 ---
 
 ## 13. Extension Points (not yet built, ordered roughly by leverage)
 
-- **PWA shell**: `manifest.json` + service worker for install-to-home-screen and true offline resilience.
 - **Chart visualization**: `state.history` already has everything needed for a daily progress line chart (Chart.js via CDN) — currently only surfaced as text/cards.
 - **Generalized Termin system**: replace the single hardcoded `termin1TargetDate` with an array of `{label, targetDate, targetPercent}` and a parameterized render function (prerequisite: refactor §5.7 first).
 - **Per-SLS PIC / medan (terrain) fields**: extend `SLSRow` with `pic` and `medan` (Mudah/Sedang/Sulit) to feed a composite recommendation score (progress × medan-weight × ROI) — this was scoped conceptually in an earlier design pass but not yet wired into this codebase's `prioritasSLS()`.
-- **Toast/modal system** to replace `alert()`/`confirm()` calls app-wide, matching the existing dark UI kit.
+- **Toast/modal system** to replace `alert()`/`confirm()` calls app-wide, matching the existing dark UI kit (would also let those messages carry Bootstrap Icons, closing the one exception noted in §12).
 - **In-app changelog page** rather than the current inline note block.
 - **WhatsApp/PDF export** of the daily analysis card stack for sharing with supervisors.
+- **Build-time version injection**: a small script (Node or otherwise) that reads one `VERSION` file and writes it into `index.html`/`sw.js`/`manifest.json` automatically, removing the manual-sync requirement described in §12 — currently out of scope since the project is explicitly no-build-step.
 
 ---
 
@@ -341,4 +364,5 @@ Note the app's data layer and DOM are **already initialized underneath** both ov
 
 | Version | Change |
 |---|---|
+| v5.5.0 | Removed all emoji/emoticon usage app-wide in favor of Bootstrap Icons; documented the new cross-file Semantic Versioning policy and runtime version-sync mechanism between `index.html`, `sw.js`, and `manifest.json` (§12); updated §11 to reflect that the PWA shell (`manifest.json` + `sw.js`) now exists; removed the now-completed "PWA shell" item from §13. |
 | v5.4.5 | Initial SKILL.md written, covering full v5.4.5 architecture. Documents new Consent Gate + PIN Lock security layer, all core formulas, AI orchestrator, and known limitations/extension points. |

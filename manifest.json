@@ -1,13 +1,17 @@
 {
   "name": "Saka Tracker",
   "short_name": "SakaTracker",
-  "description": "Aplikasi monitoring progres SLS SE2026 - Saka Tracker v5.4.5",
+  "version": "5.5.0",
+  "description": "Aplikasi monitoring progres SLS SE2026 - Saka Tracker v5.5.0",
   "start_url": "/sakahybrid/",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#0b1120",
   "theme_color": "#3b82f6",
-  "categories": ["productivity", "business"],
+  "categories": [
+    "productivity",
+    "business"
+  ],
   "lang": "id",
   "dir": "ltr",
   "icons": [

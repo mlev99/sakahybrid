@@ -1,218 +1,181 @@
 <div align="center">
+ 
+# Saka Tracker
+ 
+**Monitoring progres lapangan SLS, real-time, offline-ready.**
 
-# 📊 Saka Tracker
-
-**Dashboard monitoring progres lapangan Sensus Ekonomi 2026 (SE2026)**
-Single-file web app — offline-capable, local-first, tanpa server.
-
-![Version](https://img.shields.io/badge/version-5.4.5-3b82f6?style=flat-square)
+![Version](https://img.shields.io/badge/version-5.5.0-3b82f6?style=flat-square)
 ![Status](https://img.shields.io/badge/status-stable-10b981?style=flat-square)
-![License](https://img.shields.io/badge/license-Proprietary-ef4444?style=flat-square)
-![Stack](https://img.shields.io/badge/stack-Vanilla%20JS%20%2F%20HTML%20%2F%20CSS-f59e0b?style=flat-square)
-![Storage](https://img.shields.io/badge/storage-localStorage-8b5cf6?style=flat-square)
+![PWA](https://img.shields.io/badge/PWA-installable-10b981?style=flat-square)
+![Build Step](https://img.shields.io/badge/build_step-none-f59e0b?style=flat-square)
+![License](https://img.shields.io/badge/license-internal-94a3b8?style=flat-square)
+
+Dikembangkan oleh **Saka_Omni** &middot; Saka Omni Webapps
 
 </div>
 
 ---
 
-> ⚠️ **Disclaimer**: Saka Tracker adalah alat bantu internal untuk monitoring progres lapangan. Aplikasi ini **bukan produk resmi Badan Pusat Statistik (BPS)** dan tidak berafiliasi dengan BPS.
+## Daftar Isi
 
-## 📖 Daftar Isi
-
-- [Tentang](#-tentang)
-- [Fitur](#-fitur)
-- [Screenshot](#-screenshot)
-- [Cara Menjalankan](#-cara-menjalankan)
-- [Struktur Data](#-struktur-data)
-- [Logika Bisnis Inti](#-logika-bisnis-inti)
-- [Multi-AI Orchestrator](#-multi-ai-orchestrator)
-- [Keamanan](#-keamanan)
-- [Struktur Proyek](#-struktur-proyek)
-- [Roadmap](#-roadmap)
-- [Keterbatasan yang Diketahui](#-keterbatasan-yang-diketahui)
-- [Kontribusi](#-kontribusi)
-- [Lisensi](#-lisensi)
-- [Kontak](#-kontak)
+- [Tentang](#tentang)
+- [Fitur Utama](#fitur-utama)
+- [Tumpukan Teknologi](#tumpukan-teknologi)
+- [Struktur Proyek](#struktur-proyek)
+- [Menjalankan Secara Lokal](#menjalankan-secara-lokal)
+- [Model Data](#model-data)
+- [Versioning](#versioning)
+- [Standar Ikon](#standar-ikon)
+- [Keamanan & Privasi](#keamanan--privasi)
+- [Riwayat Versi](#riwayat-versi)
+- [Roadmap](#roadmap)
+- [Lisensi](#lisensi)
+- [Kontak](#kontak)
 
 ---
 
-## 🧭 Tentang
+## Tentang
 
-Saka Tracker membantu PML/koordinator lapangan memantau progres per SLS (open/submit/reject/pending/approve) terhadap dua target paralel:
+Saka Tracker adalah alat bantu internal untuk PML/koordinator dalam memantau progres lapangan tingkat SLS pada Sensus Ekonomi 2026 (SE2026). Aplikasi membandingkan progres aktual terhadap dua target paralel — **Dashboard FASIH** (jumlah asesmen) dan **Muatan** (volume kontrak) — lalu menyajikan prioritisasi kerja, forecasting ketercapaian termin, dan insight strategis berbasis AI.
 
-- **Dashboard FASIH** — jumlah asesmen
-- **Muatan** — volume kontrak
+> Saka Tracker adalah alat bantu internal (field-ops tooling) dan **bukan produk resmi BPS**.
 
-Aplikasi menghitung target harian, forecast tanggal pencapaian, prioritas kerja optimal per SLS, skor performa harian, dan ringkasan strategi berbasis AI — semua berjalan **sepenuhnya di browser**, tanpa backend.
+## Fitur Utama
 
-**Kenapa local-first?**
-Karena ini alat kerja lapangan: harus bisa dibuka tanpa instalasi, tanpa akun, dan tetap berfungsi meski koneksi lemah — cukup satu file HTML.
-
-## ✨ Fitur
-
-| Kategori | Fitur |
+| Kategori | Deskripsi |
 |---|---|
-| **Input & Tracking** | Grid input harian per SLS, mode input harian vs akumulasi rentang tanggal, validasi submit ≤ open |
-| **Analitik** | Forecast Engine (estimasi tanggal clearance), skor performa A+–E, ritme ritme 7-hari terakhir |
-| **Prioritisasi** | Ranking SLS otomatis berbasis skor (open/approve/submit/muatan-weighted) + label aksi (URGENT/Prioritas Tinggi/Lanjutkan/Mulai) |
-| **Termin Tracking** | Status target termin 1 (40%) dengan 5 varian tampilan sesuai urgensi |
-| **AI Insight** | Multi-provider orchestrator (OpenAI → Gemini → Mistral) dengan fallback deterministik tanpa AI |
-| **History** | Snapshot harian, riwayat progres, hapus per-entry atau semua |
-| **Data Master** | CRUD data SLS (kode, open FASIH, muatan) |
-| **Backup/Restore** | Export/import seluruh state sebagai JSON |
-| **Keamanan** | Consent Gate (ToS/Privacy wajib disetujui) + PIN Lock 4-digit opsional dengan recovery |
+| Dashboard Real-time | Ringkasan open/submit/reject/pending/approve per SLS dan agregat total |
+| Prioritisasi Otomatis | Algoritma skor memprioritaskan SLS mana yang perlu ditangani lebih dulu |
+| Forecasting Termin | Proyeksi ketercapaian target 40% dan 100% berdasarkan ritme input harian |
+| Grading Performa | Penilaian A+ s/d E terhadap garis progres yang diharapkan |
+| Multi-AI Insight | Orkestrasi OpenAI, Gemini, dan Mistral dengan fallback deterministik tanpa API key |
+| Progressive Web App | Dapat dipasang ke layar utama, tetap berjalan saat offline |
+| Consent Gate & PIN Lock | Lapisan persetujuan ToS/Privacy dan kunci akses opsional berbasis PIN |
+| Backup & Restore | Ekspor/impor seluruh state aplikasi sebagai berkas JSON |
 
-## 📸 Screenshot
+## Tumpukan Teknologi
 
-> _Tambahkan screenshot aplikasi di sini (`docs/screenshots/`) — dashboard, prioritas SLS, dan halaman pengaturan direkomendasikan._
+![HTML5](https://img.shields.io/badge/HTML5-e34f26?style=flat-square&logo=html5&logoColor=white)
+![CSS3](https://img.shields.io/badge/CSS3-1572b6?style=flat-square&logo=css3&logoColor=white)
+![JavaScript](https://img.shields.io/badge/JavaScript-ES6+-f7df1e?style=flat-square&logo=javascript&logoColor=black)
+![Bootstrap Icons](https://img.shields.io/badge/Bootstrap_Icons-1.11.3-7952b3?style=flat-square&logo=bootstrap&logoColor=white)
+![PWA](https://img.shields.io/badge/Service_Worker-enabled-5a0fc8?style=flat-square)
 
-```
-docs/screenshots/dashboard.png
-docs/screenshots/priority.png
-docs/screenshots/settings.png
-```
+- **Vanilla JavaScript** — tanpa framework, tanpa bundler, tanpa dependensi npm.
+- **Bootstrap Icons** (CDN) — satu-satunya resource eksternal, dipakai untuk seluruh indikator visual (tidak ada emoji di manapun dalam kode).
+- **Browser-native APIs** — `localStorage`, `fetch`, `crypto.subtle` (hashing PIN), `FileReader`, Service Worker.
+- **Zero backend** — seluruh data tersimpan di perangkat; tidak ada server maupun akun.
 
-## 🚀 Cara Menjalankan
-
-Tidak ada proses build. Tidak ada dependency untuk diinstal.
-
-```bash
-# Clone repo
-git clone <repo-url>
-cd saka-tracker
-
-# Buka langsung di browser
-open index.html          # macOS
-xdg-open index.html      # Linux
-start index.html         # Windows
-```
-
-Atau host sebagai static file di GitHub Pages / Netlify / Vercel / server internal mana pun — cukup satu file `index.html`.
-
-**Persyaratan browser:** Chrome/Safari modern (mendukung `crypto.subtle`, `fetch`, `localStorage`). Didesain mobile-first (viewport terkunci, navigasi bottom-tab).
-
-### Konfigurasi AI (opsional)
-
-Fitur AI Insight bersifat opsional. Buka **Pengaturan → Konfigurasi API**, isi salah satu atau lebih:
-
-| Provider | Format Key |
-|---|---|
-| OpenAI | `sk-proj-...` |
-| Gemini | `AIzaSy...` |
-| Mistral | `...` |
-
-Tanpa key, aplikasi tetap berfungsi penuh menggunakan **deterministic fallback** (analisis berbasis rule, bukan LLM).
-
-## 🗂️ Struktur Data
-
-Seluruh state tersimpan di `localStorage` pada key `saka_tracker_v5_4`:
-
-```js
-state = {
-  config:   { assessment, muatan },              // derived dari state.sls
-  dashboard:{ open, draft, submit, reject, pending, approve },
-  sls:      [{ kode, nama, open, submit, reject, pending, approve, muatan }],
-  history:  [{ date, progress, dashP, velocity, grade }],
-  apiKeys:  { openai, gemini, mistral },
-  isAccumulationMode: Boolean,
-  consent:  { accepted, version, date },
-  security: { pinEnabled, pinHash, recoveryHash, failedAttempts, lockUntil }
-}
-```
-
-> 📌 `state.sls` adalah **single source of truth**. `dashboard` dan `config` dihitung ulang dari `sls` setiap kali data berubah (`syncDashboardFromSLS`, `syncConfigTargets`) — jangan pernah menulis langsung ke field turunan.
-
-Dokumentasi lengkap arsitektur & skema ada di [`SKILL.md`](./SKILL.md).
-
-## 🧮 Logika Bisnis Inti
-
-```
-progress   = dashboard.submit + dashboard.approve   // draft/reject/pending TIDAK dihitung
-dashP      = progress / config.assessment * 100
-muatanP    = progress / config.muatan * 100
-```
-
-**Skor prioritas per SLS:**
-```
-score = (min(open*0.8, 40) + approve*0.3 + submit*0.1) * (muatan/100 || 1)
-```
-
-**Grade performa** dihitung dari selisih progres aktual terhadap garis progres linear ideal (`elapsedDays / totalDays * 100`), menghasilkan grade A+ hingga E.
-
-Detail lengkap semua formula, termasuk forecast engine dan tracking termin, ada di [`SKILL.md § 5`](./SKILL.md#5-core-business-logic).
-
-## 🤖 Multi-AI Orchestrator
-
-```
-OpenAI (gpt-4o-mini) → Gemini (gemini-2.0-flash) → Mistral (mistral-small-latest) → Deterministic Fallback
-```
-
-- Mencoba provider sesuai urutan, **melewati** provider tanpa API key.
-- Timeout 12 detik per provider.
-- Semua panggilan API terjadi **langsung dari browser** ke masing-masing provider — tidak melalui server Saka Tracker (karena tidak ada backend).
-- Jika semua provider gagal/tidak dikonfigurasi, insight tetap dihasilkan lewat fallback berbasis rule (`deterministicFallback()`), bukan LLM.
-
-## 🔐 Keamanan
-
-| Layer | Deskripsi |
-|---|---|
-| **Consent Gate** | Wajib menyetujui ToS/Privacy Policy sebelum masuk aplikasi. Otomatis muncul lagi jika `LEGAL_VERSION` berubah. |
-| **PIN Lock** | Opsional, 4 digit, disimpan sebagai hash SHA-256 (`crypto.subtle`). Bukan enkripsi data — murni lapisan kenyamanan/anti-akses-casual. |
-| **Recovery** | Jawaban pemulihan wajib diisi saat setup PIN; jika lupa keduanya, satu-satunya jalan adalah menghapus data browser (destruktif). |
-| **Brute-force throttle** | 5 percobaan PIN salah → lockout 30 detik (client-side, bukan pengaman kriptografis). |
-
-⚠️ **Catatan penting**: karena tidak ada backend, seluruh data (termasuk API key) tersimpan di `localStorage` perangkat. Siapa pun dengan akses devtools ke perangkat berpotensi membaca data mentah terlepas dari status PIN Lock. Jangan pernah memasukkan data pribadi responden (nama, NIK, alamat, kontak individu) ke aplikasi ini — lihat [Privacy Policy](#) di dalam aplikasi (Pengaturan → Privacy Policy) untuk detail lengkap.
-
-## 📁 Struktur Proyek
+## Struktur Proyek
 
 ```
 saka-tracker/
-├── index.html          # Seluruh aplikasi (HTML + CSS + JS), single file
-├── SKILL.md             # Spesifikasi teknikal lengkap (arsitektur, skema, formula)
-├── README.md             # Dokumen ini
-└── docs/
-    └── screenshots/      # (opsional) tangkapan layar untuk dokumentasi
+├── index.html        Aplikasi utama (single-file HTML + CSS + JS)
+├── sw.js              Service Worker — caching aset & mode offline
+├── manifest.json      Manifest PWA (ikon, nama, shortcut, versi)
+├── SKILL.md           Spesifikasi teknis lengkap (arsitektur, formula, extension points)
+└── README.md          Dokumen ini
 ```
 
-## 🗺️ Roadmap
+## Menjalankan Secara Lokal
 
-- [ ] PWA shell (`manifest.json` + service worker) — install-to-home-screen, offline resilience penuh
-- [ ] Grafik tren progres harian (Chart.js)
-- [ ] Generalisasi sistem termin (saat ini hanya Termin 1 hardcoded)
-- [ ] Field PIC & medan (tingkat kesulitan) per SLS untuk Recommendation Engine
-- [ ] Toast/modal system menggantikan `alert()`/`confirm()` native
+Service Worker memerlukan konteks HTTP (bukan `file://`), jadi jalankan lewat server statis sederhana:
+
+```bash
+# opsi 1 — Python
+python3 -m http.server 8080
+
+# opsi 2 — Node
+npx serve .
+```
+
+Lalu buka `http://localhost:8080/` di browser. Untuk pengalaman PWA penuh (install ke layar utama, ikon, shortcut), sajikan proyek pada path `/sakahybrid/` sesuai konfigurasi `start_url` di `manifest.json`, atau sesuaikan path tersebut dengan lokasi deploy Anda.
+
+## Model Data
+
+Seluruh state tersimpan sebagai satu objek JSON di `localStorage` (kunci historis `saka_tracker_v5_4`, direferensikan lewat konstanta `STORAGE_KEY`):
+
+```
+state
+├── config     { assessment, muatan }        // target, diturunkan dari data SLS
+├── dashboard  { open, draft, submit, ... }   // agregat, diturunkan dari data SLS
+├── sls[]      { kode, nama, open, submit, reject, pending, approve, muatan }
+├── history[]  snapshot harian (progress, dashP, velocity, grade)
+├── apiKeys    { openai, gemini, mistral }
+├── consent    { accepted, version, date }
+└── security   { pinEnabled, pinHash, recoveryHash, failedAttempts, lockUntil }
+```
+
+Detail lengkap formula (`prioritasSLS`, `performanceGrade`, forecasting) ada di `SKILL.md`.
+
+## Versioning
+
+Proyek ini mengikuti [Semantic Versioning](https://semver.org/) — `MAJOR.MINOR.PATCH`:
+
+- **MAJOR** — perubahan tidak kompatibel ke belakang (mis. migrasi skema data).
+- **MINOR** — penambahan fitur yang tetap kompatibel.
+- **PATCH** — perbaikan bug tanpa perubahan perilaku.
+
+Nomor versi yang identik harus tercermin di lima tempat setiap kali ada rilis:
+
+| Berkas | Lokasi versi |
+|---|---|
+| `index.html` | konstanta `APP_VERSION` |
+| `sw.js` | konstanta `SW_VERSION` & `CACHE_NAME` |
+| `manifest.json` | field `"version"` |
+| `SKILL.md` | header `Version documented` |
+| `README.md` | badge versi di atas |
+
+Karena proyek ini sengaja tanpa build step, sinkronisasi antar berkas dilakukan manual — namun aplikasi memverifikasi kecocokan versi secara otomatis saat runtime:
+
+1. Saat Service Worker baru aktif, versinya dikirim ke halaman lewat `postMessage`.
+2. Halaman membandingkan versi tersebut — dan juga versi di `manifest.json` yang di-*fetch* langsung — terhadap `APP_VERSION`-nya sendiri.
+3. Ketidakcocokan dicatat sebagai `console.warn` di browser.
+4. Jika Service Worker versi baru selesai terpasang, muncul pita **"Versi baru tersedia"** dengan tombol muat ulang.
+
+`LEGAL_VERSION` (versi dokumen ToS/Privacy) sengaja independen dari `APP_VERSION` — hanya dinaikkan saat teks legal berubah, agar Consent Gate hanya muncul ulang saat benar-benar relevan. Lihat §12 pada `SKILL.md` untuk detail kontrak versioning ini.
+
+## Standar Ikon
+
+Seluruh indikator visual dalam aplikasi menggunakan [Bootstrap Icons](https://icons.getbootstrap.com/) (`<i class="bi bi-...">`) — tidak ada emoji/emoticon di manapun, termasuk pada log console dan halaman offline fallback. Satu-satunya pengecualian adalah dialog native `alert()`/`confirm()`, yang secara teknis tidak dapat merender HTML/ikon sehingga menggunakan teks polos.
+
+## Keamanan & Privasi
+
+- **Tanpa data pribadi (PII)** — hanya menyimpan agregat angka dan label wilayah SLS/RT-RW; tidak pernah menyimpan nama, NIK, alamat, atau nomor telepon responden.
+- **Consent Gate** — persetujuan ToS/Privacy Policy wajib sebelum aplikasi dapat digunakan.
+- **PIN Lock opsional** — kunci akses 4 digit berbasis hash SHA-256 (bukan enkripsi data, murni gerbang UX perangkat).
+- **API key tersimpan plaintext di localStorage** — cocok untuk penggunaan personal/single-user; tidak direkomendasikan untuk perangkat bersama.
+
+## Riwayat Versi
+
+| Versi | Ringkasan |
+|---|---|
+| 5.5.0 | Standardisasi seluruh ikon ke Bootstrap Icons (emoji dihapus total); sistem Semantic Versioning terpadu lintas berkas dengan sinkronisasi versi otomatis saat runtime antara halaman, Service Worker, dan manifest PWA. |
+| 5.4.5 | Penyempurnaan Terms of Service & Privacy Policy; penambahan Consent Gate dan PIN Lock opsional. |
+
+## Roadmap
+
+- [ ] Visualisasi grafik progres harian (Chart.js)
+- [ ] Sistem termin yang digeneralisasi (tidak lagi hardcoded satu milestone)
+- [ ] Toast/modal kustom menggantikan `alert()`/`confirm()` native
 - [ ] Halaman changelog in-app
-- [ ] Export laporan harian ke WhatsApp/PDF
+- [ ] Ekspor analisis harian ke PDF/WhatsApp
 
-Detail & rationale tiap item ada di [`SKILL.md § 13`](./SKILL.md#13-extension-points-not-yet-built-ordered-roughly-by-leverage).
+Detail lengkap ada pada bagian *Extension Points* di `SKILL.md`.
 
-## ⚠️ Keterbatasan yang Diketahui
+## Lisensi
 
-1. API key tersimpan plaintext di `localStorage` dan file backup.
-2. PIN Lock adalah UX gate, bukan enkripsi.
-3. Tanggal snapshot history menggunakan locale string (`id-ID`), bukan ISO — rapuh untuk lintas timezone.
-4. Restore backup bersifat destruktif total (tidak ada merge).
-5. Logika termin hardcoded ke satu milestone.
+Proyek internal — hak cipta dipegang oleh **Saka Omni Webapps**. Tidak didistribusikan di bawah lisensi open-source publik; penggunaan di luar tim internal memerlukan izin dari pengembang.
 
-Selengkapnya di [`SKILL.md § 11`](./SKILL.md#11-known-limitations-carry-these-into-any-future-work).
+## Kontak
 
-## 🤝 Kontribusi
-
-Proyek internal — perubahan dikoordinasikan langsung dengan developer. Jika menemukan bug atau punya ide fitur, hubungi lewat kanal di bagian [Kontak](#-kontak).
-
-## 📄 Lisensi
-
-Proprietary — internal tool. Seluruh hak cipta pada developer. Tidak untuk didistribusikan ulang tanpa izin.
-
-## 📬 Kontak
-
-- **Email**: [mlevian@protonmail.com](mailto:mlevian@protonmail.com)
- 
+Dikembangkan dan dirawat oleh **Saka_Omni**.
+Untuk pertanyaan teknis atau permintaan fitur, hubungi developer melalui kontak yang tersedia di dalam aplikasi (halaman Pengaturan).
 
 ---
 
 <div align="center">
 
-**Developed by Saka_Omni** · Build 20260708 · v5.4.5
+Saka Tracker v5.5.0 &middot; Alat bantu internal monitoring SE2026
 
 </div>
