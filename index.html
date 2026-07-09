@@ -227,6 +227,34 @@
         .modal-body .legal-note { background: rgba(59,130,246,0.08); border-left: 3px solid var(--accent-blue); border-radius: 8px; padding: 10px 12px; margin: 10px 0; font-size: 0.85rem; }
         .modal-close { margin-top: 20px; width: 100%; }
 
+        .full-gate {
+            position: fixed; top:0; left:0; right:0; bottom:0; z-index: 999999;
+            background: var(--bg-color); display: none; align-items: center; justify-content: center;
+            padding: 24px 16px; overflow-y: auto;
+        }
+        .gate-card {
+            background: var(--card-bg); border: 1px solid var(--border); border-radius: 18px;
+            padding: 26px 22px; max-width: 440px; width: 100%; max-height: 92vh; overflow-y: auto;
+        }
+        .gate-scroll {
+            max-height: 38vh; overflow-y: auto; font-size: 0.83rem; color: var(--text-muted);
+            background: #0f172a; border: 1px solid var(--border); border-radius: 10px; padding: 14px; margin-bottom: 4px;
+        }
+        .gate-scroll ul { margin: 8px 0 4px 18px; }
+        .gate-scroll li { margin-bottom: 8px; }
+        .gate-scroll strong { color: var(--text-main); }
+        .consent-check-row { display: flex; gap: 10px; align-items: flex-start; font-size: 0.82rem; color: var(--text-muted); margin: 16px 0; }
+        .consent-check-row input { width: 18px; height: 18px; margin-top: 2px; accent-color: var(--accent-blue); }
+
+        .pin-dots { display: flex; justify-content: center; gap: 14px; margin: 18px 0 8px; }
+        .pin-dots span { width: 14px; height: 14px; border-radius: 50%; background: #334155; border: 1px solid var(--border); transition: all .15s ease; display: inline-block; }
+        .pin-dots span.filled { background: var(--accent-blue); box-shadow: 0 0 8px rgba(59,130,246,0.6); }
+        .pin-keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; max-width: 260px; margin: 4px auto 0; }
+        .pin-key { background: #0f172a; border: 1px solid var(--border); color: var(--text-main); font-size: 1.3rem; font-weight: 600; padding: 16px 0; border-radius: 14px; cursor: pointer; }
+        .pin-key:active { background: var(--border); }
+        .pin-key.empty { background: transparent; border: none; cursor: default; }
+        #pin-error { color: var(--accent-red); font-size: 0.8rem; min-height: 18px; text-align: center; margin-bottom: 4px; }
+
         .bottom-nav {
             position: fixed;
             bottom: 0;
@@ -510,11 +538,36 @@
             <input type="file" id="restore-file" accept=".json" style="display: none;" onchange="restoreData(this)">
         </div>
 
+        <div style="margin-top: 30px; border-top: 1px solid var(--border); padding-top: 20px;">
+            <div class="result-title"><i class="bi bi-shield-lock"></i> KEAMANAN APLIKASI</div>
+            <div class="api-status" id="pin-status-display" style="margin-bottom:14px;"><span class="status-dot"></span> PIN Lock: Nonaktif</div>
+
+            <div class="setting-group">
+                <label>PIN Baru (tepat 4 digit angka)</label>
+                <input type="password" inputmode="numeric" maxlength="4" id="pin-new" placeholder="••••">
+            </div>
+            <div class="setting-group">
+                <label>Konfirmasi PIN</label>
+                <input type="password" inputmode="numeric" maxlength="4" id="pin-confirm" placeholder="••••">
+            </div>
+            <div class="setting-group">
+                <label>Jawaban Pemulihan (dipakai jika lupa PIN)</label>
+                <input type="text" id="pin-recovery" placeholder="mis. nama kecamatan, kode tim...">
+            </div>
+            <button class="btn-success" onclick="setupPin()"><i class="bi bi-lock-fill"></i> Aktifkan / Perbarui PIN</button>
+            <button class="btn-outline" id="btn-lock-now" onclick="lockAppNow()" style="display:none;"><i class="bi bi-lock"></i> Kunci Aplikasi Sekarang</button>
+            <button class="btn-danger" id="btn-disable-pin" onclick="disablePin()" style="display:none; width:100%; justify-content:center; margin-top:10px;"><i class="bi bi-unlock"></i> Nonaktifkan PIN Lock</button>
+
+            <div style="font-size:0.72rem; color:var(--text-muted); margin-top:12px; line-height:1.5; background:#0b1120; border:1px solid var(--border); border-radius:8px; padding:10px 12px;">
+                <i class="bi bi-info-circle"></i> PIN ini adalah kunci akses cepat di perangkat (disimpan sebagai hash SHA-256, bukan teks asli), bukan enkripsi data. Ini lapisan kenyamanan untuk mencegah akses casual, bukan pengaman kriptografis penuh — siapa pun dengan akses teknis ke browser tetap berpotensi membaca data mentah di localStorage.
+            </div>
+        </div>
+
         <div class="app-info-box">
             <div class="app-name">Saka Tracker v5.4.5 (Build 20260708)</div>
             <div style="margin-bottom: 10px; font-size: 0.8rem;">Aplikasi monitoring progres SLS berbasis Hybrid AI dengan tracking termin dan komparasi muatan kontrak.</div>
             <div style="margin-bottom: 10px; font-size: 0.72rem; color: var(--text-muted); background:#0b1120; border:1px solid var(--border); border-radius:8px; padding:8px 10px; text-align:left;">
-                <strong style="color:var(--text-main); font-size:0.75rem;"><i class="bi bi-clock-history"></i> v5.4.5</strong> — Penyempurnaan Terms of Service &amp; Privacy Policy: cakupan lebih lengkap soal penyimpanan lokal, pengiriman data ke provider AI pihak ketiga, dan status aplikasi sebagai alat bantu internal (bukan aplikasi resmi BPS).
+                <strong style="color:var(--text-main); font-size:0.75rem;"><i class="bi bi-clock-history"></i> v5.4.5</strong> — Penyempurnaan Terms of Service &amp; Privacy Policy, penambahan Consent Gate (wajib menyetujui sebelum masuk aplikasi) dan PIN Lock opsional (kunci akses 4 digit + jawaban pemulihan) di halaman Pengaturan.
             </div>
             <div style="font-weight: bold; color: var(--text-main); margin-bottom: 5px;">Developed by Saka_Omni</div>
             
@@ -537,6 +590,63 @@
         <div class="modal-title" id="modal-title">Title</div>
         <div class="modal-body" id="modal-body">Content</div>
         <button class="btn-primary modal-close" onclick="closeModal()"><i class="bi bi-x-lg"></i> Tutup</button>
+    </div>
+</div>
+
+<!-- CONSENT GATE (blocks app until TOS/Privacy accepted for current legal version) -->
+<div id="consent-gate" class="full-gate">
+    <div class="gate-card">
+        <div style="font-size:2.2rem; text-align:center; color:var(--accent-blue);"><i class="bi bi-shield-check"></i></div>
+        <h2 style="text-align:center; margin:10px 0 2px; font-size:1.2rem;">Sebelum Melanjutkan</h2>
+        <p style="text-align:center; color:var(--text-muted); font-size:0.82rem; margin-bottom:14px;">Saka Tracker v5.4.5 — Alat bantu internal monitoring SE2026</p>
+        <div class="gate-scroll">
+            <p>Dengan melanjutkan, Anda menyetujui hal-hal berikut:</p>
+            <ul>
+                <li>Aplikasi ini adalah <strong>alat bantu internal</strong>, bukan aplikasi resmi Badan Pusat Statistik (BPS).</li>
+                <li>Seluruh data tersimpan <strong>lokal di perangkat Anda</strong> (localStorage) — tidak ada server backend milik aplikasi ini.</li>
+                <li><strong>Jangan</strong> memasukkan data pribadi responden sensus (nama, NIK, alamat, kontak individu) ke aplikasi ini — hanya angka agregat progres per SLS.</li>
+                <li>Fitur AI Insight (opsional) mengirim ringkasan angka agregat <strong>langsung dari browser Anda</strong> ke provider AI yang API key-nya Anda isi sendiri.</li>
+                <li>Aplikasi disediakan apa adanya (as-is) tanpa jaminan; Anda bertanggung jawab menjaga keamanan perangkat dan API key.</li>
+            </ul>
+            <p>Baca selengkapnya: <button class="legal-btn" onclick="openModal('tos')" style="padding:2px 4px;">Terms of Service</button> &middot; <button class="legal-btn" onclick="openModal('privacy')" style="padding:2px 4px;">Privacy Policy</button></p>
+        </div>
+        <label class="consent-check-row">
+            <input type="checkbox" id="consent-checkbox" onchange="document.getElementById('btn-consent-agree').disabled = !this.checked">
+            Saya telah membaca dan menyetujui Terms of Service dan Privacy Policy di atas.
+        </label>
+        <button class="btn-primary" id="btn-consent-agree" disabled onclick="acceptConsent()"><i class="bi bi-check-lg"></i> Setuju &amp; Lanjutkan</button>
+    </div>
+</div>
+
+<!-- PIN LOCK SCREEN -->
+<div id="pin-lock-screen" class="full-gate">
+    <div class="gate-card" style="text-align:center;">
+        <i class="bi bi-lock-fill" style="font-size:2.2rem; color:var(--accent-blue);"></i>
+        <h2 style="margin:10px 0 2px; font-size:1.2rem;">Terkunci</h2>
+        <p style="color:var(--text-muted); font-size:0.82rem;">Masukkan PIN untuk membuka Saka Tracker</p>
+        <div class="pin-dots" id="pin-dots"><span></span><span></span><span></span><span></span></div>
+        <div id="pin-error"></div>
+        <div class="pin-keypad">
+            <button class="pin-key" onclick="pinPress('1')">1</button>
+            <button class="pin-key" onclick="pinPress('2')">2</button>
+            <button class="pin-key" onclick="pinPress('3')">3</button>
+            <button class="pin-key" onclick="pinPress('4')">4</button>
+            <button class="pin-key" onclick="pinPress('5')">5</button>
+            <button class="pin-key" onclick="pinPress('6')">6</button>
+            <button class="pin-key" onclick="pinPress('7')">7</button>
+            <button class="pin-key" onclick="pinPress('8')">8</button>
+            <button class="pin-key" onclick="pinPress('9')">9</button>
+            <button class="pin-key empty"></button>
+            <button class="pin-key" onclick="pinPress('0')">0</button>
+            <button class="pin-key" onclick="pinBackspace()"><i class="bi bi-backspace"></i></button>
+        </div>
+        <button class="legal-btn" style="margin-top:16px;" onclick="showRecoveryFlow()">Lupa PIN?</button>
+        <div id="recovery-flow" style="display:none; margin-top:12px; text-align:left;">
+            <label style="font-size:0.78rem; color:var(--text-muted);">Jawaban pemulihan Anda</label>
+            <input type="text" id="recovery-answer-input" placeholder="Jawaban pemulihan..." style="margin-top:6px;">
+            <button class="btn-success" style="margin-top:8px;" onclick="verifyRecovery()"><i class="bi bi-key"></i> Verifikasi</button>
+            <div id="recovery-msg" style="font-size:0.76rem; margin-top:6px;"></div>
+        </div>
     </div>
 </div>
 
@@ -566,6 +676,7 @@
 // ===============================
 const APP_VERSION = "5.4.5";
 const BUILD_DATE = "20260708";
+const LEGAL_VERSION = "5.4.5"; // bump this whenever TOS/Privacy content changes materially, to re-trigger consent gate
 
 // ===============================
 // CONFIG & STATE MANAGEMENT
@@ -599,6 +710,10 @@ let state = JSON.parse(localStorage.getItem('saka_tracker_v5_4')) || {
     apiKeys: { openai: '', gemini: '', mistral: '' },
     isAccumulationMode: false
 };
+
+// Migration guard: users with state saved before v5.4.5 won't have these fields yet.
+if(!state.consent) state.consent = { accepted: false, version: null, date: null };
+if(!state.security) state.security = { pinEnabled: false, pinHash: null, recoveryHash: null, failedAttempts: 0, lockUntil: null };
 
 // ===============================
 // HELPER FUNCTIONS
@@ -1440,6 +1555,8 @@ function restoreData(inputElement) {
             const restoredState = JSON.parse(e.target.result);
             if(restoredState.sls && restoredState.apiKeys) {
                 state = restoredState;
+                if(!state.consent) state.consent = { accepted: false, version: null, date: null };
+                if(!state.security) state.security = { pinEnabled: false, pinHash: null, recoveryHash: null, failedAttempts: 0, lockUntil: null };
                 localStorage.setItem('saka_tracker_v5_4', JSON.stringify(state));
                 alert('✅ Data berhasil dipulihkan!');
                 location.reload();
@@ -1542,161 +1659,4 @@ function openModal(type) {
             </ul>
 
             <h4><i class="bi bi-7-circle-fill"></i> Keamanan</h4>
-            <p>Karena data tersimpan lokal, keamanan data sangat bergantung pada keamanan perangkat Anda (kunci layar, akses fisik ke perangkat). Gunakan perangkat pribadi yang terkunci dan hindari mengisi API key di perangkat/browser bersama.</p>
-
-            <h4><i class="bi bi-8-circle-fill"></i> Perubahan Kebijakan</h4>
-            <p>Kebijakan ini dapat diperbarui seiring pembaruan versi aplikasi. Versi dan tanggal pembaruan terakhir selalu tercantum di bagian atas dokumen ini.</p>
-
-            <h4><i class="bi bi-envelope-fill"></i> Kontak</h4>
-            <p>Pertanyaan seputar privasi dapat disampaikan ke <strong>mlevian@protonmail.com</strong> atau WhatsApp developer.</p>
-        `;
-    }
-}
-
-function closeModal() {
-    document.getElementById('legal-modal').style.display = 'none';
-}
-
-// ===============================
-// HYBRID AI ORCHESTRATOR
-// ===============================
-class HybridAIOrchestrator {
-    constructor(keys) {
-        this.keys = keys;
-        this.activeProvider = null;
-        this.providers = [
-            { name: 'OpenAI', key: keys.openai, endpoint: 'https://api.openai.com/v1/chat/completions', model: 'gpt-4o-mini' },
-            { name: 'Gemini', key: keys.gemini, endpoint: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent', model: 'gemini-2.0-flash' },
-            { name: 'Mistral', key: keys.mistral, endpoint: 'https://api.mistral.ai/v1/chat/completions', model: 'mistral-small-latest' }
-        ];
-    }
-
-    async generateInsight(prompt) {
-        for (const provider of this.providers) {
-            if (!provider.key) continue;
-            try {
-                this.updateStatus(provider.name, 'calling');
-                const response = await this.callProvider(provider, prompt);
-                this.activeProvider = provider.name;
-                this.updateStatus(provider.name, 'active');
-                return this.cleanMarkdown(response);
-            } catch (err) {
-                console.warn(provider.name + ' failed:', err.message);
-                this.updateStatus(provider.name, 'error');
-                continue;
-            }
-        }
-        this.activeProvider = 'Deterministic Fallback';
-        this.updateStatus('Fallback', 'active');
-        return this.deterministicFallback();
-    }
-
-    async callProvider(provider, prompt) {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 12000);
-        let body, headers;
-        if (provider.name === 'Gemini') {
-            body = JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] });
-            headers = { 'Content-Type': 'application/json', 'x-goog-api-key': provider.key };
-        } else {
-            body = JSON.stringify({ model: provider.model, messages: [{ role: 'user', content: prompt }], temperature: 0.3, max_tokens: 500 });
-            headers = { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + provider.key };
-        }
-        const res = await fetch(provider.endpoint, { method: 'POST', headers, body, signal: controller.signal });
-        clearTimeout(timeoutId);
-        if (!res.ok) { 
-            const errData = await res.json().catch(() => ({}));
-            const err = new Error(errData.error?.message || 'HTTP ' + res.status);
-            err.status = res.status; throw err; 
-        }
-        const data = await res.json();
-        if (provider.name === 'Gemini') return data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-        return data.choices?.[0]?.message?.content || '';
-    }
-
-    cleanMarkdown(text) {
-        if(!text) return '';
-        let cleaned = text.replace(/\*\*(.*?)\*\*/g, '<span class="ai-highlight">$1</span>');
-        cleaned = cleaned.replace(/\*(.*?)\*/g, '<em>$1</em>');
-        cleaned = cleaned.split('\n\n').map(p => '<p>' + p.trim() + '</p>').join('');
-        return cleaned.replace(/\n/g, '<br>');
-    }
-
-    deterministicFallback() {
-        const prog = getProgress();
-        const sisaHari = getSisaHariKeClearance();
-        const remaining = state.config.assessment - prog.val;
-        const reqVel = Math.ceil(remaining / Math.max(1, sisaHari));
-        const currVel = getVelocity();
-        const isOnTrack = currVel >= reqVel;
-        const top3 = prioritasSLS().slice(0,3).map(s => s.kode + ' (' + s.open + ' open)').join(', ');
-        const statusTag = isOnTrack ? '<span class="ai-success">✅ ON TRACK</span>' : '<span class="ai-warn">⚠️ AT RISK</span>';
-        if (currVel === 0) {
-            return '<p>' + statusTag + ': Belum ada data progres yang tercatat.</p><p>📌 Mulai input data harian untuk mendapatkan analisis yang akurat.</p><p>Target clearance: <strong>' + clearanceDate.toLocaleDateString('id-ID') + '</strong></p>';
-        }
-        return '<p>' + statusTag + ': Ritme saat ini <strong>' + currVel + ' data/hari</strong> ' + (isOnTrack ? 'memenuhi' : 'belum memenuhi') + ' target clearance.</p><p>Sisa data: <strong>' + remaining + '</strong>. Kebutuhan harian: <strong>' + reqVel + ' data</strong>.</p><p>Fokus prioritas: <span class="ai-highlight">' + top3 + '</span>.</p>' + (!isOnTrack ? '<p>💡 Strategi: Percepat approval di SLS prioritas dan evaluasi bottleneck harian.</p>' : '');
-    }
-
-    updateStatus(name, status) {
-        const el = document.getElementById('ai-provider-status');
-        let statusText = '🟢';
-        if (status === 'calling') statusText = '🔄';
-        else if (status === 'error') statusText = '🔴';
-        else if (status === 'active') statusText = '🟢';
-        el.innerHTML = 'Multi-AI Orchestrator | Provider: <span class="provider-active">' + statusText + ' ' + name + '</span>';
-    }
-}
-
-// ===============================
-// INITIALIZATION
-// ===============================
-function initForm() {
-    syncConfigTargets();
-    syncDashboardFromSLS();
-    
-    const checkbox = document.getElementById('mode-akumulasi');
-    if(checkbox) {
-        checkbox.checked = state.isAccumulationMode;
-        const dateDisplay = document.getElementById('date-range-display');
-        const toggleLabel = document.querySelector('.toggle-label');
-        if (state.isAccumulationMode) {
-            toggleLabel.innerHTML = '<i class="bi bi-calendar-range"></i> Mode Akumulasi (Rentang Tanggal)';
-            if(dateDisplay) dateDisplay.style.display = "block";
-        } else {
-            toggleLabel.innerHTML = '<i class="bi bi-calendar-event"></i> Mode Input Harian';
-            if(dateDisplay) dateDisplay.style.display = "none";
-        }
-    }
-
-    const container = document.getElementById('sls-inputs-container');
-    if(!container) return;
-    container.innerHTML = '';
-    state.sls.forEach((s,idx)=>{
-        const row = document.createElement('div');
-        row.className = 'input-row';
-        row.style.display = 'contents'; 
-        row.innerHTML = `
-            <div class="sls-code">${s.kode}</div>
-            <input type="number" value="${s.open}" onchange="updateSLS(${idx},'open',this.value)">
-            <input type="number" value="${s.submit}" onchange="updateSLS(${idx},'submit',this.value)">
-            <input type="number" value="${s.reject}" onchange="updateSLS(${idx},'reject',this.value)">
-            <input type="number" value="${s.pending}" onchange="updateSLS(${idx},'pending',this.value)">
-            <input type="number" value="${s.approve}" onchange="updateSLS(${idx},'approve',this.value)">
-        `;
-        container.appendChild(row);
-    });
-    
-    const dateEl = document.getElementById('current-date');
-    if(dateEl) dateEl.innerText = new Date().toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
-}
-
-window.addEventListener('DOMContentLoaded', function() {
-    setTimeout(function() {
-        initForm();
-        loadApiKeys();
-        renderHistory();
-    }, 100);
-});
-</script>
-</body>
-</html>
+            <p>Karena data tersimpan lokal, keamanan data sangat bergantung pada keamanan perangkat Anda (kunci layar, akses fisik ke perangkat). G
